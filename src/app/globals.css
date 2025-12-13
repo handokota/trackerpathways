@@ -1,26 +1,91 @@
 @import "tailwindcss";
 
+/* 1. DEFINISI VARIABEL WARNA & RADIUS */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* LIGHT MODE */
+  --background: oklch(97% 0 0);        
+  --foreground: oklch(14.5% 0 0);       
+  
+  --card: oklch(100% 0 0);             
+  --card-foreground: oklch(14.5% 0 0);
+  
+  --border: oklch(92% 0 0);            
+  --input: oklch(92% 0 0);
+  --ring: oklch(14.5% 0 0);
+  --radius: 0.625rem;                  
 }
 
-@theme inline {
+.dark {
+  /* DARK MODE */
+  --background: oklch(14.5% 0 0);      
+  --foreground: oklch(98.5% 0 0);       
+  
+  --card: oklch(20.5% 0 0);            
+  --card-foreground: oklch(98.5% 0 0);
+  
+  --border: oklch(100% 0 0 / 0.1);     
+  --input: oklch(100% 0 0 / 0.1);
+  --ring: oklch(98.5% 0 0);
+}
+
+/* 2. KONFIGURASI TEMA TAILWIND V4 */
+@theme {
+  /* Font Utama (Inter) */
+  /* Kita definisikan di sini agar utility 'font-sans' bekerja */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  /* Mapping Warna Custom */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  
+  /* Mapping Radius */
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* 3. SETUP DARK MODE */
+@variant dark (&:where(.dark, .dark *));
 
+/* 4. BASE STYLES */
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  
+  /* [PERBAIKAN UTAMA] Paksa Font Inter di Body */
+  /* Ini memastikan Android tidak fallback ke Roboto meskipun class font-sans telat load */
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Transisi halus saat ganti tema */
+  transition-property: background-color, color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Set border default */
+*, ::before, ::after {
+  border-color: var(--border);
+}
+
+/* 5. CLASS ICON MANUAL */
+.material-symbols-rounded {
+  font-family: var(--font-material-symbols);
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
