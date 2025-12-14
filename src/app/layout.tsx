@@ -20,7 +20,7 @@ const materialSymbols = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Tracker Pathways - Discover the private tracker network",
+  title: "Tracker Pathways",
   description: "Find your way to the trackers worth chasing.",
 };
 
