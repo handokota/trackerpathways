@@ -9,34 +9,41 @@ You've found a bug, have a suggestion, or something else? Just create an issue o
 ## Development Workflow
 
 1.  **Fork the repository**
+
     Click the "Fork" button at the top right of the repository page to create your own copy.
 
 2.  **Clone your fork**
+
     ```bash
-    git clone [https://github.com/handokota/trackerpathways.git](https://github.com/handokota/trackerpathways.git)
+    git clone https://github.com/handokota/trackerpathways.git
     cd trackerpathways
     ```
 
 3.  **Create a new branch**
+
     Create a branch using the convention `<type>/<description>`.
     * Use `feat/` for new features or data additions.
     * Use `fix/` for bug fixes or data corrections.
 
+    Example for adding a feature:
     ```bash
-    # Example for adding a tracker
     git checkout -b feat/add-tracker-aither
-    
-    # Example for fixing a typo
+    ```
+
+    Example for fixing a bug:
+    ```bash
     git checkout -b fix/update-requirements
     ```
 
 4.  **Install dependencies and run locally**
+
     ```bash
     npm install
     npm run dev
     ```
 
 5.  **Make your changes**
+
     Edit the code or update `src/data/trackers.json`.
 
 ## Submit a Pull Request
