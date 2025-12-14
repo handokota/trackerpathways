@@ -1,16 +1,15 @@
 <div align="center">
   <img src="./public/logo.png" alt="Tracker Pathways Logo" width="120" />
   <h1>Tracker Pathways</h1>
-  <p>Discover the private tracker network.</p>
 </div>
 
-Tracker Pathways is a tool designed to visualize invite routes and requirements within the private tracker community. It allows users to search for specific paths between trackers, view detailed requirement data, and filter results based on account age or user class.
-
-<br />
+Discover the private tracker network.
 
 <div align="center">
   <img src="./public/dashboard.png" alt="Tracker Pathways Dashboard" width="100%" />
 </div>
+
+Tracker Pathways is a tool designed to visualize invite routes and requirements within the private tracker community. Search for specific paths between trackers, view detailed requirement data, and filter results based on account age or user class.
 
 ## Contributing
 
