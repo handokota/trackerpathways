@@ -133,12 +133,37 @@ export default function TrackerSearchApp() {
     return status; 
   };
 
+  const renderReqs = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    return parts.map((part, i) => {
+      if (part.match(urlRegex)) {
+        return (
+          <a
+            key={i}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:underline break-all"
+          >
+            {part}
+          </a>
+        );
+      }
+      return part;
+    });
+  };
+
   const foundPaths = useMemo(() => {
     const sQueryRaw = deferredSource.toLowerCase().trim();
     const sourceInputs = sQueryRaw ? sQueryRaw.split(',').map(s => s.trim()).filter(s => s) : [];
     const tQuery = deferredTarget.toLowerCase().trim();
 
     if (!sQueryRaw && !tQuery) return [];
+    
+    const isStrictTarget = allTrackers.some(t => 
+       t.toLowerCase() === tQuery || getAbbr(t).toLowerCase() === tQuery
+    );
     
     const results: PathResult[] = [];
     const queue: PathResult[] = [];
@@ -150,7 +175,13 @@ export default function TrackerSearchApp() {
       startNodes = allTrackerKeys.filter(t => {
         const tLower = t.toLowerCase();
         const tAbbr = getAbbr(t).toLowerCase();
-        return sourceInputs.some(input => tLower.includes(input) || tAbbr === input);
+        return sourceInputs.some(input => {
+            const isStrictInput = allTrackers.some(validT => validT.toLowerCase() === input || getAbbr(validT).toLowerCase() === input);
+            if (isStrictInput) {
+                return tLower === input || tAbbr === input;
+            }
+            return tLower.includes(input) || tAbbr === input;
+        });
       });
     } else {
       if (tQuery) {
@@ -174,9 +205,16 @@ export default function TrackerSearchApp() {
 
       if (currentPath.nodes.length > 1) {
         let isTargetMatch = true;
+        
         if (tQuery) {
-          isTargetMatch = currentNode.toLowerCase().includes(tQuery) || 
-                          getAbbr(currentNode).toLowerCase().includes(tQuery);
+          const cName = currentNode.toLowerCase();
+          const cAbbr = getAbbr(currentNode).toLowerCase();
+
+          if (isStrictTarget) {
+             isTargetMatch = cName === tQuery || cAbbr === tQuery;
+          } else {
+             isTargetMatch = cName.includes(tQuery) || cAbbr.includes(tQuery);
+          }
         }
         
         if (isTargetMatch) {
@@ -214,7 +252,7 @@ export default function TrackerSearchApp() {
       return a.routes.length - b.routes.length;
     });
 
-  }, [deferredSource, deferredTarget, maxJumps, maxDays, sortBy]);
+  }, [deferredSource, deferredTarget, maxJumps, maxDays, sortBy, allTrackers]);
 
   const groupedResults = useMemo(() => {
     const groups: { [key: string]: PathResult[] } = {};
@@ -270,11 +308,11 @@ export default function TrackerSearchApp() {
                 />
                 {showSourceSug && getSuggestions(sourceSearch).length > 0 && (
                   <div className="absolute top-full -left-8 w-[calc(100%+2rem)] mt-2 bg-card rounded-xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-100 border border-foreground/10">
-                    <div className="max-h-60 overflow-y-auto py-1">
+                    <div className="max-h-60 overflow-y-auto p-1">
                       {getSuggestions(sourceSearch).map((item, i) => (
                         <div 
                           key={i}
-                          className="px-4 py-2.5 text-sm cursor-pointer hover:bg-foreground/5 transition-colors text-foreground/90 font-medium flex items-center justify-between"
+                          className="px-3 py-2.5 rounded-md text-sm cursor-pointer hover:bg-foreground/5 transition-colors text-foreground/90 font-medium flex items-center justify-between"
                           onClick={() => handleSourceSelect(item)}
                         >
                           <span>{item}</span>
@@ -303,11 +341,11 @@ export default function TrackerSearchApp() {
                 />
                 {showTargetSug && getSuggestions(targetSearch).length > 0 && (
                   <div className="absolute top-full -left-8 w-[calc(100%+2rem)] mt-2 bg-card rounded-xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-100 border border-foreground/10">
-                    <div className="max-h-60 overflow-y-auto py-1">
+                    <div className="max-h-60 overflow-y-auto p-1">
                       {getSuggestions(targetSearch).map((item, i) => (
                         <div 
                           key={i}
-                          className="px-4 py-2.5 text-sm cursor-pointer hover:bg-foreground/5 transition-colors text-foreground/90 font-medium flex items-center justify-between"
+                          className="px-3 py-2.5 rounded-md text-sm cursor-pointer hover:bg-foreground/5 transition-colors text-foreground/90 font-medium flex items-center justify-between"
                           onClick={() => handleTargetSelect(item)}
                         >
                           <span>{item}</span>
@@ -532,7 +570,7 @@ export default function TrackerSearchApp() {
                                       <span>{fromNode}</span><span className="material-symbols-rounded text-sm">arrow_right_alt</span><span>{toNode}</span>
                                     </div>
                                   )}
-                                  <p className="text-foreground/70 leading-relaxed font-normal text-sm">{req.reqs}</p>
+                                  <p className="text-foreground/70 leading-relaxed font-normal text-sm">{renderReqs(req.reqs)}</p>
                                   
                                   <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-foreground/5 border-dashed">
                                     <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
