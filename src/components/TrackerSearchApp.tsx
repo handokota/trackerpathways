@@ -133,6 +133,27 @@ export default function TrackerSearchApp() {
     return status; 
   };
 
+  const renderReqs = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    return parts.map((part, i) => {
+      if (part.match(urlRegex)) {
+        return (
+          <a
+            key={i}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:underline break-all"
+          >
+            {part}
+          </a>
+        );
+      }
+      return part;
+    });
+  };
+
   const foundPaths = useMemo(() => {
     const sQueryRaw = deferredSource.toLowerCase().trim();
     const sourceInputs = sQueryRaw ? sQueryRaw.split(',').map(s => s.trim()).filter(s => s) : [];
@@ -549,7 +570,7 @@ export default function TrackerSearchApp() {
                                       <span>{fromNode}</span><span className="material-symbols-rounded text-sm">arrow_right_alt</span><span>{toNode}</span>
                                     </div>
                                   )}
-                                  <p className="text-foreground/70 leading-relaxed font-normal text-sm">{req.reqs}</p>
+                                  <p className="text-foreground/70 leading-relaxed font-normal text-sm">{renderReqs(req.reqs)}</p>
                                   
                                   <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-foreground/5 border-dashed">
                                     <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
