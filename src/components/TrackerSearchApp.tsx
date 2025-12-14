@@ -140,6 +140,10 @@ export default function TrackerSearchApp() {
 
     if (!sQueryRaw && !tQuery) return [];
     
+    const isStrictTarget = allTrackers.some(t => 
+       t.toLowerCase() === tQuery || getAbbr(t).toLowerCase() === tQuery
+    );
+    
     const results: PathResult[] = [];
     const queue: PathResult[] = [];
 
@@ -150,7 +154,13 @@ export default function TrackerSearchApp() {
       startNodes = allTrackerKeys.filter(t => {
         const tLower = t.toLowerCase();
         const tAbbr = getAbbr(t).toLowerCase();
-        return sourceInputs.some(input => tLower.includes(input) || tAbbr === input);
+        return sourceInputs.some(input => {
+            const isStrictInput = allTrackers.some(validT => validT.toLowerCase() === input || getAbbr(validT).toLowerCase() === input);
+            if (isStrictInput) {
+                return tLower === input || tAbbr === input;
+            }
+            return tLower.includes(input) || tAbbr === input;
+        });
       });
     } else {
       if (tQuery) {
@@ -174,9 +184,16 @@ export default function TrackerSearchApp() {
 
       if (currentPath.nodes.length > 1) {
         let isTargetMatch = true;
+        
         if (tQuery) {
-          isTargetMatch = currentNode.toLowerCase().includes(tQuery) || 
-                          getAbbr(currentNode).toLowerCase().includes(tQuery);
+          const cName = currentNode.toLowerCase();
+          const cAbbr = getAbbr(currentNode).toLowerCase();
+
+          if (isStrictTarget) {
+             isTargetMatch = cName === tQuery || cAbbr === tQuery;
+          } else {
+             isTargetMatch = cName.includes(tQuery) || cAbbr.includes(tQuery);
+          }
         }
         
         if (isTargetMatch) {
@@ -214,7 +231,7 @@ export default function TrackerSearchApp() {
       return a.routes.length - b.routes.length;
     });
 
-  }, [deferredSource, deferredTarget, maxJumps, maxDays, sortBy]);
+  }, [deferredSource, deferredTarget, maxJumps, maxDays, sortBy, allTrackers]);
 
   const groupedResults = useMemo(() => {
     const groups: { [key: string]: PathResult[] } = {};
