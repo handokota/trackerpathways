@@ -640,8 +640,8 @@
       "UHDBits": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2024" }
     },
     "PornBay": {
-      "Empornium": { "days": 180, "reqs": "Expert User+, 6 months, no warnings", "active": "?", "updated": "Nov 2025" },
-      "MoreThanTV": { "days": 180, "reqs": "Expert User+, 6 months, no warnings", "active": "?", "updated": "Nov 2025" }
+      "Empornium": { "days": 180, "reqs": "Expert User+, 6 months, no warnings", "active": "Unknown", "updated": "Nov 2025" },
+      "MoreThanTV": { "days": 180, "reqs": "Expert User+, 6 months, no warnings", "active": "Unknown", "updated": "Nov 2025" }
     },
     "PrivateHD": {
       "AvistaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2024" },

@@ -579,7 +579,7 @@ export default function TrackerSearchApp() {
                                       </span>
                                       <div className="flex items-center gap-1 text-foreground/30" title="Last checked date">
                                         <span className="material-symbols-rounded text-[14px]">history</span>
-                                        <span className="text-xs font-medium">Last Checked: {req.updated}</span>
+                                        <span className="text-xs font-medium">Last checked: {req.updated}</span>
                                       </div>
                                     </div>
                                   </div>
