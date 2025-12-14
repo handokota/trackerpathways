@@ -287,11 +287,11 @@ export default function TrackerSearchApp() {
                 />
                 {showSourceSug && getSuggestions(sourceSearch).length > 0 && (
                   <div className="absolute top-full -left-8 w-[calc(100%+2rem)] mt-2 bg-card rounded-xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-100 border border-foreground/10">
-                    <div className="max-h-60 overflow-y-auto py-1">
+                    <div className="max-h-60 overflow-y-auto p-1">
                       {getSuggestions(sourceSearch).map((item, i) => (
                         <div 
                           key={i}
-                          className="px-4 py-2.5 text-sm cursor-pointer hover:bg-foreground/5 transition-colors text-foreground/90 font-medium flex items-center justify-between"
+                          className="px-3 py-2.5 rounded-md text-sm cursor-pointer hover:bg-foreground/5 transition-colors text-foreground/90 font-medium flex items-center justify-between"
                           onClick={() => handleSourceSelect(item)}
                         >
                           <span>{item}</span>
@@ -320,11 +320,11 @@ export default function TrackerSearchApp() {
                 />
                 {showTargetSug && getSuggestions(targetSearch).length > 0 && (
                   <div className="absolute top-full -left-8 w-[calc(100%+2rem)] mt-2 bg-card rounded-xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-100 border border-foreground/10">
-                    <div className="max-h-60 overflow-y-auto py-1">
+                    <div className="max-h-60 overflow-y-auto p-1">
                       {getSuggestions(targetSearch).map((item, i) => (
                         <div 
                           key={i}
-                          className="px-4 py-2.5 text-sm cursor-pointer hover:bg-foreground/5 transition-colors text-foreground/90 font-medium flex items-center justify-between"
+                          className="px-3 py-2.5 rounded-md text-sm cursor-pointer hover:bg-foreground/5 transition-colors text-foreground/90 font-medium flex items-center justify-between"
                           onClick={() => handleTargetSelect(item)}
                         >
                           <span>{item}</span>
