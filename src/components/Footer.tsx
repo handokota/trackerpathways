@@ -41,7 +41,7 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="py-6 text-center text-sm font-medium text-foreground/40 mt-auto">
+    <footer className="py-6 text-center text-xs font-medium text-foreground/40 mt-auto">
       <p className="flex items-center justify-center gap-2">
         <span>Last updated {latestUpdateDate}</span>
         <span className="w-1 h-1 rounded-full bg-foreground/10"></span>
