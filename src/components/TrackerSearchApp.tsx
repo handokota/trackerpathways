@@ -410,7 +410,7 @@ export default function TrackerSearchApp() {
               <div>
                 <label className="text-sm font-medium text-foreground/50 mb-2 block">Max jumps</label>
                 <div className="flex rounded-lg bg-foreground/5 p-1">
-                  {[1, 2, 3].map((val) => (
+                  {[1, 2, 3, 5, 10].map((val) => (
                     <button
                       key={val}
                       onClick={() => setMaxJumps(val)}
@@ -432,6 +432,7 @@ export default function TrackerSearchApp() {
                   {[
                     { l: 'Any', v: null },
                     { l: '90d', v: 90 },
+                    { l: '6m', v: 180 },
                     { l: '1y', v: 365 },
                     { l: '2y', v: 730 }
                   ].map((opt) => (
