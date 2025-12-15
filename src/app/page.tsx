@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main className="w-full max-w-screen-2xl mx-auto px-6 pt-24 md:pt-32 pb-10">
+    <main className="w-full px-6 pt-24 md:pt-32 pb-10">
       <Suspense fallback={<div className="w-full min-h-[50vh]" />}>
         <TrackerSearchApp />
       </Suspense>

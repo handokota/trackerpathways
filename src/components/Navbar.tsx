@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 
@@ -8,12 +9,16 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const handleLogoClick = () => {
-    router.replace(pathname);
+    if (pathname === "/") {
+      router.replace("/");
+    } else {
+      router.push("/");
+    }
   };
 
   return (
     <header className="fixed w-full top-0 z-50 bg-background/80 backdrop-blur-xl transition-colors duration-300">
-      <div className="max-w-screen-2xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="w-full px-6 h-16 flex items-center justify-between">
         <div 
           className="flex items-center gap-3 cursor-pointer select-none group" 
           onClick={handleLogoClick}
@@ -35,7 +40,21 @@ export default function Navbar() {
             Tracker Pathways
           </span>
         </div>
-        <ThemeSwitcher />
+
+        <div className="flex items-center gap-2">
+          <Link 
+            href="/map" 
+            className={`w-9 h-9 rounded-md flex items-center justify-center transition-colors hover:bg-foreground/5 ${
+              pathname === "/map" 
+                ? "text-foreground" 
+                : "text-foreground/60 hover:text-foreground"
+            }`}
+            aria-label="View Map"
+          >
+            <span className="material-symbols-rounded text-xl">map</span>
+          </Link>
+          <ThemeSwitcher />
+        </div>
       </div>
     </header>
   );

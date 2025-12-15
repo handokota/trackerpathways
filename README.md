@@ -7,9 +7,11 @@ Discover the private tracker network.
 
 <div align="center">
   <img src="./public/dashboard.png" alt="Tracker Pathways Dashboard" width="100%" />
+  <br /><br />
+  <img src="./public/graph.png" alt="Tracker Pathways Graph" width="100%" />
 </div>
 
-Tracker Pathways is a tool designed to visualize invite routes and requirements within the private tracker community. Search for specific paths between trackers, view detailed requirement data, and filter results based on account age or user class.
+Tracker Pathways is an open source tool designed to map the private tracker network, enabling exploration of invite routes with detailed requirements or visualization of connections using an interactive force directed graph to find the optimal path between communities.
 
 ## Contributing
 

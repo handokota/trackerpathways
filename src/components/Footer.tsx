@@ -1,12 +1,15 @@
 "use client";
 
 import { useMemo } from "react";
+import { usePathname } from "next/navigation";
 import rawData from "@/data/trackers.json";
 import { DataStructure } from "@/types";
 
 const data = rawData as unknown as DataStructure;
 
 export default function Footer() {
+  const pathname = usePathname();
+
   const latestUpdateDate = useMemo(() => {
     const monthMap: { [key: string]: number } = {
       Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
@@ -40,9 +43,13 @@ export default function Footer() {
     return maxStr || "Unknown";
   }, []);
 
+  if (pathname === "/map") {
+    return null;
+  }
+
   return (
-    <footer className="w-full py-6 px-4 mt-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-xs font-medium text-foreground/40 text-center">
+    <footer className="w-full py-6 px-6 mt-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="w-full flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-xs font-medium text-foreground/40 text-center">
         <span>Last updated {latestUpdateDate}</span>
         
         <span className="w-1 h-1 rounded-full bg-foreground/10 shrink-0"></span>
