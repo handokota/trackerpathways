@@ -7,7 +7,6 @@ Discover the private tracker network.
 
 <div align="center">
   <img src="./public/dashboard.png" alt="Tracker Pathways Dashboard" width="100%" />
-  <br /><br />
   <img src="./public/graph.png" alt="Tracker Pathways Graph" width="100%" />
 </div>
 
@@ -16,6 +15,16 @@ Tracker Pathways is an open source tool designed to map the private tracker netw
 ## Contributing
 
 You're very welcome to contribute to Tracker Pathways! Please follow the [contribution guide](CONTRIBUTING.md) to get started.
+
+## Star History
+
+<a href="https://www.star-history.com/#handokota/trackerpathways&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=handokota/trackerpathways&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=handokota/trackerpathways&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=handokota/trackerpathways&type=date&legend=top-left" />
+ </picture>
+</a>
 
 ## License
 
