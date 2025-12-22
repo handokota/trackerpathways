@@ -16,6 +16,7 @@
     "Bibliotik": "BiB",
     "Bit-HDTV": "BHDTV",
     "BitGamer": "BG",
+    "BitPorn": "BP",
     "BitSpyder": "BS",
     "Blutopia": "BLU",
     "BroadcasTheNet": "BTN",
@@ -165,7 +166,7 @@
     "RetroFlix": [28, "Movie Lover"],
     "RocketHD": [60, "Lunar Explorer"],
     "Secret Cinema": [60, "Cinematographer"],
-    "seedpool": [360, "MegaPool"],
+    "seedpool": [180, "SuperPool"],
     "TorrentBD": [180, "Elite"],
     "TV-Vault": [182, "Elite"],
     "U2.dmhy": [28, "Power User"],
@@ -325,11 +326,11 @@
     },
     "BroadCity": {
       "PTerClub": { "days": 120, "reqs": "Gold User+, 4 months, 2 proofs from another tracker", "active": "No", "updated": "May 2024" },
-      "TeamHD": { "days": 0, "reqs": "No requirement", "active": "", "updated": "Jan 2024" }
+      "TeamHD": { "days": 0, "reqs": "No requirement", "active": "Unknown", "updated": "Jan 2024" }
     },
     "Cathode-Ray.Tube": {
-      "Aither": { "days": 0, "reqs": "", "active": "", "updated": "Dec 24" },
-      "hawke-uno": { "days": 0, "reqs": "", "active": "", "updated": "Dec 24" }
+      "Aither": { "days": 0, "reqs": "Unknown", "active": "Unknown", "updated": "Dec 24" },
+      "hawke-uno": { "days": 0, "reqs": "Unknown", "active": "Unknown", "updated": "Dec 24" }
     },
     "Cinemageddon": {
       "Aither": { "days": 180, "reqs": "Superfan+, 6 months", "active": "No", "updated": "Mar 2025" },
@@ -586,6 +587,7 @@
     "Orpheus": {
       "Aither": { "days": 60, "reqs": "Elite+, 2 months", "active": "Yes", "updated": "Dec 2025" },
       "Anthelion": { "days": 0, "reqs": "Elite+", "active": "Yes", "updated": "Dec 2025" },
+      "BeyondHD": { "days": 1825, "reqs": "TM+, 1.5 years", "active": "Yes", "updated": "Dec 2025" },
       "Cathode-Ray.Tube": { "days": 0, "reqs": "Elite+, ratio>1.0", "active": "Yes", "updated": "Dec 2025" },
       "Concertos": { "days": 0, "reqs": "Elite+", "active": "Yes", "updated": "Dec 2025" },
       "Empornium": { "days": 180, "reqs": "Elite+, 6 months", "active": "Yes", "updated": "Dec 2025" },
@@ -683,7 +685,7 @@
       "SceneHD": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Dec 2025" },
       "Secret Cinema": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Dec 2025" },
       "seedpool": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Dec 2025" },
-      "SugoiMusic": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Dec 2024" },
+      "SugoiMusic": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Dec 2025" },
       "TheGeeks": { "days": 180, "reqs": "2-3 full tracker profile screenshots (including RED) that meet the following criteria: 180 days, 60GB real upload, real ratio>=1.05", "active": "Yes", "updated": "Dec 2025" },
       "TLFBits": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Dec 2025" },
       "Unwalled": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Dec 2025" },
@@ -715,10 +717,18 @@
       "TeamHD": { "days": 365, "reqs": "1 year, 20TB upload in public tracker or 2TB upload in private tracker", "active": "Yes", "updated": "Jun 2025" }
     },
     "seedpool": {
-      "ReelFliX": { "days": 0, "reqs": "MasterPool+", "active": "Yes", "updated": "May 2025" },
-      "Upload.cx": { "days": 0, "reqs": "MasterPool+, never had an ULCX account before", "active": "Yes", "updated": "May 2025" },
-      "White Rabbit Network": { "days": 0, "reqs": "MasterPool+", "active": "Yes", "updated": "May 2025" },
-      "YuScene": { "days": 0, "reqs": "MasterPool+", "active": "Yes", "updated": "May 2025" }
+      "BitPorn": { "days": 0, "reqs": "SuperPool, 5 TiB upload", "active": "Yes", "updated": "Dec 2025" },
+      "BitSpyder": { "days": 0, "reqs": "SuperPool", "active": "Yes", "updated": "Dec 2025" },
+      "CapybaraBR": { "days": 0, "reqs": "SuperPool", "active": "Yes", "updated": "Dec 2025" },
+      "DarkPeers": { "days": 0, "reqs": "SuperPool", "active": "Yes", "updated": "Dec 2025" },
+      "Digital Core Club": { "days": 0, "reqs": "SuperPool", "active": "Yes", "updated": "Dec 2025" },
+      "HDCity": { "days": 0, "reqs": "SuperPool, 5 TB upload", "active": "Yes", "updated": "Dec 2025" },
+      "HomieHelpDesk": { "days": 0, "reqs": "SuperPool", "active": "Yes", "updated": "Dec 2025" },
+      "LST": { "days": 0, "reqs": "SuperPool", "active": "Yes", "updated": "Dec 2025" },
+      "ReelFliX": { "days": 0, "reqs": "SuperPool", "active": "Yes", "updated": "Dec 2025" },
+      "Upload.cx": { "days": 0, "reqs": "SuperPool, never had an ULCX account before", "active": "Yes", "updated": "Dec 2025" },
+      "White Rabbit Network": { "days": 0, "reqs": "SuperPool", "active": "Yes", "updated": "Dec 2025" },
+      "YuScene": { "days": 0, "reqs": "SuperPool", "active": "Yes", "updated": "Dec 2025" }
     },
     "TeamHD": {
       "BroadCity": { "days": 0, "reqs": "Site is dead", "active": "No", "updated": "Jun 2025" },
@@ -773,12 +783,13 @@
       "ReelFliX": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Sep 2025" }
     },
     "Upload.cx": {
-      "FearNoPeer": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Aug 2025" },
+      "Digital Core Club": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Dec 2025" },
+      "FearNoPeer": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Dec 2025" },
       "HDCity": { "days": 0, "reqs": "PU+, 10TB \"upload size\", (optional) additional tracker profile screenshots", "active": "Yes", "updated": "Aug 2025" },
-      "LST": { "days": 90, "reqs": "PU+, 3 months", "active": "Yes", "updated": "Aug 2025" },
-      "ReelFliX": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Aug 2025" },
-      "seedpool": { "days": 0, "reqs": "1TiB seedsize", "active": "Yes", "updated": "Aug 2025" },
-      "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2025" }
+      "LST": { "days": 90, "reqs": "PU+, 3 months", "active": "Yes", "updated": "Dec 2025" },
+      "ReelFliX": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Dec 2025" },
+      "seedpool": { "days": 0, "reqs": "1TiB seedsize", "active": "Yes", "updated": "Dec 2025" },
+      "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Dec 2025" }
     }
   }
 }

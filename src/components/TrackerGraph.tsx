@@ -100,7 +100,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
           onClick={() => setIsPanelOpen(!isPanelOpen)}
           className="w-full flex items-center gap-2 px-4 py-3 text-left outline-none whitespace-nowrap"
         >
-          <span className={`material-symbols-rounded text-xl transition-transform duration-300 ${isPanelOpen ? "rotate-90 text-primary" : "text-foreground"}`}>
+          <span className={`material-symbols-rounded text-lg transition-transform duration-300 ${isPanelOpen ? "rotate-90 text-primary" : "text-foreground"}`}>
             directions
           </span>
           <span className="text-sm font-bold tracking-tight flex-1">Pathfinder</span>
