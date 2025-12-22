@@ -326,11 +326,11 @@
     },
     "BroadCity": {
       "PTerClub": { "days": 120, "reqs": "Gold User+, 4 months, 2 proofs from another tracker", "active": "No", "updated": "May 2024" },
-      "TeamHD": { "days": 0, "reqs": "No requirement", "active": "", "updated": "Jan 2024" }
+      "TeamHD": { "days": 0, "reqs": "No requirement", "active": "Unknown", "updated": "Jan 2024" }
     },
     "Cathode-Ray.Tube": {
-      "Aither": { "days": 0, "reqs": "", "active": "", "updated": "Dec 24" },
-      "hawke-uno": { "days": 0, "reqs": "", "active": "", "updated": "Dec 24" }
+      "Aither": { "days": 0, "reqs": "Unknown", "active": "Unknown", "updated": "Dec 24" },
+      "hawke-uno": { "days": 0, "reqs": "Unknown", "active": "Unknown", "updated": "Dec 24" }
     },
     "Cinemageddon": {
       "Aither": { "days": 180, "reqs": "Superfan+, 6 months", "active": "No", "updated": "Mar 2025" },
