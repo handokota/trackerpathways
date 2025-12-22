@@ -28,8 +28,15 @@ export default function TrackerSearchApp() {
 
   const [showSourceSug, setShowSourceSug] = useState(false);
   const [showTargetSug, setShowTargetSug] = useState(false);
+  
+  const [sourceActiveIndex, setSourceActiveIndex] = useState(-1);
+  const [targetActiveIndex, setTargetActiveIndex] = useState(-1);
+
   const sourceWrapperRef = useRef<HTMLDivElement>(null);
   const targetWrapperRef = useRef<HTMLDivElement>(null);
+  
+  const sourceListRef = useRef<HTMLDivElement>(null);
+  const targetListRef = useRef<HTMLDivElement>(null);
 
   const deferredSource = useDeferredValue(sourceSearch);
   const deferredTarget = useDeferredValue(targetSearch);
@@ -66,14 +73,48 @@ export default function TrackerSearchApp() {
     function handleClickOutside(event: MouseEvent) {
       if (sourceWrapperRef.current && !sourceWrapperRef.current.contains(event.target as Node)) {
         setShowSourceSug(false);
+        setSourceActiveIndex(-1);
       }
       if (targetWrapperRef.current && !targetWrapperRef.current.contains(event.target as Node)) {
         setShowTargetSug(false);
+        setTargetActiveIndex(-1);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (sourceActiveIndex >= 0 && sourceListRef.current) {
+      const list = sourceListRef.current;
+      const activeElement = list.children[sourceActiveIndex] as HTMLElement;
+      if (activeElement) {
+        if (sourceActiveIndex === 0) {
+           list.scrollTop = 0;
+        } else if (sourceActiveIndex === list.children.length - 1) {
+           list.scrollTop = list.scrollHeight;
+        } else {
+           activeElement.scrollIntoView({ block: "nearest" });
+        }
+      }
+    }
+  }, [sourceActiveIndex]);
+
+  useEffect(() => {
+    if (targetActiveIndex >= 0 && targetListRef.current) {
+      const list = targetListRef.current;
+      const activeElement = list.children[targetActiveIndex] as HTMLElement;
+      if (activeElement) {
+        if (targetActiveIndex === 0) {
+           list.scrollTop = 0;
+        } else if (targetActiveIndex === list.children.length - 1) {
+           list.scrollTop = list.scrollHeight;
+        } else {
+           activeElement.scrollIntoView({ block: "nearest" });
+        }
+      }
+    }
+  }, [targetActiveIndex]);
 
   const getAbbr = (name: string) => {
     if (data.abbrList[name]) return data.abbrList[name];
@@ -112,11 +153,51 @@ export default function TrackerSearchApp() {
     terms.push(selectedItem); 
     setSourceSearch(terms.join(", ")); 
     setShowSourceSug(false);
+    setSourceActiveIndex(-1);
   };
 
   const handleTargetSelect = (selectedItem: string) => {
     setTargetSearch(selectedItem);
     setShowTargetSug(false);
+    setTargetActiveIndex(-1);
+  };
+
+  const handleSourceKeyDown = (e: React.KeyboardEvent) => {
+    if (!showSourceSug) return;
+    const suggestions = getSuggestions(sourceSearch);
+    if (suggestions.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSourceActiveIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSourceActiveIndex(prev => (prev > 0 ? prev - 1 : 0));
+    } else if (e.key === "Enter" && sourceActiveIndex >= 0 && suggestions[sourceActiveIndex]) {
+      e.preventDefault();
+      handleSourceSelect(suggestions[sourceActiveIndex]);
+    } else if (e.key === "Escape") {
+      setShowSourceSug(false);
+    }
+  };
+
+  const handleTargetKeyDown = (e: React.KeyboardEvent) => {
+    if (!showTargetSug) return;
+    const suggestions = getSuggestions(targetSearch);
+    if (suggestions.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setTargetActiveIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setTargetActiveIndex(prev => (prev > 0 ? prev - 1 : 0));
+    } else if (e.key === "Enter" && targetActiveIndex >= 0 && suggestions[targetActiveIndex]) {
+      e.preventDefault();
+      handleTargetSelect(suggestions[targetActiveIndex]);
+    } else if (e.key === "Escape") {
+      setShowTargetSug(false);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -329,15 +410,21 @@ export default function TrackerSearchApp() {
                   onChange={(e) => {
                     setSourceSearch(e.target.value);
                     setShowSourceSug(true);
+                    setSourceActiveIndex(-1);
                   }}
+                  onKeyDown={handleSourceKeyDown}
                 />
                 {showSourceSug && getSuggestions(sourceSearch).length > 0 && (
                   <div className="absolute top-full -left-8 w-[calc(100%+2rem)] mt-2 bg-card rounded-xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-100 border border-foreground/10">
-                    <div className="max-h-60 overflow-y-auto p-1">
+                    <div className="max-h-60 overflow-y-auto p-1" ref={sourceListRef}>
                       {getSuggestions(sourceSearch).map((item, i) => (
                         <div 
                           key={i}
-                          className="px-3 py-2.5 rounded-md text-sm cursor-pointer hover:bg-foreground/5 transition-colors text-foreground/90 font-medium flex items-center justify-between"
+                          className={`px-3 py-2.5 rounded-md text-sm cursor-pointer transition-colors text-foreground/90 font-medium flex items-center justify-between ${
+                            i === sourceActiveIndex 
+                              ? 'bg-foreground/10' 
+                              : 'hover:bg-foreground/5'
+                          }`}
                           onClick={() => handleSourceSelect(item)}
                         >
                           <span>{item}</span>
@@ -362,15 +449,21 @@ export default function TrackerSearchApp() {
                   onChange={(e) => {
                     setTargetSearch(e.target.value);
                     setShowTargetSug(true);
+                    setTargetActiveIndex(-1);
                   }}
+                  onKeyDown={handleTargetKeyDown}
                 />
                 {showTargetSug && getSuggestions(targetSearch).length > 0 && (
                   <div className="absolute top-full -left-8 w-[calc(100%+2rem)] mt-2 bg-card rounded-xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-100 border border-foreground/10">
-                    <div className="max-h-60 overflow-y-auto p-1">
+                    <div className="max-h-60 overflow-y-auto p-1" ref={targetListRef}>
                       {getSuggestions(targetSearch).map((item, i) => (
                         <div 
                           key={i}
-                          className="px-3 py-2.5 rounded-md text-sm cursor-pointer hover:bg-foreground/5 transition-colors text-foreground/90 font-medium flex items-center justify-between"
+                          className={`px-3 py-2.5 rounded-md text-sm cursor-pointer transition-colors text-foreground/90 font-medium flex items-center justify-between ${
+                            i === targetActiveIndex 
+                              ? 'bg-foreground/10' 
+                              : 'hover:bg-foreground/5'
+                          }`}
                           onClick={() => handleTargetSelect(item)}
                         >
                           <span>{item}</span>
@@ -579,7 +672,7 @@ export default function TrackerSearchApp() {
                               
                             </div>
                             
-                            <span className={`text-sm font-medium bg-transparent border border-foreground/10 px-2 py-1 rounded-md whitespace-nowrap shrink-0 ${path.totalDays === null ? 'text-foreground/40 italic' : 'text-foreground/70'}`}>
+                            <span className={`text-sm font-medium bg-transparent border border-foreground/10 px-2 py-1 rounded-md whitespace-nowrap shrink-0 ${path.totalDays === null ? 'text-foreground/40' : 'text-foreground/70'}`}>
                               {path.totalDays === null ? 'Unknown' : `${path.totalDays} days`}
                             </span>
                           </div>
