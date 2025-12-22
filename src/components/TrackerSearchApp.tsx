@@ -369,7 +369,7 @@ export default function TrackerSearchApp() {
                     : 'text-foreground/50 hover:text-foreground' 
                 }`}
               >
-                <span className="material-symbols-rounded text-base">tune</span>
+                <span className="material-symbols-rounded text-lg">tune</span>
                 <span>Options</span>
               </button>
 
@@ -511,7 +511,7 @@ export default function TrackerSearchApp() {
                     
                     {unlockInfo && (
                       <div className="flex items-center gap-2 w-fit self-start md:self-auto text-sm text-foreground/60 bg-foreground/5 px-2.5 py-1 md:px-3 md:py-1.5 rounded-md mt-1 md:mt-0">
-                        <span className="material-symbols-rounded text-[18px]">lock_open</span>
+                        <span className="material-symbols-rounded text-lg">lock_open</span>
                         <span className="font-medium">{unlockInfo[1]} ({unlockInfo[0]}d)</span>
                       </div>
                     )}
@@ -527,7 +527,7 @@ export default function TrackerSearchApp() {
                       const isDirect = path.routes.length === 1;
 
                       return (
-                        <div key={idx} className="group flex flex-col p-5 rounded-md bg-card transition-colors duration-200">
+                        <div key={idx} className="group flex flex-col p-5 rounded-md bg-card transition-colors duration-200 h-full">
                           
                           <div className="flex justify-between items-start mb-3 gap-4"> 
                             <div className="min-w-0">
@@ -559,7 +559,7 @@ export default function TrackerSearchApp() {
                             </span>
                           </div>
                           
-                          <div className="space-y-3 mt-auto">
+                          <div className="space-y-3 mt-auto flex-1">
                             {path.routes.map((req, rIdx) => {
                               const fromNode = path.nodes[rIdx];
                               const toNode = path.nodes[rIdx + 1];
@@ -568,7 +568,7 @@ export default function TrackerSearchApp() {
                                 <div key={rIdx} className="text-sm pl-3 relative border-l-2 border-foreground/10">
                                   {!isDirect && (
                                     <div className="text-sm font-semibold text-foreground/40 mb-1 flex items-center gap-1">
-                                      <span>{fromNode}</span><span className="material-symbols-rounded text-sm">arrow_right_alt</span><span>{toNode}</span>
+                                      <span>{fromNode}</span><span className="material-symbols-rounded text-base">arrow_right_alt</span><span>{toNode}</span>
                                     </div>
                                   )}
                                   <p className="text-foreground/70 leading-relaxed font-normal text-sm">{renderReqs(req.reqs)}</p>
@@ -579,7 +579,7 @@ export default function TrackerSearchApp() {
                                         {getStatusLabel(req.active)}
                                       </span>
                                       <div className="flex items-center gap-1 text-foreground/30" title="Last checked date">
-                                        <span className="material-symbols-rounded text-[14px]">history</span>
+                                        <span className="material-symbols-rounded text-sm">history</span>
                                         <span className="text-xs font-medium">Last checked: {req.updated}</span>
                                       </div>
                                     </div>

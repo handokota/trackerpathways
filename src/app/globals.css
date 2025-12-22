@@ -1,8 +1,6 @@
 @import "tailwindcss";
 
-/* 1. DEFINISI VARIABEL WARNA & RADIUS */
 :root {
-  /* LIGHT MODE */
   --background: oklch(97% 0 0);        
   --foreground: oklch(14.5% 0 0);       
   
@@ -16,7 +14,6 @@
 }
 
 .dark {
-  /* DARK MODE */
   --background: oklch(14.5% 0 0);      
   --foreground: oklch(98.5% 0 0);       
   
@@ -28,13 +25,9 @@
   --ring: oklch(98.5% 0 0);
 }
 
-/* 2. KONFIGURASI TEMA TAILWIND V4 */
 @theme {
-  /* Font Utama (Inter) */
-  /* Kita definisikan di sini agar utility 'font-sans' bekerja */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
-  /* Mapping Warna Custom */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -43,41 +36,30 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   
-  /* Mapping Radius */
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 }
 
-/* 3. SETUP DARK MODE */
 @variant dark (&:where(.dark, .dark *));
 
-/* 4. BASE STYLES */
 body {
   background-color: var(--background);
   color: var(--foreground);
-  
-  /* [PERBAIKAN UTAMA] Paksa Font Inter di Body */
-  /* Ini memastikan Android tidak fallback ke Roboto meskipun class font-sans telat load */
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-
-  /* Transisi halus saat ganti tema */
   transition-property: background-color, color, border-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 300ms;
 }
 
-/* Set border default */
 *, ::before, ::after {
   border-color: var(--border);
 }
 
-/* 5. CLASS ICON MANUAL */
 .material-symbols-rounded {
   font-family: var(--font-material-symbols);
   font-weight: normal;
   font-style: normal;
-  font-size: 24px;
   display: inline-block;
   line-height: 1;
   text-transform: none;

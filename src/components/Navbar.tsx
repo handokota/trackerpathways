@@ -51,7 +51,7 @@ export default function Navbar() {
             }`}
             aria-label="View Map"
           >
-            <span className="material-symbols-rounded text-xl">map</span>
+            <span className="material-symbols-rounded text-lg">map</span>
           </Link>
           <ThemeSwitcher />
         </div>
