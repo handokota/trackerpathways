@@ -189,6 +189,8 @@ export default function TrackerSearchApp() {
       }
     }
 
+    const startNodeSet = new Set(startNodes);
+
     startNodes.forEach(start => {
       queue.push({
         source: start,
@@ -229,6 +231,10 @@ export default function TrackerSearchApp() {
       const neighbors = data.routeInfo[currentNode];
       if (neighbors) {
         Object.entries(neighbors).forEach(([nextTracker, details]) => {
+          if (startNodeSet.has(nextTracker) && nextTracker.toLowerCase() !== tQuery) {
+             return;
+          }
+
           if (!currentPath.nodes.includes(nextTracker)) {
             const days = details.days; 
             if (maxDays !== null && (currentPath.totalDays + days) > maxDays) return;
