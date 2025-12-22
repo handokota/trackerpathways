@@ -630,7 +630,7 @@ export default function TrackerSearchApp() {
                     {unlockInfo && (
                       <div className="flex items-center gap-2 w-fit self-start md:self-auto text-sm text-foreground/60 bg-foreground/5 px-2.5 py-1 md:px-3 md:py-1.5 rounded-md mt-1 md:mt-0">
                         <span className="material-symbols-rounded text-lg">lock_open</span>
-                        <span className="font-medium">{unlockInfo[1]} ({unlockInfo[0]}d)</span>
+                        <span className="font-medium">{unlockInfo[1]} ({unlockInfo[0] !== null ? `${unlockInfo[0]}d` : 'Unknown'})</span>
                       </div>
                     )}
                   </div>
