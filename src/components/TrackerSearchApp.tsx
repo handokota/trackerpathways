@@ -165,8 +165,8 @@ export default function TrackerSearchApp() {
        t.toLowerCase() === tQuery || getAbbr(t).toLowerCase() === tQuery
     );
     
-    const results: PathResult[] = [];
-    const queue: PathResult[] = [];
+    const results: any[] = [];
+    const queue: any[] = [];
 
     const allTrackerKeys = Object.keys(data.routeInfo);
     let startNodes: string[] = [];
@@ -220,7 +220,7 @@ export default function TrackerSearchApp() {
         }
         
         if (isTargetMatch) {
-          if (maxDays === null || currentPath.totalDays <= maxDays) {
+          if (maxDays === null || (currentPath.totalDays !== null && currentPath.totalDays <= maxDays)) {
             results.push(currentPath);
           }
         }
@@ -236,14 +236,25 @@ export default function TrackerSearchApp() {
           }
 
           if (!currentPath.nodes.includes(nextTracker)) {
-            const days = details.days; 
-            if (maxDays !== null && (currentPath.totalDays + days) > maxDays) return;
+            const edgeDays = details.days; 
+            const forumReq = data.unlockInviteClass[currentNode];
+            const forumDays = forumReq ? forumReq[0] : 0;
+            
+            let stepDays: number | null = null;
+            
+            if (edgeDays !== null) {
+                stepDays = Math.max(edgeDays, forumDays || 0);
+            }
+
+            const nextTotalDays = (currentPath.totalDays === null || stepDays === null) ? null : currentPath.totalDays + stepDays;
+
+            if (maxDays !== null && nextTotalDays !== null && nextTotalDays > maxDays) return;
 
             queue.push({
               source: currentPath.source,
               target: nextTracker,
               nodes: [...currentPath.nodes, nextTracker],
-              totalDays: currentPath.totalDays + days,
+              totalDays: nextTotalDays,
               routes: [...currentPath.routes, details] 
             });
           }
@@ -253,9 +264,17 @@ export default function TrackerSearchApp() {
 
     return results.sort((a, b) => {
       if (sortBy === 'days') {
+        if (a.totalDays === null && b.totalDays !== null) return 1;
+        if (a.totalDays !== null && b.totalDays === null) return -1;
+        if (a.totalDays === null && b.totalDays === null) return 0;
         return a.totalDays - b.totalDays;
       }
-      return a.routes.length - b.routes.length;
+      
+      if (a.routes.length !== b.routes.length) {
+        return a.routes.length - b.routes.length;
+      }
+      
+      return a.target.localeCompare(b.target);
     });
 
   }, [deferredSource, deferredTarget, maxJumps, maxDays, sortBy, allTrackers]);
@@ -560,8 +579,8 @@ export default function TrackerSearchApp() {
                               
                             </div>
                             
-                            <span className="text-sm font-medium text-foreground/70 bg-transparent border border-foreground/10 px-2 py-1 rounded-md whitespace-nowrap shrink-0">
-                              {path.totalDays} days
+                            <span className={`text-sm font-medium bg-transparent border border-foreground/10 px-2 py-1 rounded-md whitespace-nowrap shrink-0 ${path.totalDays === null ? 'text-foreground/40 italic' : 'text-foreground/70'}`}>
+                              {path.totalDays === null ? 'Unknown' : `${path.totalDays} days`}
                             </span>
                           </div>
                           
@@ -585,7 +604,6 @@ export default function TrackerSearchApp() {
                                         {getStatusLabel(req.active)}
                                       </span>
                                       <div className="flex items-center gap-1 text-foreground/30" title="Last checked date">
-                                        <span className="material-symbols-rounded text-sm">history</span>
                                         <span className="text-xs font-medium">Last checked: {req.updated}</span>
                                       </div>
                                     </div>
