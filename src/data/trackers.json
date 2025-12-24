@@ -130,7 +130,7 @@
     "YuScene": "YS"
   },
   "unlockInviteClass": {
-    "Aither": [240, "Prometheus"],
+    "Aither": [730, "Prometheus"],
     "AlphaRatio": [182, "Sphinx"],
     "AnimeBytes": [14, "Power User"],
     "AnimeWorld": [30, "Power User"],
@@ -182,6 +182,7 @@
       "OldToonsWorld": { "days": 180, "reqs": "Prometheus+, 6 months", "active": "Yes", "updated": "Aug 2025" },
       "OnlyEncodes+": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Aug 2025" },
       "Orpheus": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Nov 2025" },
+      "PassThePopcorn": { "days": 730, "reqs": "Titan+, 2 years, 200 uploads", "active": "Yes", "updated": "Dec 2025" },
       "ReelFliX": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Aug 2025" },
       "seedpool": { "days": 0, "reqs": "1TiB seedsize", "active": "Yes", "updated": "Aug 2025" },
       "Unwalled": { "days": 0, "reqs": "Harmonia+, 5 seeded uploads", "active": "Yes", "updated": "Aug 2025" }
@@ -190,7 +191,7 @@
       "Aither": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
       "Cathode-Ray.Tube": { "days": 0, "reqs": "Ratio>1.0", "active": "Yes", "updated": "Nov 2025" },
       "GazelleGames": { "days": 420, "reqs": "Satyr/Adonis (12 TB, 2,400,000 bp, 60 weeks)", "active": "Yes", "updated": "Nov 2025" },
-      "HellasHut": { "days": 360, "reqs": "12 months", "active": "No", "updated": "Sep 2025" },
+      "HellasHut": { "days": 360, "reqs": "12 months", "active": "Nov", "updated": "Sep 2025" },
       "LzTr": { "days": 0, "reqs": "20 uploads", "active": "Yes", "updated": "Nov 2025" },
       "MoreThanTV": { "days": 0, "reqs": "Ratio>1.5", "active": "Yes", "updated": "Nov 2025" },
       "obscure": { "days": 0, "reqs": "Sphinx", "active": "Yes", "updated": "Nov 2025" },
@@ -788,8 +789,8 @@
       "HDCity": { "days": 0, "reqs": "PU+, 10TB \"upload size\", (optional) additional tracker profile screenshots", "active": "Yes", "updated": "Aug 2025" },
       "LST": { "days": 90, "reqs": "PU+, 3 months", "active": "Yes", "updated": "Dec 2025" },
       "ReelFliX": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Dec 2025" },
-      "seedpool": { "days": 0, "reqs": "1TiB seedsize", "active": "Yes", "updated": "Dec 2025" },
-      "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Dec 2025" }
+      "seedpool": { "days": 0, "reqs": "PU+, 1TiB seedsize", "active": "Yes", "updated": "Dec 2025" },
+      "YuScene": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Dec 2025" }
     }
   }
 }
