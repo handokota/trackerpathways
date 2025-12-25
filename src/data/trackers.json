@@ -178,6 +178,7 @@
       "Anthelion": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Aug 2025" },
       "Cathode-Ray.Tube": { "days": 365, "reqs": "Prometheus+, 1 year, ratio>=1", "active": "Yes", "updated": "Aug 2025" },
       "hawke-uno": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Aug 2025" },
+      "HDBits": { "days": 730, "reqs": "Titan+, 2 years, 200 uploads", "active": "Yes", "updated": "Dec 2025" },
       "LST": { "days": 90, "reqs": "Prometheus+, 3 months", "active": "Yes", "updated": "Aug 2025" },
       "OldToonsWorld": { "days": 180, "reqs": "Prometheus+, 6 months", "active": "Yes", "updated": "Aug 2025" },
       "OnlyEncodes+": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Aug 2025" },
