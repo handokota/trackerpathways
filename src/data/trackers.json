@@ -76,7 +76,6 @@
     "nCore": "nC",
     "Nebulance": "NBL",
     "Nzbplanet": "NZBP",
-    "obscure": "OBS",
     "OldToonsWorld": "OTW",
     "OnlyEncodes+": "OE+",
     "OpenCD": "OCD",
@@ -169,9 +168,9 @@
     "seedpool": [180, "SuperPool"],
     "TorrentBD": [180, "Elite"],
     "TV-Vault": [182, "Elite"],
-    "U2.dmhy": [28, "Power User"],
+    "U2.dmhy": [56, "Power User"],
     "UHDBits": [56, "Extreme"],
-    "Upload.cx": [14, "Power User"]
+    "Upload.cx": [84, "Power User"]
   },
   "routeInfo": {
     "Aither": {
@@ -195,7 +194,6 @@
       "HellasHut": { "days": 360, "reqs": "12 months", "active": "Nov", "updated": "Sep 2025" },
       "LzTr": { "days": 0, "reqs": "20 uploads", "active": "Yes", "updated": "Nov 2025" },
       "MoreThanTV": { "days": 0, "reqs": "Ratio>1.5", "active": "Yes", "updated": "Nov 2025" },
-      "obscure": { "days": 0, "reqs": "Sphinx", "active": "Yes", "updated": "Nov 2025" },
       "Orpheus": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
       "PixelHD": { "days": 180, "reqs": "2 extra tracker proofs that are 6 months old", "active": "Yes", "updated": "Nov 2025" },
       "ReelFliX": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
