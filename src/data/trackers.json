@@ -17,10 +17,10 @@
     "Bit-HDTV": "BHDTV",
     "BitGamer": "BG",
     "BitPorn": "BP",
-    "BitSpyder": "BS",
     "Blutopia": "BLU",
     "BroadcasTheNet": "BTN",
     "BroadCity": "BdC",
+    "BrokenStones": "BS",
     "BwTorrents": "BwT",
     "Canal Street": "CAST",
     "CapybaraBR": "CBR",
@@ -92,6 +92,7 @@
     "PTerClub": "PTer",
     "PTFiles": "PTF",
     "PTHome": "PTH",
+    "Racing4Everyone": "R4E",
     "Redacted": "RED",
     "ReelFliX": "RFX",
     "RetroFlix": "RTF",
@@ -174,18 +175,22 @@
   },
   "routeInfo": {
     "Aither": {
-      "Anthelion": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Aug 2025" },
-      "Cathode-Ray.Tube": { "days": 365, "reqs": "Prometheus+, 1 year, ratio>=1", "active": "Yes", "updated": "Aug 2025" },
-      "hawke-uno": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Aug 2025" },
+      "Anthelion": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
+      "BrokenStones": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
+      "Cathode-Ray.Tube": { "days": 365, "reqs": "Prometheus+, 1 year, ratio>=1", "active": "Yes", "updated": "Dec 2025" },
+      "ExtremeBits": { "days": 365, "reqs": "Prometheus+, 1 year", "active": "Yes", "updated": "Dec 2025" },
+      "hawke-uno": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
       "HDBits": { "days": 730, "reqs": "Titan+, 2 years, 200 uploads", "active": "Yes", "updated": "Dec 2025" },
-      "LST": { "days": 90, "reqs": "Prometheus+, 3 months", "active": "Yes", "updated": "Aug 2025" },
-      "OldToonsWorld": { "days": 180, "reqs": "Prometheus+, 6 months", "active": "Yes", "updated": "Aug 2025" },
-      "OnlyEncodes+": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Aug 2025" },
-      "Orpheus": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Nov 2025" },
+      "LST": { "days": 90, "reqs": "Prometheus+, 3 months", "active": "Yes", "updated": "Dec 2025" },
+      "Nebulance": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
+      "OldToonsWorld": { "days": 180, "reqs": "Prometheus+, 6 months", "active": "Yes", "updated": "Dec 2025" },
+      "OnlyEncodes+": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
+      "Orpheus": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
       "PassThePopcorn": { "days": 730, "reqs": "Titan+, 2 years, 200 uploads", "active": "Yes", "updated": "Dec 2025" },
-      "ReelFliX": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Aug 2025" },
-      "seedpool": { "days": 0, "reqs": "1TiB seedsize", "active": "Yes", "updated": "Aug 2025" },
-      "Unwalled": { "days": 0, "reqs": "Harmonia+, 5 seeded uploads", "active": "Yes", "updated": "Aug 2025" }
+      "Racing4Everyone": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
+      "ReelFliX": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
+      "seedpool": { "days": 0, "reqs": "1TiB seedsize", "active": "Yes", "updated": "Dec 2025" },
+      "Unwalled": { "days": 0, "reqs": "Harmonia+, 5 seeded uploads", "active": "Yes", "updated": "Dec 2025" }
     },
     "AlphaRatio": {
       "Aither": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
@@ -288,7 +293,7 @@
       "SpeedApp": { "days": null, "reqs": "Screenshot", "active": "No", "updated": "Oct 2025" }
     },
     "Blutopia": {
-      "BitSpyder": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
+      "BrokenStones": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
       "CapybaraBR": { "days": 0, "reqs": "No requirement", "active": "YES", "updated": "Nov 2025" },
       "Concertos": { "days": 0, "reqs": "10 uploads", "active": "Yes", "updated": "Aug 2025" },
       "ExtremeBits": { "days": 365, "reqs": "1 year", "active": "Yes", "updated": "Nov 2025" },
@@ -376,7 +381,7 @@
       "PrivateHD": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Nov 2025" }
     },
     "FearNoPeer": {
-      "BitSpyder": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
+      "BrokenStones": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
       "CapybaraBR": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
       "LST": { "days": 120, "reqs": "4 months, avg seedtime>=6 days", "active": "Yes", "updated": "Nov 2025" },
       "OldToonsWorld": { "days": 365, "reqs": "1 year, avg seedtime>=6 months, Seedsize>=1 TiB", "active": "Yes", "updated": "Nov 2025" },
@@ -545,8 +550,8 @@
       "Anthelion": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Dec 2025" },
       "BakaBT": { "days": 180, "reqs": "PU+, 6 months", "active": "Yes", "updated": "Nov 2025" },
       "Bit-HDTV": { "days": 180, "reqs": "6 months, ratio>=1", "active": "Yes", "updated": "Nov 2025" },
-      "BitSpyder": { "days": 180, "reqs": "PU+, 6 months, 1TiB upload", "active": "Yes", "updated": "Nov 2025" },
       "Blutopia": { "days": 270, "reqs": "9 months or 6 months and 10+ uploads", "active": "Yes", "updated": "Nov 2025" },
+      "BrokenStones": { "days": 180, "reqs": "PU+, 6 months, 1TiB upload", "active": "Yes", "updated": "Nov 2025" },
       "Canal Street": { "days": 365, "reqs": "PU+, 1 year", "active": "Yes", "updated": "Oct 2025" },
       "Digital Core Club": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
       "HomieHelpDesk": { "days": 210, "reqs": "7 months, 1TiB upload, 2 additional proofs", "active": "Yes", "updated": "Nov 2025" },
@@ -718,7 +723,7 @@
     },
     "seedpool": {
       "BitPorn": { "days": 0, "reqs": "SuperPool, 5 TiB upload", "active": "Yes", "updated": "Dec 2025" },
-      "BitSpyder": { "days": 0, "reqs": "SuperPool", "active": "Yes", "updated": "Dec 2025" },
+      "BrokenStones": { "days": 0, "reqs": "SuperPool", "active": "Yes", "updated": "Dec 2025" },
       "CapybaraBR": { "days": 0, "reqs": "SuperPool", "active": "Yes", "updated": "Dec 2025" },
       "DarkPeers": { "days": 0, "reqs": "SuperPool", "active": "Yes", "updated": "Dec 2025" },
       "Digital Core Club": { "days": 0, "reqs": "SuperPool", "active": "Yes", "updated": "Dec 2025" },
@@ -776,7 +781,7 @@
     "UHDBits": {
       "Aither": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Sep 2025" },
       "Anthelion": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Sep 2025" },
-      "BitSpyder": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Sep 2025" },
+      "BrokenStones": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Sep 2025" },
       "Dajiao PT": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Sep 2025" },
       "FileList": { "days": 180, "reqs": "6 months", "active": "No", "updated": "Sep 2025" },
       "Orpheus": { "days": 0, "reqs": "No requirement", "active": "No", "updated": "Sep 2025" },
