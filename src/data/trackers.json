@@ -586,8 +586,8 @@
       "seedpool": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" }
     },
     "OnlyEncodes+": {
-      "LST": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "May 2025" },
-      "ReelFliX": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "May 2025" }
+      "LST": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Dec 2025" },
+      "ReelFliX": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Dec 2025" }
     },
     "Orpheus": {
       "Aither": { "days": 60, "reqs": "Elite+, 2 months", "active": "Yes", "updated": "Dec 2025" },
