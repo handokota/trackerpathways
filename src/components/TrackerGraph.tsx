@@ -78,7 +78,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   }, [selectedNodeId, rawData]);
 
   const allTrackerNames = useMemo(() => {
-    return data.nodes.map(n => n.id).sort();
+    return data.nodes.map(n => n.id).sort((a: string, b: string) => a.localeCompare(b));
   }, [data]);
 
   const isDark = resolvedTheme === "dark";
