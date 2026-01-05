@@ -32,5 +32,4 @@ export interface PathResult {
   routes: RouteDetail[];
 }
 
-// Alias agar kompatibel
 export type RouteRequirements = RouteDetail;
