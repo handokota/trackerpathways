@@ -17,7 +17,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed w-full top-0 z-50 bg-background/80 backdrop-blur-xl transition-colors duration-300">
+    <header className="fixed w-full top-0 z-50 bg-background/80 backdrop-blur-xl transition-colors duration-300 border-b border-border/40">
       <div className="w-full px-6 h-16 flex items-center justify-between">
         <div 
           className="flex items-center gap-3 cursor-pointer select-none group" 
@@ -36,7 +36,7 @@ export default function Navbar() {
             />
           </div>
 
-          <span className="text-xl font-bold tracking-tight text-foreground">
+          <span className="text-xl font-bold tracking-tight text-foreground hidden sm:block">
             Tracker Pathways
           </span>
         </div>
@@ -44,7 +44,7 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <Link 
             href="/map" 
-            className={`w-9 h-9 rounded-md flex items-center justify-center transition-colors hover:bg-foreground/5 ${
+            className={`w-9 h-9 flex items-center justify-center transition-colors ${
               pathname === "/map" 
                 ? "text-foreground" 
                 : "text-foreground/60 hover:text-foreground"
@@ -53,6 +53,19 @@ export default function Navbar() {
           >
             <span className="material-symbols-rounded text-lg">map</span>
           </Link>
+
+          <Link 
+            href="/directory" 
+            className={`w-9 h-9 flex items-center justify-center transition-colors ${
+              pathname === "/directory" 
+                ? "text-foreground" 
+                : "text-foreground/60 hover:text-foreground"
+            }`}
+            aria-label="Tracker Directory"
+          >
+            <span className="material-symbols-rounded text-lg">menu_book</span>
+          </Link>
+          
           <ThemeSwitcher />
         </div>
       </div>
