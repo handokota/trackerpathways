@@ -233,7 +233,7 @@
       "RocketHD": { "days": 60, "reqs": "2 months", "active": "Yes", "updated": "Oct 2025" }
     },
     "Anthelion": {
-      "Aither": { "days": 60, "reqs": "PU+, 2 months", "active": "Yes", "updated": "Nov 2025" },
+      "Aither": { "days": 180, "reqs": "PU+, 6 months", "active": "Yes", "updated": "Jan 2026" },
       "BakaBT": { "days": 90, "reqs": "PU+, 3 months", "active": "Yes", "updated": "Nov 2025" },
       "BeyondHD": { "days": 540, "reqs": "Elite+, 18 months", "active": "Yes", "updated": "Nov 2025" },
       "CapybaraBR": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
@@ -598,7 +598,7 @@
       "ReelFliX": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Dec 2025" }
     },
     "Orpheus": {
-      "Aither": { "days": 60, "reqs": "Elite+, 2 months", "active": "Yes", "updated": "Dec 2025" },
+      "Aither": { "days": 180, "reqs": "Elite+, 6 months", "active": "Yes", "updated": "Jan 2026" },
       "Anthelion": { "days": 0, "reqs": "Elite+", "active": "Yes", "updated": "Dec 2025" },
       "BeyondHD": { "days": 1825, "reqs": "TM+, 1.5 years", "active": "Yes", "updated": "Dec 2025" },
       "Cathode-Ray.Tube": { "days": 0, "reqs": "Elite+, ratio>1.0", "active": "Yes", "updated": "Dec 2025" },
@@ -664,7 +664,7 @@
       "ExoticaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2024" }
     },
     "Redacted": {
-      "Aither": { "days": 60, "reqs": "2 months", "active": "Yes", "updated": "Dec 2025" },
+      "Aither": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Jan 2026" },
       "AlphaRatio": { "days": 180, "reqs": "ratio>1.0, 6 months", "active": "YES", "updated": "Dec 2025" },
       "AnimeBytes": { "days": 360, "reqs": "PU, 12 months or Elite+, 6 months", "active": "Yes", "updated": "Dec 2025" },
       "Anthelion": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Dec 2025" },
