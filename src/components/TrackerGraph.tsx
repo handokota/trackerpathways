@@ -20,12 +20,12 @@ interface TrackerGraphProps {
 }
 
 export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
-  const { resolvedTheme } = useTheme(); 
+  const { resolvedTheme } = useTheme();
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const [fontFace, setFontFace] = useState("sans-serif");
-  
+
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [isPanelOpen, setIsPanelOpen] = useState(false); 
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   const [pathStart, setPathStart] = useState<string>("");
   const [pathEnd, setPathEnd] = useState<string>("");
@@ -33,6 +33,24 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const fgRef = useRef<any>(null);
+
+  const allTrackerNames = useMemo(() => {
+    // Determine sort based on graph data or rawData
+    return data.nodes.map(n => n.id).sort((a: string, b: string) => a.localeCompare(b));
+  }, [data]);
+
+  // Collection State
+  const [collection, setCollection] = useState<string>("");
+  const [isCollectionPanelOpen, setIsCollectionPanelOpen] = useState(false);
+  const [collectionInput, setCollectionInput] = useState("");
+  const [showCollectionSug, setShowCollectionSug] = useState(false);
+  const [collectionActiveIndex, setCollectionActiveIndex] = useState(-1);
+  const collectionWrapperRef = useRef<HTMLDivElement>(null);
+  const collectionListRef = useRef<HTMLDivElement>(null);
+
+  const collectionNodes = useMemo(() => {
+    return collection.split(",").map(s => s.trim()).filter(s => s && allTrackerNames.includes(s));
+  }, [collection, allTrackerNames]);
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -56,7 +74,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     if (pathStart && pathEnd) {
       const path = findShortestPath(rawData, pathStart, pathEnd);
       setActivePath(path);
-      setSelectedNodeId(null); 
+      setSelectedNodeId(null);
     } else {
       setActivePath(null);
     }
@@ -66,7 +84,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     if (!selectedNodeId) return null;
 
     const outgoing = rawData.routeInfo[selectedNodeId] || {};
-    
+
     const incoming: Record<string, any> = {};
     Object.entries(rawData.routeInfo).forEach(([source, targets]) => {
       if (targets[selectedNodeId]) {
@@ -77,24 +95,69 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     return { outgoing, incoming };
   }, [selectedNodeId, rawData]);
 
-  const allTrackerNames = useMemo(() => {
-    return data.nodes.map(n => n.id).sort((a: string, b: string) => a.localeCompare(b));
-  }, [data]);
+  const getAbbr = (name: string) => {
+    const capitals = name.match(/[A-Z]/g);
+    if (capitals && capitals.length >= 2) return capitals.join("");
+    return name.substring(0, 3).toUpperCase();
+  };
+
+  const getSuggestions = (query: string) => {
+    if (!query) return [];
+    const terms = query.split(",");
+    const lastTerm = terms[terms.length - 1].trim().toLowerCase();
+    if (!lastTerm) return [];
+
+    return allTrackerNames.filter(t => {
+      const abbr = getAbbr(t).toLowerCase();
+      return t.toLowerCase().includes(lastTerm) || abbr.includes(lastTerm);
+    }).slice(0, 8);
+  };
+
+  const handleCollectionSelect = (selectedItem: string) => {
+    const terms = collectionInput.split(",");
+    terms.pop();
+    terms.push(selectedItem);
+    const newValue = terms.join(", ") + ", ";
+    setCollectionInput(newValue);
+    setCollection(newValue);
+    setShowCollectionSug(false);
+    setCollectionActiveIndex(-1);
+  };
+
+  const handleCollectionKeyDown = (e: React.KeyboardEvent) => {
+    if (!showCollectionSug) return;
+    const suggestions = getSuggestions(collectionInput);
+    if (suggestions.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setCollectionActiveIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setCollectionActiveIndex(prev => (prev > 0 ? prev - 1 : 0));
+    } else if (e.key === "Enter" && collectionActiveIndex >= 0 && suggestions[collectionActiveIndex]) {
+      e.preventDefault();
+      handleCollectionSelect(suggestions[collectionActiveIndex]);
+    } else if (e.key === "Escape") {
+      setShowCollectionSug(false);
+    }
+  };
 
   const isDark = resolvedTheme === "dark";
   const defaultNodeColor = isDark ? "#60a5fa" : "#2563eb";
   const dimColor = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
-  const pathColor = "#22c55e"; 
+  const pathColor = "#22c55e";
+  const collectionColor = "#a855f7"; // Purple
   const bgColor = "rgba(0,0,0,0)";
   const textColor = isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.9)";
 
   return (
     <div ref={containerRef} className="relative w-full h-full overflow-hidden bg-background">
-      
-      <div 
-        className={`absolute top-4 left-4 z-20 bg-card border border-border/50 rounded-xl overflow-hidden transition-all duration-500 ease-in-out ${
-          isPanelOpen ? "w-64 md:w-80" : "w-[135px]"
-        } ${selectedNodeId ? "hidden md:block" : ""}`}
+
+      {/* Pathfinder Panel */}
+      <div
+        className={`absolute top-4 left-4 z-20 bg-card border border-border/50 rounded-xl overflow-hidden transition-all duration-500 ease-in-out ${isPanelOpen ? "w-64 md:w-80" : "w-[135px]"
+          } ${selectedNodeId ? "hidden md:block" : ""}`}
       >
         <button
           onClick={() => setIsPanelOpen(!isPanelOpen)}
@@ -104,21 +167,20 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             directions
           </span>
           <span className="text-sm font-bold tracking-tight flex-1">Pathfinder</span>
-          
+
           {!isPanelOpen && activePath && (
-             <span className="w-2 h-2 rounded-full bg-green-500 mr-1 animate-pulse"></span>
+            <span className="w-2 h-2 rounded-full bg-green-500 mr-1 animate-pulse"></span>
           )}
         </button>
 
-        <div 
-          className={`overflow-hidden transition-all duration-500 ease-in-out ${
-            isPanelOpen ? "max-h-[500px] opacity-100 border-t border-border/50" : "max-h-0 opacity-0 border-t-0"
-          }`}
+        <div
+          className={`overflow-hidden transition-all duration-500 ease-in-out ${isPanelOpen ? "max-h-[500px] opacity-100 border-t border-border/50" : "max-h-0 opacity-0 border-t-0"
+            }`}
         >
           <div className="p-4 flex flex-col gap-4 min-w-[250px]">
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-muted-foreground ml-1">Source Tracker</label>
-              <select 
+              <select
                 className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5"
                 value={pathStart}
                 onChange={(e) => setPathStart(e.target.value)}
@@ -132,7 +194,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
 
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-muted-foreground ml-1">Target Tracker</label>
-              <select 
+              <select
                 className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5"
                 value={pathEnd}
                 onChange={(e) => setPathEnd(e.target.value)}
@@ -155,13 +217,95 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 Path found ({activePath.length - 1} steps)
               </div>
             )}
-            
+
             {(pathStart || pathEnd) && (
-              <button 
+              <button
                 onClick={() => { setPathStart(""); setPathEnd(""); }}
                 className="text-sm text-muted-foreground hover:text-foreground underline decoration-dotted mt-1"
               >
                 Clear path
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Collection Panel */}
+      <div
+        className={`absolute top-4 right-4 z-20 bg-card border border-border/50 rounded-xl overflow-hidden transition-all duration-500 ease-in-out ${isCollectionPanelOpen ? "w-64 md:w-80" : "w-[130px]"
+          }`}
+      >
+        <button
+          onClick={() => setIsCollectionPanelOpen(!isCollectionPanelOpen)}
+          className="w-full flex items-center gap-2 px-4 py-3 text-left outline-none whitespace-nowrap"
+        >
+          <span className={`material-symbols-rounded text-lg transition-transform duration-300 ${isCollectionPanelOpen ? "rotate-90 text-purple-500" : "text-foreground"}`}>
+            bookmarks
+          </span>
+          <span className="text-sm font-bold tracking-tight flex-1">Collection</span>
+
+          {!isCollectionPanelOpen && collectionNodes.length > 0 && (
+            <span className="w-2 h-2 rounded-full bg-purple-500 mr-1 animate-pulse"></span>
+          )}
+        </button>
+
+        <div
+          className={`overflow-hidden transition-all duration-500 ease-in-out ${isCollectionPanelOpen ? "max-h-[500px] opacity-100 border-t border-border/50" : "max-h-0 opacity-0 border-t-0"
+            }`}
+        >
+          <div className="p-4 flex flex-col gap-4 min-w-[250px]">
+            <div className="flex flex-col gap-1.5 relative" ref={collectionWrapperRef}>
+              <label className="text-sm font-medium text-muted-foreground ml-1">My Trackers</label>
+              <input
+                type="text"
+                placeholder="e.g. RED, PTP, MAM"
+                className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5 outline-none focus:border-purple-500/50 transition-colors"
+                value={collectionInput}
+                onFocus={() => setShowCollectionSug(true)}
+                onChange={(e) => {
+                  setCollectionInput(e.target.value);
+                  setCollection(e.target.value);
+                  setShowCollectionSug(true);
+                  setCollectionActiveIndex(-1);
+                }}
+                onKeyDown={handleCollectionKeyDown}
+              />
+
+              {showCollectionSug && getSuggestions(collectionInput).length > 0 && (
+                <div className="absolute top-full left-0 w-full mt-1 bg-card border border-border/50 rounded-md shadow-lg overflow-hidden z-50 max-h-40 overflow-y-auto" ref={collectionListRef}>
+                  {getSuggestions(collectionInput).map((item, i) => (
+                    <div
+                      key={i}
+                      className={`px-3 py-2 text-sm cursor-pointer transition-colors flex items-center justify-between ${i === collectionActiveIndex
+                        ? 'bg-purple-500/10 text-purple-500'
+                        : 'hover:bg-foreground/5'
+                        }`}
+                      onClick={() => handleCollectionSelect(item)}
+                    >
+                      <span>{item}</span>
+                      <span className="text-xs text-muted-foreground">{getAbbr(item)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {collectionNodes.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {collectionNodes.map((node) => (
+                  <span key={node} className="text-xs font-semibold bg-purple-500/10 text-purple-500 px-2 py-1 rounded-md border border-purple-500/20">
+                    {node}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {collection && (
+              <button
+                onClick={() => { setCollection(""); setCollectionInput(""); }}
+                className="text-sm text-muted-foreground hover:text-foreground underline decoration-dotted mt-1 self-start"
+              >
+                Clear collection
               </button>
             )}
           </div>
@@ -175,27 +319,30 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
           height={dimensions.height}
           graphData={data}
           backgroundColor={bgColor}
-          
+
           nodeColor={(node: any) => {
             if (activePath) {
               return activePath.includes(node.id) ? pathColor : dimColor;
             }
             if (selectedNodeId) {
-                return node.id === selectedNodeId || rawData.routeInfo[selectedNodeId]?.[node.id] || rawData.routeInfo[node.id]?.[selectedNodeId] 
-                ? defaultNodeColor 
+              return node.id === selectedNodeId || rawData.routeInfo[selectedNodeId]?.[node.id] || rawData.routeInfo[node.id]?.[selectedNodeId]
+                ? defaultNodeColor
                 : dimColor;
+            }
+            if (collectionNodes.includes(node.id)) {
+              return collectionColor;
             }
             return defaultNodeColor;
           }}
 
           nodeLabel="id"
           nodeRelSize={6}
-          
+
           linkColor={(link: any) => {
             if (activePath) {
               const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
               const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-              
+
               const sourceIndex = activePath.indexOf(sourceId);
               if (sourceIndex !== -1 && activePath[sourceIndex + 1] === targetId) {
                 return pathColor;
@@ -203,21 +350,21 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
               return dimColor;
             }
             if (selectedNodeId) {
-                 return dimColor; 
+              return dimColor;
             }
             return isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)";
           }}
 
           linkWidth={(link: any) => {
-             if (activePath) {
-                const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-                const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-                const sourceIndex = activePath.indexOf(sourceId);
-                if (sourceIndex !== -1 && activePath[sourceIndex + 1] === targetId) {
-                    return 3;
-                }
-             }
-             return 1;
+            if (activePath) {
+              const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+              const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+              const sourceIndex = activePath.indexOf(sourceId);
+              if (sourceIndex !== -1 && activePath[sourceIndex + 1] === targetId) {
+                return 3;
+              }
+            }
+            return 1;
           }}
 
           linkDirectionalArrowLength={3.5}
@@ -225,7 +372,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
           linkCurvature={0.1}
 
           onNodeClick={(node: any) => {
-            if (activePath) return; 
+            if (activePath) return;
             setSelectedNodeId(node.id);
             fgRef.current.centerAt(node.x, node.y, 1000);
             fgRef.current.zoom(2.5, 2000);
@@ -236,47 +383,51 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
           }}
 
           nodeCanvasObject={(node: any, ctx, globalScale) => {
-              const label = node.id;
-              const fontSize = 12 / globalScale;
-              
-              const isDimmed = activePath && !activePath.includes(node.id);
-              const isPathNode = activePath && activePath.includes(node.id);
-              
-              ctx.globalAlpha = isDimmed ? 0.1 : 1;
+            const label = node.id;
+            const fontSize = 12 / globalScale;
 
-              ctx.beginPath();
-              ctx.arc(node.x, node.y, 5, 0, 2 * Math.PI, false);
-              ctx.fillStyle = isPathNode ? pathColor : defaultNodeColor;
-              ctx.fill();
+            const isDimmed = activePath && !activePath.includes(node.id);
+            const isPathNode = activePath && activePath.includes(node.id);
+            const isCollectionNode = !activePath && collectionNodes.includes(node.id);
 
-              ctx.globalAlpha = 1; 
+            ctx.globalAlpha = isDimmed ? 0.1 : 1;
 
-              if (globalScale > 1.5 || isPathNode) {
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, 5, 0, 2 * Math.PI, false);
+            ctx.fillStyle = isPathNode ? pathColor : (isCollectionNode ? collectionColor : defaultNodeColor);
+            ctx.fill();
+
+            ctx.globalAlpha = 1;
+
+            if (globalScale > 1.5 || isPathNode || isCollectionNode) {
+              ctx.font = `500 ${fontSize}px ${fontFace}`;
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+
+              if (isPathNode) {
+                ctx.fillStyle = isDark ? "#fff" : "#000";
+                ctx.font = `bold ${fontSize * 1.2}px ${fontFace}`;
+              } else if (isCollectionNode) {
+                ctx.fillStyle = collectionColor;
                 ctx.font = `500 ${fontSize}px ${fontFace}`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                
-                if (isPathNode) {
-                    ctx.fillStyle = isDark ? "#fff" : "#000";
-                    ctx.font = `bold ${fontSize * 1.2}px ${fontFace}`;
-                } else if (isDimmed) {
-                    ctx.fillStyle = "rgba(128,128,128,0.2)"; 
-                } else {
-                    ctx.fillStyle = textColor;
-                }
-                
-                ctx.fillText(label, node.x, node.y + 8);
+              } else if (isDimmed) {
+                ctx.fillStyle = "rgba(128,128,128,0.2)";
+              } else {
+                ctx.fillStyle = textColor;
               }
+
+              ctx.fillText(label, node.x, node.y + 8);
+            }
           }}
         />
       </div>
 
       {!activePath && selectedNodeId && selectedNodeDetails && (
         <aside className="absolute top-4 bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-80 flex flex-col rounded-xl bg-card border border-border/50 z-10 overflow-hidden animate-in slide-in-from-right-10 fade-in duration-300">
-          
+
           <div className="flex items-center justify-between p-5 border-b border-border/40 shrink-0">
             <h2 className="text-xl font-bold tracking-tight truncate pr-2">{selectedNodeId}</h2>
-            <button 
+            <button
               onClick={() => setSelectedNodeId(null)}
               className="p-1.5 rounded-full transition-opacity opacity-70 hover:opacity-100"
             >
