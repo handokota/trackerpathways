@@ -31,15 +31,23 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   const [pathEnd, setPathEnd] = useState<string>("");
   const [activePath, setActivePath] = useState<string[] | null>(null);
 
+  const [pathStartInput, setPathStartInput] = useState("");
+  const [showPathStartSug, setShowPathStartSug] = useState(false);
+  const [pathStartActiveIndex, setPathStartActiveIndex] = useState(-1);
+  const pathStartListRef = useRef<HTMLDivElement>(null);
+
+  const [pathEndInput, setPathEndInput] = useState("");
+  const [showPathEndSug, setShowPathEndSug] = useState(false);
+  const [pathEndActiveIndex, setPathEndActiveIndex] = useState(-1);
+  const pathEndListRef = useRef<HTMLDivElement>(null);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const fgRef = useRef<any>(null);
 
   const allTrackerNames = useMemo(() => {
-    // Determine sort based on graph data or rawData
     return data.nodes.map(n => n.id).sort((a: string, b: string) => a.localeCompare(b));
   }, [data]);
 
-  // Collection State
   const [collection, setCollection] = useState<string>("");
   const [isCollectionPanelOpen, setIsCollectionPanelOpen] = useState(false);
   const [collectionInput, setCollectionInput] = useState("");
@@ -52,21 +60,13 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     const savedCollection = localStorage.getItem("tracker-collection");
     if (savedCollection) {
       setCollection(savedCollection);
-      setCollectionInput(savedCollection);
     }
   }, []);
-
-  const updateCollection = (newValue: string) => {
-    setCollection(newValue);
-    setCollectionInput(newValue);
-    localStorage.setItem("tracker-collection", newValue);
-  };
 
   const collectionNodes = useMemo(() => {
     return collection.split(",").map(s => s.trim()).filter(s => s && allTrackerNames.includes(s));
   }, [collection, allTrackerNames]);
 
-  // Compute neighbors of the collection
   const collectionNeighbors = useMemo(() => {
     if (collectionNodes.length === 0) return new Set<string>();
     const neighbors = new Set<string>();
@@ -74,13 +74,8 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     collectionNodes.forEach(nodeId => {
       const outgoing = rawData.routeInfo[nodeId];
       if (outgoing) Object.keys(outgoing).forEach(target => neighbors.add(target));
-
-      // Also check incoming if we want bidirectional neighborhood (usually graph visualization implies undirected or we care about connectivity)
-      // Checking rawData for incoming is expensive if not pre-calculated. 
-      // However, `data.links` contains all connections. Let's use `data.links`.
     });
 
-    // Efficient lookup using data.links
     data.links.forEach((link: any) => {
       const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
       const targetId = typeof link.target === 'object' ? link.target.id : link.target;
@@ -89,9 +84,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
       if (collectionNodes.includes(targetId)) neighbors.add(sourceId);
     });
 
-    // Remove collection nodes themselves from neighbors set
     collectionNodes.forEach(nodeId => neighbors.delete(nodeId));
-
     return neighbors;
   }, [collectionNodes, data.links, rawData]);
 
@@ -106,10 +99,8 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     };
 
     setFontFace(window.getComputedStyle(document.body).fontFamily);
-
     window.addEventListener("resize", updateDimensions);
     updateDimensions();
-
     return () => window.removeEventListener("resize", updateDimensions);
   }, []);
 
@@ -123,22 +114,56 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     }
   }, [pathStart, pathEnd, rawData]);
 
+  useEffect(() => {
+    if (pathStartActiveIndex >= 0 && pathStartListRef.current) {
+      const list = pathStartListRef.current;
+      const activeElement = list.children[pathStartActiveIndex] as HTMLElement;
+      if (activeElement) {
+        if (pathStartActiveIndex === 0) list.scrollTop = 0;
+        else if (pathStartActiveIndex === list.children.length - 1) list.scrollTop = list.scrollHeight;
+        else activeElement.scrollIntoView({ block: "nearest" });
+      }
+    }
+  }, [pathStartActiveIndex]);
+
+  useEffect(() => {
+    if (pathEndActiveIndex >= 0 && pathEndListRef.current) {
+      const list = pathEndListRef.current;
+      const activeElement = list.children[pathEndActiveIndex] as HTMLElement;
+      if (activeElement) {
+        if (pathEndActiveIndex === 0) list.scrollTop = 0;
+        else if (pathEndActiveIndex === list.children.length - 1) list.scrollTop = list.scrollHeight;
+        else activeElement.scrollIntoView({ block: "nearest" });
+      }
+    }
+  }, [pathEndActiveIndex]);
+
+  useEffect(() => {
+    if (collectionActiveIndex >= 0 && collectionListRef.current) {
+      const list = collectionListRef.current;
+      const activeElement = list.children[collectionActiveIndex] as HTMLElement;
+      if (activeElement) {
+        if (collectionActiveIndex === 0) list.scrollTop = 0;
+        else if (collectionActiveIndex === list.children.length - 1) list.scrollTop = list.scrollHeight;
+        else activeElement.scrollIntoView({ block: "nearest" });
+      }
+    }
+  }, [collectionActiveIndex]);
+
   const selectedNodeDetails = useMemo(() => {
     if (!selectedNodeId) return null;
-
     const outgoing = rawData.routeInfo[selectedNodeId] || {};
-
     const incoming: Record<string, any> = {};
     Object.entries(rawData.routeInfo).forEach(([source, targets]) => {
       if (targets[selectedNodeId]) {
         incoming[source] = targets[selectedNodeId];
       }
     });
-
     return { outgoing, incoming };
   }, [selectedNodeId, rawData]);
 
   const getAbbr = (name: string) => {
+    if (rawData.abbrList && rawData.abbrList[name]) return rawData.abbrList[name];
     const capitals = name.match(/[A-Z]/g);
     if (capitals && capitals.length >= 2) return capitals.join("");
     return name.substring(0, 3).toUpperCase();
@@ -157,15 +182,24 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   };
 
   const handleCollectionSelect = (selectedItem: string) => {
-    const terms = collectionInput.split(",");
-    terms.pop();
-    terms.push(selectedItem);
-    const newValue = terms.join(", ") + ", ";
-    setCollectionInput(newValue);
-    setCollection(newValue);
-    localStorage.setItem("tracker-collection", newValue);
+    const currentList = collection.split(",").map(s => s.trim()).filter(s => s);
+    
+    if (!currentList.includes(selectedItem)) {
+      const newValue = [...currentList, selectedItem].join(", ");
+      setCollection(newValue);
+      localStorage.setItem("tracker-collection", newValue);
+    }
+    
+    setCollectionInput("");
     setShowCollectionSug(false);
     setCollectionActiveIndex(-1);
+  };
+
+  const removeCollectionItem = (itemToRemove: string) => {
+    const currentList = collection.split(",").map(s => s.trim()).filter(s => s);
+    const newValue = currentList.filter(item => item !== itemToRemove).join(", ");
+    setCollection(newValue);
+    localStorage.setItem("tracker-collection", newValue);
   };
 
   const handleCollectionKeyDown = (e: React.KeyboardEvent) => {
@@ -187,74 +221,171 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     }
   };
 
+  const handlePathStartSelect = (selectedItem: string) => {
+    setPathStart(selectedItem);
+    setPathStartInput(selectedItem);
+    setShowPathStartSug(false);
+    setPathStartActiveIndex(-1);
+  };
+
+  const handlePathStartKeyDown = (e: React.KeyboardEvent) => {
+    if (!showPathStartSug) return;
+    const suggestions = getSuggestions(pathStartInput);
+    if (suggestions.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setPathStartActiveIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setPathStartActiveIndex(prev => (prev > 0 ? prev - 1 : 0));
+    } else if (e.key === "Enter" && pathStartActiveIndex >= 0 && suggestions[pathStartActiveIndex]) {
+      e.preventDefault();
+      handlePathStartSelect(suggestions[pathStartActiveIndex]);
+    } else if (e.key === "Escape") {
+      setShowPathStartSug(false);
+    }
+  };
+
+  const handlePathEndSelect = (selectedItem: string) => {
+    setPathEnd(selectedItem);
+    setPathEndInput(selectedItem);
+    setShowPathEndSug(false);
+    setPathEndActiveIndex(-1);
+  };
+
+  const handlePathEndKeyDown = (e: React.KeyboardEvent) => {
+    if (!showPathEndSug) return;
+    const suggestions = getSuggestions(pathEndInput);
+    if (suggestions.length === 0) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setPathEndActiveIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setPathEndActiveIndex(prev => (prev > 0 ? prev - 1 : 0));
+    } else if (e.key === "Enter" && pathEndActiveIndex >= 0 && suggestions[pathEndActiveIndex]) {
+      e.preventDefault();
+      handlePathEndSelect(suggestions[pathEndActiveIndex]);
+    } else if (e.key === "Escape") {
+      setShowPathEndSug(false);
+    }
+  };
+
   const isDark = resolvedTheme === "dark";
   const defaultNodeColor = isDark ? "#60a5fa" : "#2563eb";
   const dimColor = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
-  const distantNodeColor = isDark ? "#4b5563" : "#9ca3af"; // Dark Gray / Gray for distant nodes
+  const distantNodeColor = isDark ? "#4b5563" : "#9ca3af";
   const pathColor = "#22c55e";
-  const collectionColor = "#a855f7"; // Purple
+  const collectionColor = "#a855f7";
   const bgColor = "rgba(0,0,0,0)";
   const textColor = isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.9)";
   const distantTextColor = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)";
 
-  // Check if rings mode is active (collection exists and no path selected)
   const isRingMode = collectionNodes.length > 0 && !activePath && !selectedNodeId;
 
   return (
     <div ref={containerRef} className="relative w-full h-full overflow-hidden bg-background">
 
-      {/* Panel Container */}
       <div className={`absolute top-4 left-4 z-20 flex flex-col gap-4 ${selectedNodeId ? "hidden md:flex" : ""}`}>
 
-        {/* Pathfinder Panel */}
-        <div
-          className={`bg-card border border-border/50 rounded-xl overflow-hidden transition-all duration-500 ease-in-out ${isPanelOpen ? "w-64 md:w-80" : "w-[135px]"}`}
-        >
+        <div className={`relative z-30 bg-card/95 backdrop-blur-sm border border-border/50 rounded-xl transition-all duration-500 ease-in-out ${isPanelOpen ? "w-64 md:w-80" : "w-12"}`}>
           <button
             onClick={() => setIsPanelOpen(!isPanelOpen)}
-            className="w-full flex items-center gap-2 px-4 py-3 text-left outline-none whitespace-nowrap"
+            className={`w-full flex items-center py-3 text-left outline-none whitespace-nowrap overflow-hidden transition-all duration-500 ${isPanelOpen ? "justify-start px-4" : "justify-center px-0"}`}
           >
-            <span className={`material-symbols-rounded text-lg transition-transform duration-300 ${isPanelOpen ? "rotate-90 text-primary" : "text-foreground"}`}>
+            <span className={`material-symbols-rounded text-lg shrink-0 transition-transform duration-300 ${isPanelOpen ? "rotate-90 text-green-500" : "text-foreground"}`}>
               directions
             </span>
-            <span className="text-sm font-bold tracking-tight flex-1">Pathfinder</span>
+            <span className={`text-sm font-bold tracking-tight transition-all duration-500 ${isPanelOpen ? "opacity-100 max-w-[200px] ml-2" : "opacity-0 max-w-0 ml-0"}`}>
+              Pathfinder
+            </span>
 
             {!isPanelOpen && activePath && (
-              <span className="w-2 h-2 rounded-full bg-green-500 mr-1 animate-pulse"></span>
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             )}
           </button>
 
-          <div
-            className={`overflow-hidden transition-all duration-500 ease-in-out ${isPanelOpen ? "max-h-[500px] opacity-100 border-t border-border/50" : "max-h-0 opacity-0 border-t-0"
-              }`}
-          >
+          <div className={`transition-all duration-500 ease-in-out ${isPanelOpen ? "max-h-[500px] opacity-100 border-t border-border/50 overflow-visible" : "max-h-0 opacity-0 border-t-0 overflow-hidden"}`}>
             <div className="p-4 flex flex-col gap-4 min-w-[250px]">
-              <div className="flex flex-col gap-1.5">
+              
+              <div className="flex flex-col gap-1.5 relative">
                 <label className="text-sm font-medium text-muted-foreground ml-1">Source Tracker</label>
-                <select
-                  className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5"
-                  value={pathStart}
-                  onChange={(e) => setPathStart(e.target.value)}
-                >
-                  <option value="">Select source</option>
-                  {allTrackerNames.map(name => (
-                    <option key={`start-${name}`} value={name}>{name}</option>
-                  ))}
-                </select>
+                <input
+                  type="text"
+                  placeholder="Select source"
+                  className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5 outline-none focus:border-green-500/50 transition-colors"
+                  value={pathStartInput}
+                  onFocus={() => setShowPathStartSug(true)}
+                  onChange={(e) => {
+                    setPathStartInput(e.target.value);
+                    setPathStart(""); 
+                    setShowPathStartSug(true);
+                    setPathStartActiveIndex(-1);
+                  }}
+                  onKeyDown={handlePathStartKeyDown}
+                />
+                
+                {showPathStartSug && getSuggestions(pathStartInput).length > 0 && (
+                  <>
+                    <div className="fixed inset-0 z-30" onClick={() => setShowPathStartSug(false)} />
+                    <div className="absolute top-full left-0 w-full mt-1 bg-card border border-border/50 rounded-xl shadow-lg overflow-hidden z-40 max-h-40 overflow-y-auto p-1" ref={pathStartListRef}>
+                      {getSuggestions(pathStartInput).map((item, i) => (
+                        <div
+                          key={i}
+                          className={`px-3 py-2.5 rounded-md text-sm cursor-pointer transition-colors text-foreground/90 font-medium flex items-center justify-between ${i === pathStartActiveIndex
+                            ? 'bg-foreground/10'
+                            : 'hover:bg-foreground/5'
+                          }`}
+                          onClick={() => handlePathStartSelect(item)}
+                        >
+                          <span>{item}</span>
+                          <span className="text-[10px] text-foreground/40 font-semibold">{getAbbr(item)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
 
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1.5 relative">
                 <label className="text-sm font-medium text-muted-foreground ml-1">Target Tracker</label>
-                <select
-                  className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5"
-                  value={pathEnd}
-                  onChange={(e) => setPathEnd(e.target.value)}
-                >
-                  <option value="">Select target</option>
-                  {allTrackerNames.map(name => (
-                    <option key={`end-${name}`} value={name}>{name}</option>
-                  ))}
-                </select>
+                <input
+                  type="text"
+                  placeholder="Select target"
+                  className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5 outline-none focus:border-green-500/50 transition-colors"
+                  value={pathEndInput}
+                  onFocus={() => setShowPathEndSug(true)}
+                  onChange={(e) => {
+                    setPathEndInput(e.target.value);
+                    setPathEnd("");
+                    setShowPathEndSug(true);
+                    setPathEndActiveIndex(-1);
+                  }}
+                  onKeyDown={handlePathEndKeyDown}
+                />
+                
+                {showPathEndSug && getSuggestions(pathEndInput).length > 0 && (
+                  <>
+                    <div className="fixed inset-0 z-30" onClick={() => setShowPathEndSug(false)} />
+                    <div className="absolute top-full left-0 w-full mt-1 bg-card border border-border/50 rounded-xl shadow-lg overflow-hidden z-40 max-h-40 overflow-y-auto p-1" ref={pathEndListRef}>
+                      {getSuggestions(pathEndInput).map((item, i) => (
+                        <div
+                          key={i}
+                          className={`px-3 py-2.5 rounded-md text-sm cursor-pointer transition-colors text-foreground/90 font-medium flex items-center justify-between ${i === pathEndActiveIndex
+                            ? 'bg-foreground/10'
+                            : 'hover:bg-foreground/5'
+                          }`}
+                          onClick={() => handlePathEndSelect(item)}
+                        >
+                          <span>{item}</span>
+                          <span className="text-[10px] text-foreground/40 font-semibold">{getAbbr(item)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
 
               {pathStart && pathEnd && !activePath && (
@@ -269,10 +400,13 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 </div>
               )}
 
-              {(pathStart || pathEnd) && (
+              {(pathStart || pathEnd || pathStartInput || pathEndInput) && (
                 <button
-                  onClick={() => { setPathStart(""); setPathEnd(""); }}
-                  className="text-sm text-muted-foreground hover:text-foreground underline decoration-dotted mt-1"
+                  onClick={() => { 
+                    setPathStart(""); setPathEnd(""); 
+                    setPathStartInput(""); setPathEndInput(""); 
+                  }}
+                  className="text-sm text-muted-foreground hover:text-foreground underline decoration-dotted mt-1 self-center"
                 >
                   Clear path
                 </button>
@@ -281,42 +415,35 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
           </div>
         </div>
 
-        {/* Collection Panel */}
-        <div
-          className={`bg-card border border-border/50 rounded-xl overflow-hidden transition-all duration-500 ease-in-out ${isCollectionPanelOpen ? "w-64 md:w-80" : "w-[130px]"}`}
-        >
+        <div className={`relative z-20 bg-card/95 backdrop-blur-sm border border-border/50 rounded-xl transition-all duration-500 ease-in-out ${isCollectionPanelOpen ? "w-64 md:w-80" : "w-12"}`}>
           <button
             onClick={() => setIsCollectionPanelOpen(!isCollectionPanelOpen)}
-            className="w-full flex items-center gap-2 px-4 py-3 text-left outline-none whitespace-nowrap"
+            className={`w-full flex items-center py-3 text-left outline-none whitespace-nowrap overflow-hidden transition-all duration-500 ${isCollectionPanelOpen ? "justify-start px-4" : "justify-center px-0"}`}
           >
-            <span className={`material-symbols-rounded text-lg transition-transform duration-300 ${isCollectionPanelOpen ? "rotate-90 text-purple-500" : "text-foreground"}`}>
+            <span className={`material-symbols-rounded text-lg shrink-0 transition-transform duration-300 ${isCollectionPanelOpen ? "rotate-90 text-purple-500" : "text-foreground"}`}>
               bookmarks
             </span>
-            <span className="text-sm font-bold tracking-tight flex-1">Collection</span>
+            <span className={`text-sm font-bold tracking-tight transition-all duration-500 ${isCollectionPanelOpen ? "opacity-100 max-w-[200px] ml-2" : "opacity-0 max-w-0 ml-0"}`}>
+              Collection
+            </span>
 
             {!isCollectionPanelOpen && collectionNodes.length > 0 && (
-              <span className="w-2 h-2 rounded-full bg-purple-500 mr-1 animate-pulse"></span>
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
             )}
           </button>
 
-          <div
-            className={`overflow-hidden transition-all duration-500 ease-in-out ${isCollectionPanelOpen ? "max-h-[500px] opacity-100 border-t border-border/50" : "max-h-0 opacity-0 border-t-0"
-              }`}
-          >
+          <div className={`transition-all duration-500 ease-in-out ${isCollectionPanelOpen ? "max-h-[500px] opacity-100 border-t border-border/50 overflow-visible" : "max-h-0 opacity-0 border-t-0 overflow-hidden"}`}>
             <div className="p-4 flex flex-col gap-4 min-w-[250px]">
               <div className="flex flex-col gap-1.5 relative" ref={collectionWrapperRef}>
                 <label className="text-sm font-medium text-muted-foreground ml-1">My Trackers</label>
                 <input
                   type="text"
-                  placeholder="e.g. RED, PTP, MAM"
+                  placeholder="Type to add (e.g. RED)"
                   className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5 outline-none focus:border-purple-500/50 transition-colors"
                   value={collectionInput}
                   onFocus={() => setShowCollectionSug(true)}
                   onChange={(e) => {
-                    const val = e.target.value;
-                    setCollectionInput(val);
-                    setCollection(val);
-                    localStorage.setItem("tracker-collection", val);
+                    setCollectionInput(e.target.value);
                     setShowCollectionSug(true);
                     setCollectionActiveIndex(-1);
                   }}
@@ -324,30 +451,38 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 />
 
                 {showCollectionSug && getSuggestions(collectionInput).length > 0 && (
-                  <div className="absolute top-full left-0 w-full mt-1 bg-card border border-border/50 rounded-md shadow-lg overflow-hidden z-50 max-h-40 overflow-y-auto" ref={collectionListRef}>
-                    {getSuggestions(collectionInput).map((item, i) => (
-                      <div
-                        key={i}
-                        className={`px-3 py-2 text-sm cursor-pointer transition-colors flex items-center justify-between ${i === collectionActiveIndex
-                          ? 'bg-purple-500/10 text-purple-500'
-                          : 'hover:bg-foreground/5'
+                  <>
+                    <div className="fixed inset-0 z-30" onClick={() => setShowCollectionSug(false)} />
+                    <div className="absolute top-full left-0 w-full mt-1 bg-card border border-border/50 rounded-xl shadow-lg overflow-hidden z-40 max-h-40 overflow-y-auto p-1" ref={collectionListRef}>
+                      {getSuggestions(collectionInput).map((item, i) => (
+                        <div
+                          key={i}
+                          className={`px-3 py-2.5 rounded-md text-sm cursor-pointer transition-colors text-foreground/90 font-medium flex items-center justify-between ${i === collectionActiveIndex
+                            ? 'bg-foreground/10'
+                            : 'hover:bg-foreground/5'
                           }`}
-                        onClick={() => handleCollectionSelect(item)}
-                      >
-                        <span>{item}</span>
-                        <span className="text-xs text-muted-foreground">{getAbbr(item)}</span>
-                      </div>
-                    ))}
-                  </div>
+                          onClick={() => handleCollectionSelect(item)}
+                        >
+                          <span>{item}</span>
+                          <span className="text-[10px] text-foreground/40 font-semibold">{getAbbr(item)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}
               </div>
 
               {collectionNodes.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-1">
                   {collectionNodes.map((node) => (
-                    <span key={node} className="text-xs font-semibold bg-purple-500/10 text-purple-500 px-2 py-1 rounded-md border border-purple-500/20">
+                    <button 
+                      key={node} 
+                      onClick={() => removeCollectionItem(node)}
+                      className="px-2.5 py-1 rounded-md text-sm font-medium bg-purple-500/10 hover:bg-red-500/10 text-purple-600 dark:text-purple-400 hover:text-red-600 dark:hover:text-red-400 border border-purple-500/20 hover:border-red-500/20 transition-colors cursor-pointer"
+                      title="Remove from collection"
+                    >
                       {node}
-                    </span>
+                    </button>
                   ))}
                 </div>
               )}
@@ -356,10 +491,9 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 <button
                   onClick={() => {
                     setCollection("");
-                    setCollectionInput("");
                     localStorage.removeItem("tracker-collection");
                   }}
-                  className="text-sm text-muted-foreground hover:text-foreground underline decoration-dotted mt-1 self-start"
+                  className="text-sm text-muted-foreground hover:text-foreground underline decoration-dotted mt-1 self-center"
                 >
                   Clear collection
                 </button>
@@ -387,16 +521,13 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 : dimColor;
             }
 
-            // Ring Visualization
             if (isRingMode) {
               if (collectionNodes.includes(node.id)) return collectionColor;
               if (collectionNeighbors.has(node.id)) return defaultNodeColor;
               return distantNodeColor;
             }
 
-            if (collectionNodes.includes(node.id)) {
-              return collectionColor;
-            }
+            if (collectionNodes.includes(node.id)) return collectionColor;
             return defaultNodeColor;
           }}
 
@@ -407,44 +538,20 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             if (activePath) {
               const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
               const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-
               const sourceIndex = activePath.indexOf(sourceId);
-              if (sourceIndex !== -1 && activePath[sourceIndex + 1] === targetId) {
-                return pathColor;
-              }
+              if (sourceIndex !== -1 && activePath[sourceIndex + 1] === targetId) return pathColor;
               return dimColor;
             }
-            if (selectedNodeId) {
-              return dimColor;
-            }
+            if (selectedNodeId) return dimColor;
 
-            // Ring Link Visualization
             if (isRingMode) {
               const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
               const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-
               const isSourceRel = collectionNodes.includes(sourceId) || collectionNeighbors.has(sourceId);
               const isTargetRel = collectionNodes.includes(targetId) || collectionNeighbors.has(targetId);
 
-              // Keep link visible if it connects to the "core" (collection or neighbors)
-              // The request said: "If it is further than one hop away... make that second hop line 50% transparent"
-              // Interpretation: 
-              // Link between Collection <-> Neighbor: Visible
-              // Link between Neighbor <-> Distant: Visible? Or Dimmed? 
-              // "everything tracker directly conencted to the purple collection tracker, leave it blue." (Nodes)
-              // "If it is further than one hop away, make it a darker gray." (Nodes)
-              // "make that second hop line 50% transparent" (Links)
-
-              // Logic: If BOTH ends are Distant (Gray), make it very dim.
-              // If ONE end is at least Neighbor or Collection, keep it standard (or slightly dimmed?)
-              // "second hop line" implies the line leaving the neighbor going outwards.
-              // So if Source is Neighbor and Target is Distant -> 50% transparent.
-
-              if (isSourceRel && isTargetRel) {
-                return isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)"; // Standard visibility
-              }
-
-              return isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"; // High transparency for distant links
+              if (isSourceRel && isTargetRel) return isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)";
+              return isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
             }
 
             return isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)";
@@ -455,9 +562,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
               const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
               const targetId = typeof link.target === 'object' ? link.target.id : link.target;
               const sourceIndex = activePath.indexOf(sourceId);
-              if (sourceIndex !== -1 && activePath[sourceIndex + 1] === targetId) {
-                return 3;
-              }
+              if (sourceIndex !== -1 && activePath[sourceIndex + 1] === targetId) return 3;
             }
             return 1;
           }}
@@ -473,9 +578,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             fgRef.current.zoom(2.5, 2000);
           }}
 
-          onBackgroundClick={() => {
-            setSelectedNodeId(null);
-          }}
+          onBackgroundClick={() => setSelectedNodeId(null)}
 
           nodeCanvasObject={(node: any, ctx, globalScale) => {
             const label = node.id;
@@ -484,32 +587,22 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             const isDimmed = activePath && !activePath.includes(node.id);
             const isPathNode = activePath && activePath.includes(node.id);
             const isCollectionNode = !activePath && collectionNodes.includes(node.id);
-
-            // Ring checks
             const isRingNeighbor = isRingMode && collectionNeighbors.has(node.id);
             const isRingDistant = isRingMode && !isCollectionNode && !isRingNeighbor;
 
             ctx.globalAlpha = isDimmed ? 0.1 : 1;
-
             ctx.beginPath();
             ctx.arc(node.x, node.y, 5, 0, 2 * Math.PI, false);
 
-            if (isPathNode) {
-              ctx.fillStyle = pathColor;
-            } else if (isCollectionNode) {
-              ctx.fillStyle = collectionColor;
-            } else if (isRingDistant) {
-              ctx.fillStyle = distantNodeColor;
-            } else {
-              ctx.fillStyle = defaultNodeColor;
-            }
+            if (isPathNode) ctx.fillStyle = pathColor;
+            else if (isCollectionNode) ctx.fillStyle = collectionColor;
+            else if (isRingDistant) ctx.fillStyle = distantNodeColor;
+            else ctx.fillStyle = defaultNodeColor;
 
             ctx.fill();
-
             ctx.globalAlpha = 1;
 
             if (globalScale > 1.5 || isPathNode || isCollectionNode || isRingNeighbor) {
-              ctx.font = `500 ${fontSize}px ${fontFace}`;
               ctx.textAlign = 'center';
               ctx.textBaseline = 'middle';
 
@@ -521,12 +614,14 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 ctx.font = `500 ${fontSize}px ${fontFace}`;
               } else if (isRingDistant) {
                 ctx.fillStyle = distantTextColor;
+                ctx.font = `500 ${fontSize}px ${fontFace}`;
               } else if (isDimmed) {
                 ctx.fillStyle = "rgba(128,128,128,0.2)";
+                ctx.font = `500 ${fontSize}px ${fontFace}`;
               } else {
                 ctx.fillStyle = textColor;
+                ctx.font = `500 ${fontSize}px ${fontFace}`;
               }
-
               ctx.fillText(label, node.x, node.y + 8);
             }
           }}
@@ -534,13 +629,12 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
       </div>
 
       {!activePath && selectedNodeId && selectedNodeDetails && (
-        <aside className="absolute top-4 bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-80 flex flex-col rounded-xl bg-card border border-border/50 z-10 overflow-hidden animate-in slide-in-from-right-10 fade-in duration-300">
-
+        <aside className="absolute top-4 bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-80 flex flex-col rounded-xl bg-card/95 backdrop-blur border border-border/50 z-10 overflow-hidden animate-in slide-in-from-right-10 fade-in duration-300 shadow-lg">
           <div className="flex items-center justify-between p-5 border-b border-border/40 shrink-0">
             <h2 className="text-xl font-bold tracking-tight truncate pr-2">{selectedNodeId}</h2>
             <button
               onClick={() => setSelectedNodeId(null)}
-              className="p-1.5 rounded-full transition-opacity opacity-70 hover:opacity-100"
+              className="p-1.5 rounded-full transition-opacity opacity-70 hover:opacity-100 hover:bg-foreground/5"
             >
               <span className="material-symbols-rounded text-lg">close</span>
             </button>
