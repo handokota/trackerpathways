@@ -52,6 +52,35 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     return collection.split(",").map(s => s.trim()).filter(s => s && allTrackerNames.includes(s));
   }, [collection, allTrackerNames]);
 
+  // Compute neighbors of the collection
+  const collectionNeighbors = useMemo(() => {
+    if (collectionNodes.length === 0) return new Set<string>();
+    const neighbors = new Set<string>();
+
+    collectionNodes.forEach(nodeId => {
+      const outgoing = rawData.routeInfo[nodeId];
+      if (outgoing) Object.keys(outgoing).forEach(target => neighbors.add(target));
+
+      // Also check incoming if we want bidirectional neighborhood (usually graph visualization implies undirected or we care about connectivity)
+      // Checking rawData for incoming is expensive if not pre-calculated. 
+      // However, `data.links` contains all connections. Let's use `data.links`.
+    });
+
+    // Efficient lookup using data.links
+    data.links.forEach((link: any) => {
+      const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+      const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+
+      if (collectionNodes.includes(sourceId)) neighbors.add(targetId);
+      if (collectionNodes.includes(targetId)) neighbors.add(sourceId);
+    });
+
+    // Remove collection nodes themselves from neighbors set
+    collectionNodes.forEach(nodeId => neighbors.delete(nodeId));
+
+    return neighbors;
+  }, [collectionNodes, data.links, rawData]);
+
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
@@ -146,10 +175,15 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   const isDark = resolvedTheme === "dark";
   const defaultNodeColor = isDark ? "#60a5fa" : "#2563eb";
   const dimColor = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
+  const distantNodeColor = isDark ? "#4b5563" : "#9ca3af"; // Dark Gray / Gray for distant nodes
   const pathColor = "#22c55e";
   const collectionColor = "#a855f7"; // Purple
   const bgColor = "rgba(0,0,0,0)";
   const textColor = isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.9)";
+  const distantTextColor = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)";
+
+  // Check if rings mode is active (collection exists and no path selected)
+  const isRingMode = collectionNodes.length > 0 && !activePath && !selectedNodeId;
 
   return (
     <div ref={containerRef} className="relative w-full h-full overflow-hidden bg-background">
@@ -329,6 +363,14 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 ? defaultNodeColor
                 : dimColor;
             }
+
+            // Ring Visualization
+            if (isRingMode) {
+              if (collectionNodes.includes(node.id)) return collectionColor;
+              if (collectionNeighbors.has(node.id)) return defaultNodeColor;
+              return distantNodeColor;
+            }
+
             if (collectionNodes.includes(node.id)) {
               return collectionColor;
             }
@@ -352,6 +394,36 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             if (selectedNodeId) {
               return dimColor;
             }
+
+            // Ring Link Visualization
+            if (isRingMode) {
+              const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+              const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+
+              const isSourceRel = collectionNodes.includes(sourceId) || collectionNeighbors.has(sourceId);
+              const isTargetRel = collectionNodes.includes(targetId) || collectionNeighbors.has(targetId);
+
+              // Keep link visible if it connects to the "core" (collection or neighbors)
+              // The request said: "If it is further than one hop away... make that second hop line 50% transparent"
+              // Interpretation: 
+              // Link between Collection <-> Neighbor: Visible
+              // Link between Neighbor <-> Distant: Visible? Or Dimmed? 
+              // "everything tracker directly conencted to the purple collection tracker, leave it blue." (Nodes)
+              // "If it is further than one hop away, make it a darker gray." (Nodes)
+              // "make that second hop line 50% transparent" (Links)
+
+              // Logic: If BOTH ends are Distant (Gray), make it very dim.
+              // If ONE end is at least Neighbor or Collection, keep it standard (or slightly dimmed?)
+              // "second hop line" implies the line leaving the neighbor going outwards.
+              // So if Source is Neighbor and Target is Distant -> 50% transparent.
+
+              if (isSourceRel && isTargetRel) {
+                return isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)"; // Standard visibility
+              }
+
+              return isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"; // High transparency for distant links
+            }
+
             return isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)";
           }}
 
@@ -390,16 +462,30 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             const isPathNode = activePath && activePath.includes(node.id);
             const isCollectionNode = !activePath && collectionNodes.includes(node.id);
 
+            // Ring checks
+            const isRingNeighbor = isRingMode && collectionNeighbors.has(node.id);
+            const isRingDistant = isRingMode && !isCollectionNode && !isRingNeighbor;
+
             ctx.globalAlpha = isDimmed ? 0.1 : 1;
 
             ctx.beginPath();
             ctx.arc(node.x, node.y, 5, 0, 2 * Math.PI, false);
-            ctx.fillStyle = isPathNode ? pathColor : (isCollectionNode ? collectionColor : defaultNodeColor);
+
+            if (isPathNode) {
+              ctx.fillStyle = pathColor;
+            } else if (isCollectionNode) {
+              ctx.fillStyle = collectionColor;
+            } else if (isRingDistant) {
+              ctx.fillStyle = distantNodeColor;
+            } else {
+              ctx.fillStyle = defaultNodeColor;
+            }
+
             ctx.fill();
 
             ctx.globalAlpha = 1;
 
-            if (globalScale > 1.5 || isPathNode || isCollectionNode) {
+            if (globalScale > 1.5 || isPathNode || isCollectionNode || isRingNeighbor) {
               ctx.font = `500 ${fontSize}px ${fontFace}`;
               ctx.textAlign = 'center';
               ctx.textBaseline = 'middle';
@@ -410,6 +496,8 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
               } else if (isCollectionNode) {
                 ctx.fillStyle = collectionColor;
                 ctx.font = `500 ${fontSize}px ${fontFace}`;
+              } else if (isRingDistant) {
+                ctx.fillStyle = distantTextColor;
               } else if (isDimmed) {
                 ctx.fillStyle = "rgba(128,128,128,0.2)";
               } else {
