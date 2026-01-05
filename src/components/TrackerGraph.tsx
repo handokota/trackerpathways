@@ -203,166 +203,168 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   return (
     <div ref={containerRef} className="relative w-full h-full overflow-hidden bg-background">
 
-      {/* Pathfinder Panel */}
-      <div
-        className={`absolute top-4 left-4 z-20 bg-card border border-border/50 rounded-xl overflow-hidden transition-all duration-500 ease-in-out ${isPanelOpen ? "w-64 md:w-80" : "w-[135px]"
-          } ${selectedNodeId ? "hidden md:block" : ""}`}
-      >
-        <button
-          onClick={() => setIsPanelOpen(!isPanelOpen)}
-          className="w-full flex items-center gap-2 px-4 py-3 text-left outline-none whitespace-nowrap"
-        >
-          <span className={`material-symbols-rounded text-lg transition-transform duration-300 ${isPanelOpen ? "rotate-90 text-primary" : "text-foreground"}`}>
-            directions
-          </span>
-          <span className="text-sm font-bold tracking-tight flex-1">Pathfinder</span>
+      {/* Panel Container */}
+      <div className={`absolute top-4 left-4 z-20 flex flex-col gap-4 ${selectedNodeId ? "hidden md:flex" : ""}`}>
 
-          {!isPanelOpen && activePath && (
-            <span className="w-2 h-2 rounded-full bg-green-500 mr-1 animate-pulse"></span>
-          )}
-        </button>
-
+        {/* Pathfinder Panel */}
         <div
-          className={`overflow-hidden transition-all duration-500 ease-in-out ${isPanelOpen ? "max-h-[500px] opacity-100 border-t border-border/50" : "max-h-0 opacity-0 border-t-0"
-            }`}
+          className={`bg-card border border-border/50 rounded-xl overflow-hidden transition-all duration-500 ease-in-out ${isPanelOpen ? "w-64 md:w-80" : "w-[135px]"}`}
         >
-          <div className="p-4 flex flex-col gap-4 min-w-[250px]">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-muted-foreground ml-1">Source Tracker</label>
-              <select
-                className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5"
-                value={pathStart}
-                onChange={(e) => setPathStart(e.target.value)}
-              >
-                <option value="">Select source</option>
-                {allTrackerNames.map(name => (
-                  <option key={`start-${name}`} value={name}>{name}</option>
-                ))}
-              </select>
-            </div>
+          <button
+            onClick={() => setIsPanelOpen(!isPanelOpen)}
+            className="w-full flex items-center gap-2 px-4 py-3 text-left outline-none whitespace-nowrap"
+          >
+            <span className={`material-symbols-rounded text-lg transition-transform duration-300 ${isPanelOpen ? "rotate-90 text-primary" : "text-foreground"}`}>
+              directions
+            </span>
+            <span className="text-sm font-bold tracking-tight flex-1">Pathfinder</span>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-muted-foreground ml-1">Target Tracker</label>
-              <select
-                className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5"
-                value={pathEnd}
-                onChange={(e) => setPathEnd(e.target.value)}
-              >
-                <option value="">Select target</option>
-                {allTrackerNames.map(name => (
-                  <option key={`end-${name}`} value={name}>{name}</option>
-                ))}
-              </select>
-            </div>
+            {!isPanelOpen && activePath && (
+              <span className="w-2 h-2 rounded-full bg-green-500 mr-1 animate-pulse"></span>
+            )}
+          </button>
 
-            {pathStart && pathEnd && !activePath && (
-              <div className="text-sm text-red-500 font-medium text-center py-1">
-                No path found
+          <div
+            className={`overflow-hidden transition-all duration-500 ease-in-out ${isPanelOpen ? "max-h-[500px] opacity-100 border-t border-border/50" : "max-h-0 opacity-0 border-t-0"
+              }`}
+          >
+            <div className="p-4 flex flex-col gap-4 min-w-[250px]">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-muted-foreground ml-1">Source Tracker</label>
+                <select
+                  className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5"
+                  value={pathStart}
+                  onChange={(e) => setPathStart(e.target.value)}
+                >
+                  <option value="">Select source</option>
+                  {allTrackerNames.map(name => (
+                    <option key={`start-${name}`} value={name}>{name}</option>
+                  ))}
+                </select>
               </div>
-            )}
-            {pathStart && pathEnd && activePath && (
-              <div className="text-sm text-green-500 font-medium text-center py-1 flex items-center justify-center gap-1.5">
-                <span className="material-symbols-rounded text-base">check_circle</span>
-                Path found ({activePath.length - 1} steps)
-              </div>
-            )}
 
-            {(pathStart || pathEnd) && (
-              <button
-                onClick={() => { setPathStart(""); setPathEnd(""); }}
-                className="text-sm text-muted-foreground hover:text-foreground underline decoration-dotted mt-1"
-              >
-                Clear path
-              </button>
-            )}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-muted-foreground ml-1">Target Tracker</label>
+                <select
+                  className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5"
+                  value={pathEnd}
+                  onChange={(e) => setPathEnd(e.target.value)}
+                >
+                  <option value="">Select target</option>
+                  {allTrackerNames.map(name => (
+                    <option key={`end-${name}`} value={name}>{name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {pathStart && pathEnd && !activePath && (
+                <div className="text-sm text-red-500 font-medium text-center py-1">
+                  No path found
+                </div>
+              )}
+              {pathStart && pathEnd && activePath && (
+                <div className="text-sm text-green-500 font-medium text-center py-1 flex items-center justify-center gap-1.5">
+                  <span className="material-symbols-rounded text-base">check_circle</span>
+                  Path found ({activePath.length - 1} steps)
+                </div>
+              )}
+
+              {(pathStart || pathEnd) && (
+                <button
+                  onClick={() => { setPathStart(""); setPathEnd(""); }}
+                  className="text-sm text-muted-foreground hover:text-foreground underline decoration-dotted mt-1"
+                >
+                  Clear path
+                </button>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Collection Panel */}
-      <div
-        className={`absolute top-4 right-4 z-20 bg-card border border-border/50 rounded-xl overflow-hidden transition-all duration-500 ease-in-out ${isCollectionPanelOpen ? "w-64 md:w-80" : "w-[130px]"
-          }`}
-      >
-        <button
-          onClick={() => setIsCollectionPanelOpen(!isCollectionPanelOpen)}
-          className="w-full flex items-center gap-2 px-4 py-3 text-left outline-none whitespace-nowrap"
-        >
-          <span className={`material-symbols-rounded text-lg transition-transform duration-300 ${isCollectionPanelOpen ? "rotate-90 text-purple-500" : "text-foreground"}`}>
-            bookmarks
-          </span>
-          <span className="text-sm font-bold tracking-tight flex-1">Collection</span>
-
-          {!isCollectionPanelOpen && collectionNodes.length > 0 && (
-            <span className="w-2 h-2 rounded-full bg-purple-500 mr-1 animate-pulse"></span>
-          )}
-        </button>
-
+        {/* Collection Panel */}
         <div
-          className={`overflow-hidden transition-all duration-500 ease-in-out ${isCollectionPanelOpen ? "max-h-[500px] opacity-100 border-t border-border/50" : "max-h-0 opacity-0 border-t-0"
-            }`}
+          className={`bg-card border border-border/50 rounded-xl overflow-hidden transition-all duration-500 ease-in-out ${isCollectionPanelOpen ? "w-64 md:w-80" : "w-[130px]"}`}
         >
-          <div className="p-4 flex flex-col gap-4 min-w-[250px]">
-            <div className="flex flex-col gap-1.5 relative" ref={collectionWrapperRef}>
-              <label className="text-sm font-medium text-muted-foreground ml-1">My Trackers</label>
-              <input
-                type="text"
-                placeholder="e.g. RED, PTP, MAM"
-                className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5 outline-none focus:border-purple-500/50 transition-colors"
-                value={collectionInput}
-                onFocus={() => setShowCollectionSug(true)}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setCollectionInput(val);
-                  setCollection(val);
-                  localStorage.setItem("tracker-collection", val);
-                  setShowCollectionSug(true);
-                  setCollectionActiveIndex(-1);
-                }}
-                onKeyDown={handleCollectionKeyDown}
-              />
+          <button
+            onClick={() => setIsCollectionPanelOpen(!isCollectionPanelOpen)}
+            className="w-full flex items-center gap-2 px-4 py-3 text-left outline-none whitespace-nowrap"
+          >
+            <span className={`material-symbols-rounded text-lg transition-transform duration-300 ${isCollectionPanelOpen ? "rotate-90 text-purple-500" : "text-foreground"}`}>
+              bookmarks
+            </span>
+            <span className="text-sm font-bold tracking-tight flex-1">Collection</span>
 
-              {showCollectionSug && getSuggestions(collectionInput).length > 0 && (
-                <div className="absolute top-full left-0 w-full mt-1 bg-card border border-border/50 rounded-md shadow-lg overflow-hidden z-50 max-h-40 overflow-y-auto" ref={collectionListRef}>
-                  {getSuggestions(collectionInput).map((item, i) => (
-                    <div
-                      key={i}
-                      className={`px-3 py-2 text-sm cursor-pointer transition-colors flex items-center justify-between ${i === collectionActiveIndex
-                        ? 'bg-purple-500/10 text-purple-500'
-                        : 'hover:bg-foreground/5'
-                        }`}
-                      onClick={() => handleCollectionSelect(item)}
-                    >
-                      <span>{item}</span>
-                      <span className="text-xs text-muted-foreground">{getAbbr(item)}</span>
-                    </div>
+            {!isCollectionPanelOpen && collectionNodes.length > 0 && (
+              <span className="w-2 h-2 rounded-full bg-purple-500 mr-1 animate-pulse"></span>
+            )}
+          </button>
+
+          <div
+            className={`overflow-hidden transition-all duration-500 ease-in-out ${isCollectionPanelOpen ? "max-h-[500px] opacity-100 border-t border-border/50" : "max-h-0 opacity-0 border-t-0"
+              }`}
+          >
+            <div className="p-4 flex flex-col gap-4 min-w-[250px]">
+              <div className="flex flex-col gap-1.5 relative" ref={collectionWrapperRef}>
+                <label className="text-sm font-medium text-muted-foreground ml-1">My Trackers</label>
+                <input
+                  type="text"
+                  placeholder="e.g. RED, PTP, MAM"
+                  className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5 outline-none focus:border-purple-500/50 transition-colors"
+                  value={collectionInput}
+                  onFocus={() => setShowCollectionSug(true)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setCollectionInput(val);
+                    setCollection(val);
+                    localStorage.setItem("tracker-collection", val);
+                    setShowCollectionSug(true);
+                    setCollectionActiveIndex(-1);
+                  }}
+                  onKeyDown={handleCollectionKeyDown}
+                />
+
+                {showCollectionSug && getSuggestions(collectionInput).length > 0 && (
+                  <div className="absolute top-full left-0 w-full mt-1 bg-card border border-border/50 rounded-md shadow-lg overflow-hidden z-50 max-h-40 overflow-y-auto" ref={collectionListRef}>
+                    {getSuggestions(collectionInput).map((item, i) => (
+                      <div
+                        key={i}
+                        className={`px-3 py-2 text-sm cursor-pointer transition-colors flex items-center justify-between ${i === collectionActiveIndex
+                          ? 'bg-purple-500/10 text-purple-500'
+                          : 'hover:bg-foreground/5'
+                          }`}
+                        onClick={() => handleCollectionSelect(item)}
+                      >
+                        <span>{item}</span>
+                        <span className="text-xs text-muted-foreground">{getAbbr(item)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {collectionNodes.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {collectionNodes.map((node) => (
+                    <span key={node} className="text-xs font-semibold bg-purple-500/10 text-purple-500 px-2 py-1 rounded-md border border-purple-500/20">
+                      {node}
+                    </span>
                   ))}
                 </div>
               )}
+
+              {collection && (
+                <button
+                  onClick={() => {
+                    setCollection("");
+                    setCollectionInput("");
+                    localStorage.removeItem("tracker-collection");
+                  }}
+                  className="text-sm text-muted-foreground hover:text-foreground underline decoration-dotted mt-1 self-start"
+                >
+                  Clear collection
+                </button>
+              )}
             </div>
-
-            {collectionNodes.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-1">
-                {collectionNodes.map((node) => (
-                  <span key={node} className="text-xs font-semibold bg-purple-500/10 text-purple-500 px-2 py-1 rounded-md border border-purple-500/20">
-                    {node}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {collection && (
-              <button
-                onClick={() => {
-                  setCollection("");
-                  setCollectionInput("");
-                  localStorage.removeItem("tracker-collection");
-                }}
-                className="text-sm text-muted-foreground hover:text-foreground underline decoration-dotted mt-1 self-start"
-              >
-                Clear collection
-              </button>
-            )}
           </div>
         </div>
       </div>
