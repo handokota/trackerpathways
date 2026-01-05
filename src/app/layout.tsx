@@ -31,11 +31,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${materialSymbols.variable} font-sans antialiased bg-background text-foreground transition-colors duration-300`}>
+      <body className={`${inter.variable} ${materialSymbols.variable} font-sans antialiased bg-background text-foreground transition-colors duration-300`} suppressHydrationWarning>
         <Providers>
           <div className="min-h-screen flex flex-col">
             <Navbar />
-            
+
             <div className="flex-1 w-full">
               {children}
             </div>

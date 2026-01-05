@@ -48,6 +48,20 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   const collectionWrapperRef = useRef<HTMLDivElement>(null);
   const collectionListRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    const savedCollection = localStorage.getItem("tracker-collection");
+    if (savedCollection) {
+      setCollection(savedCollection);
+      setCollectionInput(savedCollection);
+    }
+  }, []);
+
+  const updateCollection = (newValue: string) => {
+    setCollection(newValue);
+    setCollectionInput(newValue);
+    localStorage.setItem("tracker-collection", newValue);
+  };
+
   const collectionNodes = useMemo(() => {
     return collection.split(",").map(s => s.trim()).filter(s => s && allTrackerNames.includes(s));
   }, [collection, allTrackerNames]);
@@ -149,6 +163,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     const newValue = terms.join(", ") + ", ";
     setCollectionInput(newValue);
     setCollection(newValue);
+    localStorage.setItem("tracker-collection", newValue);
     setShowCollectionSug(false);
     setCollectionActiveIndex(-1);
   };
@@ -297,8 +312,10 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 value={collectionInput}
                 onFocus={() => setShowCollectionSug(true)}
                 onChange={(e) => {
-                  setCollectionInput(e.target.value);
-                  setCollection(e.target.value);
+                  const val = e.target.value;
+                  setCollectionInput(val);
+                  setCollection(val);
+                  localStorage.setItem("tracker-collection", val);
                   setShowCollectionSug(true);
                   setCollectionActiveIndex(-1);
                 }}
@@ -336,7 +353,11 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
 
             {collection && (
               <button
-                onClick={() => { setCollection(""); setCollectionInput(""); }}
+                onClick={() => {
+                  setCollection("");
+                  setCollectionInput("");
+                  localStorage.removeItem("tracker-collection");
+                }}
                 className="text-sm text-muted-foreground hover:text-foreground underline decoration-dotted mt-1 self-start"
               >
                 Clear collection
