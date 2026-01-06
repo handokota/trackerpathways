@@ -37,13 +37,13 @@ export default function DirectoryPageClient() {
         </div>
 
         <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/30">
             <span className="material-symbols-rounded">search</span>
           </span>
           <input
             type="text"
             placeholder="Search by name or abbreviation..."
-            className="w-full bg-foreground/5 rounded-xl py-3 pl-10 pr-4 outline-none focus:ring-2 focus:ring-foreground/10 transition-all text-sm font-medium placeholder:text-muted-foreground"
+            className="w-full bg-foreground/3 rounded-xl py-3 pl-11 pr-4 outline-none font-medium text-foreground placeholder:text-foreground/30 text-sm transition-all"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />

@@ -314,7 +314,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 <label className="text-sm font-medium text-muted-foreground ml-1">Source Tracker</label>
                 <input
                   type="text"
-                  placeholder="Select source"
+                  placeholder="Search starting tracker..."
                   className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5 outline-none focus:border-green-500/50 transition-colors"
                   value={pathStartInput}
                   onFocus={() => setShowPathStartSug(true)}
@@ -330,7 +330,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 {showPathStartSug && getSuggestions(pathStartInput).length > 0 && (
                   <>
                     <div className="fixed inset-0 z-30" onClick={() => setShowPathStartSug(false)} />
-                    <div className="absolute top-full left-0 w-full mt-1 bg-card border border-border/50 rounded-xl shadow-lg overflow-hidden z-40 max-h-40 overflow-y-auto p-1" ref={pathStartListRef}>
+                    <div className="absolute top-full left-0 w-full mt-1 bg-card border border-border/50 rounded-xl overflow-hidden z-40 max-h-40 overflow-y-auto p-1" ref={pathStartListRef}>
                       {getSuggestions(pathStartInput).map((item, i) => (
                         <div
                           key={i}
@@ -353,7 +353,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 <label className="text-sm font-medium text-muted-foreground ml-1">Target Tracker</label>
                 <input
                   type="text"
-                  placeholder="Select target"
+                  placeholder="Search destination tracker..."
                   className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5 outline-none focus:border-green-500/50 transition-colors"
                   value={pathEndInput}
                   onFocus={() => setShowPathEndSug(true)}
@@ -369,7 +369,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 {showPathEndSug && getSuggestions(pathEndInput).length > 0 && (
                   <>
                     <div className="fixed inset-0 z-30" onClick={() => setShowPathEndSug(false)} />
-                    <div className="absolute top-full left-0 w-full mt-1 bg-card border border-border/50 rounded-xl shadow-lg overflow-hidden z-40 max-h-40 overflow-y-auto p-1" ref={pathEndListRef}>
+                    <div className="absolute top-full left-0 w-full mt-1 bg-card border border-border/50 rounded-xl overflow-hidden z-40 max-h-40 overflow-y-auto p-1" ref={pathEndListRef}>
                       {getSuggestions(pathEndInput).map((item, i) => (
                         <div
                           key={i}
@@ -438,7 +438,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 <label className="text-sm font-medium text-muted-foreground ml-1">My Trackers</label>
                 <input
                   type="text"
-                  placeholder="Type to add (e.g. RED)"
+                  placeholder="Add tracker to collection..."
                   className="w-full bg-foreground/5 border border-border/30 rounded-md text-sm p-2.5 outline-none focus:border-purple-500/50 transition-colors"
                   value={collectionInput}
                   onFocus={() => setShowCollectionSug(true)}
@@ -453,7 +453,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 {showCollectionSug && getSuggestions(collectionInput).length > 0 && (
                   <>
                     <div className="fixed inset-0 z-30" onClick={() => setShowCollectionSug(false)} />
-                    <div className="absolute top-full left-0 w-full mt-1 bg-card border border-border/50 rounded-xl shadow-lg overflow-hidden z-40 max-h-40 overflow-y-auto p-1" ref={collectionListRef}>
+                    <div className="absolute top-full left-0 w-full mt-1 bg-card border border-border/50 rounded-xl overflow-hidden z-40 max-h-40 overflow-y-auto p-1" ref={collectionListRef}>
                       {getSuggestions(collectionInput).map((item, i) => (
                         <div
                           key={i}
@@ -629,7 +629,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
       </div>
 
       {!activePath && selectedNodeId && selectedNodeDetails && (
-        <aside className="absolute top-4 bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-80 flex flex-col rounded-xl bg-card/95 backdrop-blur border border-border/50 z-10 overflow-hidden animate-in slide-in-from-right-10 fade-in duration-300 shadow-lg">
+        <aside className="absolute top-4 bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-80 flex flex-col rounded-xl bg-card/95 backdrop-blur border border-border/50 z-10 overflow-hidden animate-in slide-in-from-right-10 fade-in duration-300">
           <div className="flex items-center justify-between p-5 border-b border-border/40 shrink-0">
             <h2 className="text-xl font-bold tracking-tight truncate pr-2">{selectedNodeId}</h2>
             <button
