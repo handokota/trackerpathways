@@ -15,7 +15,7 @@ export default function TrackerSearchApp() {
   const [sourceSearch, setSourceSearch] = useState(searchParams.get("source") || "");
   const [targetSearch, setTargetSearch] = useState(searchParams.get("target") || "");
   const [viewMode, setViewMode] = useState<'grid' | 'list'>((searchParams.get("view") as 'grid' | 'list') || 'grid');
-  
+   
   const [maxJumps, setMaxJumps] = useState<number>(
     searchParams.get("jumps") ? parseInt(searchParams.get("jumps")!) : 1
   );
@@ -28,13 +28,13 @@ export default function TrackerSearchApp() {
 
   const [showSourceSug, setShowSourceSug] = useState(false);
   const [showTargetSug, setShowTargetSug] = useState(false);
-  
+   
   const [sourceActiveIndex, setSourceActiveIndex] = useState(-1);
   const [targetActiveIndex, setTargetActiveIndex] = useState(-1);
 
   const sourceWrapperRef = useRef<HTMLDivElement>(null);
   const targetWrapperRef = useRef<HTMLDivElement>(null);
-  
+   
   const sourceListRef = useRef<HTMLDivElement>(null);
   const targetListRef = useRef<HTMLDivElement>(null);
 
@@ -66,7 +66,7 @@ export default function TrackerSearchApp() {
      if (!searchParams.get("source") && !searchParams.get("target")) {
         setSourceSearch("");
         setTargetSearch("");
-     }
+      }
   }, [searchParams]);
 
   useEffect(() => {
@@ -241,11 +241,11 @@ export default function TrackerSearchApp() {
     const tQuery = deferredTarget.toLowerCase().trim();
 
     if (!sQueryRaw && !tQuery) return [];
-    
+     
     const isStrictTarget = allTrackers.some(t => 
        t.toLowerCase() === tQuery || getAbbr(t).toLowerCase() === tQuery
     );
-    
+     
     const results: any[] = [];
     const queue: any[] = [];
 
@@ -288,7 +288,7 @@ export default function TrackerSearchApp() {
 
       if (currentPath.nodes.length > 1) {
         let isTargetMatch = true;
-        
+         
         if (tQuery) {
           const cName = currentNode.toLowerCase();
           const cAbbr = getAbbr(currentNode).toLowerCase();
@@ -299,7 +299,7 @@ export default function TrackerSearchApp() {
              isTargetMatch = cName.includes(tQuery) || cAbbr.includes(tQuery);
           }
         }
-        
+         
         if (isTargetMatch) {
           if (maxDays === null || (currentPath.totalDays !== null && currentPath.totalDays <= maxDays)) {
             results.push(currentPath);
@@ -320,9 +320,9 @@ export default function TrackerSearchApp() {
             const edgeDays = details.days; 
             const forumReq = data.unlockInviteClass[currentNode];
             const forumDays = forumReq ? forumReq[0] : 0;
-            
+             
             let stepDays: number | null = null;
-            
+             
             if (edgeDays !== null) {
                 stepDays = Math.max(edgeDays, forumDays || 0);
             }
@@ -350,11 +350,11 @@ export default function TrackerSearchApp() {
         if (a.totalDays === null && b.totalDays === null) return 0;
         return a.totalDays - b.totalDays;
       }
-      
+       
       if (a.routes.length !== b.routes.length) {
         return a.routes.length - b.routes.length;
       }
-      
+       
       return a.target.localeCompare(b.target);
     });
 
@@ -388,9 +388,9 @@ export default function TrackerSearchApp() {
           </div>
         )}
 
-        <div className="w-full max-w-2xl mx-auto bg-foreground/3 rounded-2xl p-2 animate-in fade-in zoom-in-95 duration-500">
+        <div className="w-full max-w-2xl mx-auto bg-foreground/3 rounded-xl p-2 animate-in fade-in zoom-in-95 duration-500">
           <div className="flex flex-col relative">
-            
+             
             <div className="absolute left-4 top-4 bottom-14 flex flex-col items-center gap-1 z-0 pointer-events-none">
               <div className="w-2.5 h-2.5 rounded-full border-[3px] border-foreground/10 bg-background"></div>
               <div className="w-px flex-1 bg-linear-to-b from-foreground/10 to-foreground/10"></div>
@@ -522,7 +522,7 @@ export default function TrackerSearchApp() {
         </div>
 
         {showFilters && (
-          <div className="max-w-2xl mx-auto mt-2 p-6 bg-foreground/3 rounded-2xl animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="max-w-2xl mx-auto mt-2 p-6 bg-foreground/3 rounded-xl animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               
               <div>
@@ -645,7 +645,7 @@ export default function TrackerSearchApp() {
                       const isDirect = path.routes.length === 1;
 
                       return (
-                        <div key={idx} className="group flex flex-col p-5 rounded-md bg-card transition-colors duration-200 h-full">
+                        <div key={idx} className="group flex flex-col p-5 rounded-xl bg-card transition-colors duration-200 h-full">
                           
                           <div className="flex justify-between items-start mb-3 gap-4"> 
                             <div className="min-w-0">
