@@ -64,6 +64,8 @@
     "IPTorrents": "IPT",
     "JPopsuki": "JPS",
     "KaraGarga": "KG",
+    "Kufirc": "KFC",
+    "Last Digital Underground": "LDU",
     "Lat-Team": "LT",
     "LearnFlakes": "LF",
     "LemonHD": "LHD",
@@ -151,6 +153,7 @@
     "HD-Space": [null, "HD Spacer"],
     "HD-Torrents": [null, "HD Monster"],
     "HDBits": [365, "1080i, 1 year, 2FA enabled for at least 1 month, last email/password change must have been more than a month ago; 1080i"],
+    "Last Digital Underground": [null, "Disciple"],
     "LST": [120, "Whale"],
     "LzTr": [14, "Power User"],
     "M-Team": [56, "Elite"],
@@ -205,7 +208,7 @@
       "SceneHD": { "days": 360, "reqs": "12 months", "active": "Yes", "updated": "Nov 2025" }
     },
     "AnimeBytes": {
-      "Aither": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jan 2026" },
+      "Aither": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Jan 2026" },
       "AsianCinema": { "days": 180, "reqs": "6 months, 4TB upload", "active": "Yes", "updated": "Jan 2026" },
       "BakaBT": { "days": 180, "reqs": "6 months, ratio>1, seeding at least half of your snatched torrents", "active": "Yes", "updated": "Jan 2026" },
       "BroadcasTheNet": { "days": 365, "reqs": "TM, 1 year", "active": "Yes", "updated": "Jan 2026" },
@@ -369,7 +372,7 @@
       "PrivateHD": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Nov 2025" }
     },
     "Empornium": {
-      "Aither": { "days": 0, "reqs": "Great Perv+", "active": "Yes", "updated": "Mar 2025" },
+      "Aither": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Jan 2026" },
       "AnimeBytes": { "days": 360, "reqs": "Sextreme Perv+, 12 months", "active": "Yes", "updated": "Mar 2025" },
       "Anthelion": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2025" },
       "GazelleGames": { "days": 90, "reqs": "Great Perv+, 3 months", "active": "Yes", "updated": "Mar 2025" },
@@ -398,7 +401,7 @@
       "Upload.cx": { "days": 0, "reqs": "SuperUser+", "active": "Yes", "updated": "Nov 2025" }
     },
     "GazelleGames": {
-      "Aither": { "days": 60, "reqs": "2 months", "active": "Yes", "updated": "Nov 2025" },
+      "Aither": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Jan 2026" },
       "AnimeBytes": { "days": 180, "reqs": "Elite Gamer, 6 months", "active": "Yes", "updated": "Nov 2025" },
       "Anthelion": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
       "BakaBT": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Nov 2025" },
@@ -409,7 +412,7 @@
       "Dolphin Is Coming": { "days": 0, "reqs": "10 music torrents or 15 other torrents", "active": "Yes", "updated": "Nov 2025" },
       "FunFile": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
       "HDBits": { "days": 730, "reqs": "Master Gamer, 2 years, 250 seeded uploads, Seedsize > 2TB AND avg. seedtime > 2 months OR avg. seedtime > 5 months, Legendary Invites forum", "active": "Yes", "updated": "Nov 2025" },
-      "LDU": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
+      "Last Digital Underground": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
       "LzTr": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Nov 2025" },
       "MoreThanTV": { "days": 180, "reqs": "Elite Gamer, 6 months, ratio>=1.5", "active": "Yes", "updated": "Nov 2025" },
       "MyAnonamouse": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
@@ -513,6 +516,13 @@
       "PassThePopcorn": { "days": 730, "reqs": "2 years with either 250 movie uploads or 30 completed subtitle pots", "active": "Yes", "updated": "Nov 2025" },
       "Unwalled": { "days": 90, "reqs": "PU, 3 months, 5 uploads", "active": "Yes", "updated": "Nov 2024" }
     },
+    "Last Digital Underground": {
+      "BitPorn": { "days": 180, "reqs": "6 months, 8TB \"upload volume\", \"No warnings ever\", 2x additional tracker profile screenshots (Not IPT, TL, FL, TD or \"low quality\")", "active": "Yes", "updated": "Jan 2026" },
+      "Fappaizuri": { "days": null, "reqs": "10TB \"upload size\", \"Screenshot of personal data\"", "active": "Yes", "updated": "Jan 2026" },
+      "FearNoPeer": { "days": null, "reqs": "No requirement", "active": "Yes", "updated": "Jan 2026" },
+      "HDCity": { "days": null, "reqs": "10TB \"upload size\", \"Screenshots of your stats from well-known trackers\"", "active": "Yes", "updated": "Jan 2026" },
+      "Kufirc": { "days": 180, "reqs": "6 months, 8TB \"upload volume\", \"No warnings ever\", 2x additional tracker profile screenshots (Not IPT, TL, FL, TD or \"low quality\")", "active": "Yes", "updated": "Jan 2026" }
+    },
     "LST": {
       "Aither": { "days": 180, "reqs": "Whale, 6 months", "active": "Yes", "updated": "Nov 2025" },
       "DarkPeers": { "days": 0, "reqs": "Whale", "active": "Yes", "updated": "Nov 2025" },
@@ -534,7 +544,7 @@
       "TeamHD": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2025" }
     },
     "MoreThanTV": {
-      "Aither": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Sep 2025" },
+      "Aither": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Jan 2026" },
       "BeyondHD": { "days": 540, "reqs": "Gaffer+, 18 months", "active": "Yes", "updated": "Nov 2025" },
       "CapybaraBR": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Sep 2025" },
       "Cathode-Ray.Tube": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Sep 2025" },
@@ -582,7 +592,7 @@
       "XSpeeds": { "days": 180, "reqs": "VIP+, 6 months, ratio>1", "active": "Yes", "updated": "Nov 2025" }
     },
     "Nebulance": {
-      "Aither": { "days": 0, "reqs": "Ensign", "active": "Yes", "updated": "Nov 2025" },
+      "Aither": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Jan 2026" },
       "Anthelion": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
       "BakaBT": { "days": 90, "reqs": "Ensign, 3 months", "active": "Yes", "updated": "Nov 2025" },
       "Cathode-Ray.Tube": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Nov 2025" },
@@ -598,7 +608,7 @@
       "ReelFliX": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Dec 2025" }
     },
     "Orpheus": {
-      "Aither": { "days": 180, "reqs": "Elite+, 6 months", "active": "Yes", "updated": "Jan 2026" },
+      "Aither": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Jan 2026" },
       "Anthelion": { "days": 0, "reqs": "Elite+", "active": "Yes", "updated": "Dec 2025" },
       "BeyondHD": { "days": 1825, "reqs": "TM+, 1.5 years", "active": "Yes", "updated": "Dec 2025" },
       "Cathode-Ray.Tube": { "days": 0, "reqs": "Elite+, ratio>1.0", "active": "Yes", "updated": "Dec 2025" },
@@ -710,7 +720,7 @@
       "Fappaizuri": { "days": 0, "reqs": "Elite+, 10TB \"upload size\"", "active": "Yes", "updated": "Aug 2025" },
       "FearNoPeer": { "days": 0, "reqs": "Elite+", "active": "Yes", "updated": "Aug 2025" },
       "HDCity": { "days": 0, "reqs": "Elite+, 10TB \"upload size\", (optional) additional tracker profile screenshots", "active": "Yes", "updated": "Aug 2025" },
-      "LDU": { "days": 0, "reqs": "Elite+", "active": "Yes", "updated": "Aug 2025" },
+      "Last Digital Underground": { "days": 0, "reqs": "Elite+", "active": "Yes", "updated": "Aug 2025" },
       "LST": { "days": 90, "reqs": "Elite+, 3 months", "active": "Yes", "updated": "Aug 2025" },
       "OldToonsWorld": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2025" },
       "seedpool": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2025" },
