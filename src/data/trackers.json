@@ -554,7 +554,7 @@
     },
     "MyAnonamouse": {
       "ABTorrents": { "days": 0, "reqs": "Some profile links and ratio proofs", "active": "Yes", "updated": "Oct 2025" },
-      "Aither": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Dec 2025" },
+      "Aither": { "days": 360, "reqs": "12 months", "active": "Yes", "updated": "Jan 2026" },
       "Anthelion": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Dec 2025" },
       "BakaBT": { "days": 180, "reqs": "PU+, 6 months", "active": "Yes", "updated": "Nov 2025" },
       "Bit-HDTV": { "days": 180, "reqs": "6 months, ratio>=1", "active": "Yes", "updated": "Nov 2025" },
