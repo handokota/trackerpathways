@@ -612,7 +612,7 @@
     "Orpheus": {
       "Aither": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Jan 2026" },
       "Anthelion": { "days": 0, "reqs": "Elite+", "active": "Yes", "updated": "Dec 2025" },
-      "BeyondHD": { "days": 1825, "reqs": "TM+, 1.5 years", "active": "Yes", "updated": "Dec 2025" },
+      "BeyondHD": { "days": 547, "reqs": "TM+, 1.5 years", "active": "Yes", "updated": "Dec 2025" },
       "Cathode-Ray.Tube": { "days": 0, "reqs": "Elite+, ratio>1.0", "active": "Yes", "updated": "Dec 2025" },
       "Concertos": { "days": 0, "reqs": "Elite+", "active": "Yes", "updated": "Dec 2025" },
       "Empornium": { "days": 180, "reqs": "Elite+, 6 months", "active": "Yes", "updated": "Dec 2025" },
