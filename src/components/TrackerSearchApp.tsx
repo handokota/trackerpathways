@@ -104,7 +104,7 @@ export default function TrackerSearchApp() {
   const [collectionInput, setCollectionInput] = useState("");
 
   const isUsingCollection = myTrackers.length > 0 && sourceSearch === myTrackers.join(", ");
-  const [visiblePathsCount, setVisiblePathsCount] = useState(PATHS_PAGE_SIZE);
+  const [visiblePathsBySource, setVisiblePathsBySource] = useState<Record<string, number>>({});
 
   useEffect(() => {
     setMounted(true);
@@ -182,7 +182,7 @@ export default function TrackerSearchApp() {
         setSourceSearch("");
         setTargetSearch("");
         setFoundPaths([]);
-        setVisiblePathsCount(PATHS_PAGE_SIZE);
+        setVisiblePathsBySource({});
       }
   }, [searchParams]);
 
@@ -312,14 +312,14 @@ export default function TrackerSearchApp() {
     terms.pop(); 
     terms.push(selectedItem); 
     setSourceSearch(terms.join(", ")); 
-    setVisiblePathsCount(PATHS_PAGE_SIZE);
+    setVisiblePathsBySource({});
     setShowSourceSug(false);
     setSourceActiveIndex(-1);
   };
 
   const handleTargetSelect = (selectedItem: string) => {
     setTargetSearch(selectedItem);
-    setVisiblePathsCount(PATHS_PAGE_SIZE);
+    setVisiblePathsBySource({});
     setShowTargetSug(false);
     setTargetActiveIndex(-1);
   };
@@ -405,7 +405,7 @@ export default function TrackerSearchApp() {
     } else {
       setSourceSearch(myTrackers.join(", "));
     }
-    setVisiblePathsCount(PATHS_PAGE_SIZE);
+    setVisiblePathsBySource({});
     setShowSourceSug(false);
     setSourceActiveIndex(-1);
   };
@@ -515,18 +515,15 @@ export default function TrackerSearchApp() {
   }, [activeInviteCountBySource, foundPaths, sortBy, sortDirection]);
 
   const bestPathId = (deferredTarget && sortedPaths.length > 0) ? getPathId(sortedPaths[0]) : null;
-  const displayedPaths = useMemo(() => {
-    return sortedPaths.slice(0, visiblePathsCount);
-  }, [sortedPaths, visiblePathsCount]);
 
   const groupedResults = useMemo(() => {
     const groups: { [key: string]: PathResult[] } = {};
-    displayedPaths.forEach(path => {
+    sortedPaths.forEach(path => {
       if (!groups[path.source]) groups[path.source] = [];
       groups[path.source].push(path);
     });
     return groups;
-  }, [displayedPaths]);
+  }, [sortedPaths]);
 
   const parseRequirementSections = (text: string, keyPrefix: string): UnlockRequirementSection[] => {
     if (!text.trim()) {
@@ -868,7 +865,7 @@ export default function TrackerSearchApp() {
                     onChange={(e) => {
                       if (isUsingCollection) return;
                       setSourceSearch(e.target.value);
-                      setVisiblePathsCount(PATHS_PAGE_SIZE);
+                      setVisiblePathsBySource({});
                       setShowSourceSug(true);
                       setSourceActiveIndex(-1);
                     }}
@@ -925,7 +922,7 @@ export default function TrackerSearchApp() {
                   onFocus={() => setShowTargetSug(true)}
                   onChange={(e) => {
                     setTargetSearch(e.target.value);
-                    setVisiblePathsCount(PATHS_PAGE_SIZE);
+                    setVisiblePathsBySource({});
                     setShowTargetSug(true);
                     setTargetActiveIndex(-1);
                   }}
@@ -1029,7 +1026,7 @@ export default function TrackerSearchApp() {
                       key={val}
                       onClick={() => {
                         setMaxJumps(val);
-                        setVisiblePathsCount(PATHS_PAGE_SIZE);
+                        setVisiblePathsBySource({});
                       }}
                       className={`flex-1 px-3 py-1.5 text-sm rounded-md transition-all ring-0 focus:ring-0 font-medium ${
                         maxJumps === val 
@@ -1057,7 +1054,7 @@ export default function TrackerSearchApp() {
                       key={opt.l}
                       onClick={() => {
                         setMaxDays(opt.v);
-                        setVisiblePathsCount(PATHS_PAGE_SIZE);
+                        setVisiblePathsBySource({});
                       }}
                       className={`flex-1 px-2 py-1.5 text-sm rounded-md whitespace-nowrap transition-all ring-0 focus:ring-0 font-medium ${
                         maxDays === opt.v 
@@ -1147,6 +1144,8 @@ export default function TrackerSearchApp() {
               const officialInvites = trackerCanInviteTo[sourceName] || [];
               const invitedFrom = trackerInvitedFrom[sourceName] || [];
               const sourceFoundCount = foundCountBySource[sourceName] || 0;
+              const visibleSourcePathsCount = visiblePathsBySource[sourceName] ?? PATHS_PAGE_SIZE;
+              const displayedSourcePaths = paths.slice(0, visibleSourcePathsCount);
 
               return (
                 <div key={sourceName} className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -1196,7 +1195,7 @@ export default function TrackerSearchApp() {
                               const nextSortBy = event.target.value as SortByOption;
                               setSortBy(nextSortBy);
                               setSortDirection(nextSortBy === "officialInvites" ? "desc" : "asc");
-                              setVisiblePathsCount(PATHS_PAGE_SIZE);
+                              setVisiblePathsBySource({});
                             }}
                             className="h-9 min-w-[176px] appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-3 pr-8 text-sm font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
                             aria-label="Sort search results"
@@ -1231,7 +1230,7 @@ export default function TrackerSearchApp() {
                       ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
                       : "grid grid-cols-1 gap-3"
                   }>
-                    {paths.map((path) => {
+                    {displayedSourcePaths.map((path) => {
                       const targetAbbr = getAbbr(path.target);
                       const targetOfficialInvites = trackerCanInviteTo[path.target] || [];
                       const targetInvitedFrom = trackerInvitedFrom[path.target] || [];
@@ -1342,21 +1341,26 @@ export default function TrackerSearchApp() {
                     })}
                   </div>
 
+                  {!isStale && !isLoading && paths.length > visibleSourcePathsCount && (
+                    <div className="flex items-center justify-center">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setVisiblePathsBySource((current) => ({
+                            ...current,
+                            [sourceName]: (current[sourceName] ?? PATHS_PAGE_SIZE) + PATHS_PAGE_SIZE,
+                          }))
+                        }
+                        className="px-4 py-2 text-sm font-medium rounded-md bg-foreground/10 text-foreground/80 hover:bg-foreground/15 transition-colors"
+                      >
+                        Load more ({Math.min(PATHS_PAGE_SIZE, paths.length - visibleSourcePathsCount)} more)
+                      </button>
+                    </div>
+                  )}
+
                 </div>
               );
             })}
-
-            {!isStale && !isLoading && sortedPaths.length > visiblePathsCount && (
-              <div className="flex items-center justify-center">
-                <button
-                  type="button"
-                  onClick={() => setVisiblePathsCount(current => current + PATHS_PAGE_SIZE)}
-                  className="px-4 py-2 text-sm font-medium rounded-md bg-foreground/10 text-foreground/80 hover:bg-foreground/15 transition-colors"
-                >
-                  Load more ({Math.min(PATHS_PAGE_SIZE, sortedPaths.length - visiblePathsCount)} more)
-                </button>
-              </div>
-            )}
             
             {!isStale && !isLoading && foundPaths.length === 0 && (sourceSearch || targetSearch) && (
               <div className="flex flex-col items-center justify-center py-20 opacity-50 border-2 border-dashed border-foreground/10 rounded-lg">
