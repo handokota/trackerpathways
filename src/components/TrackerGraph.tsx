@@ -33,7 +33,6 @@ interface UnlockRequirementSection {
   rank: string;
   requirements: string[];
   requirementText: string;
-  ageText: string | null;
 }
 
 interface OfficialInviteEntry {
@@ -43,12 +42,11 @@ interface OfficialInviteEntry {
 }
 
 type OfficialInvitesTab = "canInviteTo" | "invitedFrom";
-type DialogSortByOption = "officialInvites" | "unlockAfter";
+type DialogSortByOption = "officialInvites" | "alphabetical";
 type SortDirection = "asc" | "desc";
 
 interface OfficialInvitesPanelData {
   sourceName: string;
-  unlockDays: number | null;
   sections: UnlockRequirementSection[];
   canInviteTo: OfficialInviteEntry[];
   invitedFrom: OfficialInviteEntry[];
@@ -350,74 +348,13 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
           .map(item => item.trim())
           .filter(item => item.length > 0);
 
-        let ageText = null;
-        let updatedRequirementText = requirementText;
-
-        const ageIndex = rawRequirements.findIndex(req =>
-          /(?:year|month|week|day)s?|\b\d+d\b/i.test(req) &&
-          !/(seedtime|seed size|seedsize|upload|ratio|adoptions|bp|torrents|seeds|bonus)/i.test(req)
-        );
-
-        const requirements = [...rawRequirements];
-        if (ageIndex !== -1) {
-          ageText = requirements[ageIndex];
-          requirements.splice(ageIndex, 1);
-          updatedRequirementText = requirements.join(", ");
-        }
-
         return {
           key: `${keyPrefix}-${index}`,
           rank,
-          requirements,
-          requirementText: updatedRequirementText,
-          ageText,
+          requirements: rawRequirements,
+          requirementText: requirementText,
         };
       });
-  };
-
-  const parseAgeTextToDays = (ageText: string): number | null => {
-    const normalizedAgeText = ageText.toLowerCase();
-    let totalDays = 0;
-    let matched = false;
-
-    const durationMatches = normalizedAgeText.matchAll(/(\d+(?:\.\d+)?)\s*(years?|yrs?|y|months?|mos?|weeks?|w|days?|d)\b/g);
-    for (const match of durationMatches) {
-      const value = Number.parseFloat(match[1]);
-      if (Number.isNaN(value)) {
-        continue;
-      }
-
-      const unit = match[2];
-      matched = true;
-      if (unit.startsWith("y")) {
-        totalDays += value * 365;
-      } else if (unit.startsWith("mo") || unit.startsWith("month")) {
-        totalDays += value * 30;
-      } else if (unit.startsWith("w")) {
-        totalDays += value * 7;
-      } else {
-        totalDays += value;
-      }
-    }
-
-    if (!matched) {
-      return null;
-    }
-
-    return Math.round(totalDays);
-  };
-
-  const getInviteUnlockAfterDays = (invite: OfficialInviteEntry, keyPrefix: string): number | null => {
-    const requirementSections = parseRequirementSections(invite.details.reqs || "", keyPrefix);
-    const unlockAfterDays = requirementSections
-      .map((section) => section.ageText ? parseAgeTextToDays(section.ageText) : null)
-      .filter((days): days is number => days !== null);
-
-    if (unlockAfterDays.length === 0) {
-      return null;
-    }
-
-    return Math.min(...unlockAfterDays);
   };
 
   const getUnlockRequirementSections = (sourceName: string): UnlockRequirementSection[] => {
@@ -430,7 +367,6 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   };
 
   const selectedNodeOfficialData: OfficialInvitesPanelData | null = selectedNodeId ? (() => {
-    const unlockInfo = rawData.unlockInviteClass[selectedNodeId];
     const canInviteTo = Object.entries(rawData.routeInfo[selectedNodeId] || {})
       .filter(([, route]) => route.active.toLowerCase() === "yes")
       .map(([target, details]) => ({
@@ -461,7 +397,6 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
 
     return {
       sourceName: selectedNodeId,
-      unlockDays: unlockInfo?.[0] ?? null,
       sections: getUnlockRequirementSections(selectedNodeId),
       canInviteTo,
       invitedFrom,
@@ -473,50 +408,20 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
       return [];
     }
 
+    const directionMultiplier = officialInvitesSortDirection === "asc" ? 1 : -1;
     const currentInvites = officialInvitesTab === "canInviteTo"
       ? selectedNodeOfficialData.canInviteTo
       : selectedNodeOfficialData.invitedFrom;
-    const unlockAfterCache: { [key: string]: number | null } = {};
-    const getCachedUnlockAfterDays = (invite: OfficialInviteEntry) => {
-      if (invite.tracker in unlockAfterCache) {
-        return unlockAfterCache[invite.tracker];
-      }
-
-      const unlockAfterDays = getInviteUnlockAfterDays(
-        invite,
-        `${selectedNodeOfficialData.sourceName}-${invite.tracker}-${officialInvitesTab}-sort`
-      );
-      unlockAfterCache[invite.tracker] = unlockAfterDays;
-      return unlockAfterDays;
-    };
 
     return [...currentInvites].sort((a, b) => {
-      if (officialInvitesSortBy === "unlockAfter") {
-        const aUnlockAfterDays = getCachedUnlockAfterDays(a);
-        const bUnlockAfterDays = getCachedUnlockAfterDays(b);
-
-        if (aUnlockAfterDays === null && bUnlockAfterDays !== null) {
-          return 1;
-        }
-        if (aUnlockAfterDays !== null && bUnlockAfterDays === null) {
-          return -1;
-        }
-        if (
-          aUnlockAfterDays !== null
-          && bUnlockAfterDays !== null
-          && aUnlockAfterDays !== bUnlockAfterDays
-        ) {
-          return aUnlockAfterDays - bUnlockAfterDays;
+      if (officialInvitesSortBy === "officialInvites") {
+        if (a.officialInvites !== b.officialInvites) {
+          return (a.officialInvites - b.officialInvites) * directionMultiplier;
         }
       }
-
-      if (a.officialInvites !== b.officialInvites) {
-        return b.officialInvites - a.officialInvites;
-      }
-
-      return a.tracker.localeCompare(b.tracker);
+      return a.tracker.localeCompare(b.tracker) * (officialInvitesSortBy === "alphabetical" ? directionMultiplier : 1);
     });
-  }, [officialInvitesSortBy, officialInvitesTab, selectedNodeOfficialData]);
+  }, [officialInvitesSortBy, officialInvitesSortDirection, officialInvitesTab, selectedNodeOfficialData]);
 
   const setDialogTrackerInUrl = (trackerName: string | null, method: "push" | "replace" = "push") => {
     const params = new URLSearchParams(searchParams.toString());
@@ -741,6 +646,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   const distantTextColor = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)";
 
   const isRingMode = collectionNodes.length > 0 && !activePath && !selectedNodeId;
+  const badgeClass = "flex items-center gap-1.5 text-xs font-semibold text-foreground/80 bg-foreground/10 px-2 py-0.5 rounded-md shrink-0 whitespace-nowrap";
 
   return (
     <div ref={containerRef} className="relative w-full h-full overflow-hidden bg-background">
@@ -1216,7 +1122,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
       </div>
 
       {!activePath && selectedNodeOfficialData && (
-        <aside className="absolute top-4 bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-[44rem] flex flex-col rounded-xl bg-card/90 backdrop-blur border border-foreground/10 z-10 overflow-hidden animate-in slide-in-from-right-10 fade-in duration-300">
+        <aside className="absolute top-4 bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-md flex flex-col rounded-xl bg-card/90 backdrop-blur border border-foreground/10 z-10 overflow-hidden animate-in slide-in-from-right-10 fade-in duration-300">
           <div className="flex items-center justify-between p-5 border-b border-foreground/10 shrink-0">
             <div className="min-w-0">
               <h2 className="text-xl font-bold tracking-tight truncate pr-2">{selectedNodeOfficialData.sourceName}</h2>
@@ -1227,13 +1133,13 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 setSelectedNodeId(null);
                 setDialogTrackerInUrl(null);
               }}
-              className="p-1.5 rounded-full transition-opacity opacity-70 hover:opacity-100"
+              className="p-1.5 rounded-md text-foreground/70 transition-colors hover:text-foreground"
             >
               <span className="material-symbols-rounded text-lg">close</span>
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-4 md:p-5 space-y-4 md:space-y-6 custom-scrollbar">
             <div className="rounded-lg border border-foreground/10 bg-foreground/5 p-3">
               <button
                 type="button"
@@ -1252,16 +1158,6 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 }`}
               >
                 <div className="overflow-hidden space-y-2.5">
-                  {selectedNodeOfficialData.unlockDays !== null && (
-                    <div className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-foreground/75 bg-foreground/10 rounded-md px-1.5 py-1">
-                      <span className="material-symbols-rounded text-[13px] shrink-0">schedule</span>
-                      After {selectedNodeOfficialData.unlockDays} days
-                      <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
-                        You can join the official invite forum from {selectedNodeOfficialData.sourceName} after {selectedNodeOfficialData.unlockDays} days.
-                      </span>
-                    </div>
-                  )}
-
                   {selectedNodeOfficialData.sections.length > 0 ? (
                     <div className="space-y-2.5">
                       {selectedNodeOfficialData.sections.map((section, sectionIndex) => (
@@ -1274,36 +1170,24 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                           <div className="rounded-lg border border-foreground/10 bg-card p-3">
                             <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
                               {section.rank ? (
-                                <h4 className="text-sm font-semibold text-foreground">{section.rank}</h4>
+                                <h4 className="text-sm font-semibold text-foreground wrap-break-words">{section.rank}</h4>
                               ) : (
                                 <h4 className="text-sm font-semibold text-foreground">Requirements</h4>
-                              )}
-
-                              {section.ageText && (
-                                <div className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-foreground/75 bg-foreground/10 rounded-md px-1.5 py-1 shrink-0 max-w-full">
-                                  <span className="material-symbols-rounded text-[13px] shrink-0">schedule</span>
-                                  <span className="wrap-break-words text-left leading-tight">
-                                    After {section.ageText.trim()}
-                                  </span>
-                                  <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
-                                    You can join the official invite forum from {selectedNodeOfficialData.sourceName} after {section.ageText.trim()}.
-                                  </span>
-                                </div>
                               )}
                             </div>
 
                             {section.requirements.length > 0 ? (
-                              <ul className="space-y-1.5">
+                              <ul className="space-y-1.5 min-w-0">
                                 {section.requirements.map((requirement, requirementIndex) => (
                                   <li key={`${section.key}-${requirementIndex}`} className="text-sm text-foreground/80 leading-snug flex items-start gap-2">
                                     <span className="mt-[7px] h-1 w-1 rounded-full bg-foreground/45 shrink-0" />
-                                    <span className="wrap-break-words">{requirement}</span>
+                                    <span className="wrap-break-words min-w-0 flex-1">{renderReqs(requirement)}</span>
                                   </li>
                                 ))}
                               </ul>
                             ) : (
                               <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
-                                {section.requirementText || "No additional requirements."}
+                                {section.requirementText ? renderReqs(section.requirementText) : "No additional requirements."}
                               </p>
                             )}
                           </div>
@@ -1318,36 +1202,36 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             </div>
 
             <div className="rounded-lg border border-foreground/10 bg-foreground/5 p-3">
-              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-3 mb-3">
+                <div className="grid grid-cols-2 gap-2 w-full">
                   <button
                     type="button"
                     onClick={() => setOfficialInvitesTab("canInviteTo")}
-                    className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition-colors ${
+                    className={`justify-center w-full inline-flex items-center gap-1.5 px-2 py-1.5 rounded-md text-xs font-semibold transition-colors ${
                       officialInvitesTab === "canInviteTo"
                         ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
                         : "bg-foreground/8 text-foreground/70 border border-foreground/10 hover:bg-foreground/12"
                     }`}
                   >
-                    <span className="material-symbols-rounded text-sm">outbound</span>
-                    <span>Can Invite To ({selectedNodeOfficialData.canInviteTo.length})</span>
+                    <span className="material-symbols-rounded text-sm shrink-0">outbound</span>
+                    <span className="truncate">Can Invite To ({selectedNodeOfficialData.canInviteTo.length})</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setOfficialInvitesTab("invitedFrom")}
-                    className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition-colors ${
+                    className={`justify-center w-full inline-flex items-center gap-1.5 px-2 py-1.5 rounded-md text-xs font-semibold transition-colors ${
                       officialInvitesTab === "invitedFrom"
                         ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
                         : "bg-foreground/8 text-foreground/70 border border-foreground/10 hover:bg-foreground/12"
                     }`}
                   >
-                    <span className="material-symbols-rounded text-sm">south_west</span>
-                    <span>Invited From ({selectedNodeOfficialData.invitedFrom.length})</span>
+                    <span className="material-symbols-rounded text-sm shrink-0">south_west</span>
+                    <span className="truncate">Invited From ({selectedNodeOfficialData.invitedFrom.length})</span>
                   </button>
                 </div>
-                <div className="flex items-center gap-2 ml-auto">
-                  <span className="text-xs font-semibold text-foreground/60">Sort by</span>
-                  <div className="relative">
+                <div className="flex items-center justify-between gap-2 w-full pt-3 border-t border-foreground/5">
+                  <span className="text-xs font-semibold text-foreground/60 shrink-0">Sort by</span>
+                  <div className="relative flex-1">
                     <select
                       value={officialInvitesSortBy}
                       onChange={(event) => {
@@ -1355,11 +1239,11 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                         setOfficialInvitesSortBy(nextSortBy);
                         setOfficialInvitesSortDirection(nextSortBy === "officialInvites" ? "desc" : "asc");
                       }}
-                      className="h-8 min-w-[156px] appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-2.5 pr-7 text-xs font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
+                      className="w-full h-8 appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-2.5 pr-7 text-xs font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
                       aria-label="Sort dialog invite trackers"
                     >
                       <option value="officialInvites">Official Invites</option>
-                      <option value="unlockAfter">Days</option>
+                      <option value="alphabetical">Alphabetical</option>
                     </select>
                     <span className="pointer-events-none material-symbols-rounded absolute right-1.5 top-1/2 -translate-y-1/2 text-sm text-foreground/50">
                       expand_more
@@ -1368,14 +1252,11 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                   <button
                     type="button"
                     onClick={() => setOfficialInvitesSortDirection((current) => current === "asc" ? "desc" : "asc")}
-                    className="relative group h-8 w-8 inline-flex items-center justify-center rounded-md border border-foreground/10 bg-foreground/5 text-foreground/70 outline-none transition-colors hover:border-foreground/20 focus-visible:border-foreground/30"
+                    className="relative group shrink-0 h-8 w-8 inline-flex items-center justify-center rounded-md border border-foreground/10 bg-foreground/5 text-foreground/70 outline-none transition-colors hover:border-foreground/20 focus-visible:border-foreground/30"
                     aria-label={`Sort ${officialInvitesSortDirection === "asc" ? "ascending" : "descending"}`}
                   >
                     <span className="material-symbols-rounded text-sm">
                       {officialInvitesSortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
-                    </span>
-                    <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
-                      Sort: {officialInvitesSortDirection === "asc" ? "Ascending" : "Descending"}
                     </span>
                   </button>
                 </div>
@@ -1389,18 +1270,6 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                     );
                     const inviteCardKey = `${selectedNodeOfficialData.sourceName}:${officialInvitesTab}:${invite.tracker}`;
                     const isInviteCardOpen = expandedOfficialInviteCards[inviteCardKey] ?? true;
-                    const unlockAfterParts = Array.from(new Set(
-                      joinRequirementSections
-                        .map((section) => section.ageText?.trim())
-                        .filter((value): value is string => Boolean(value))
-                    ));
-                    const unlockAfterValue = unlockAfterParts.join(" / ");
-                    const unlockAfterText = unlockAfterParts.length > 0 ? `After ${unlockAfterValue}` : null;
-                    const joinTargetTracker = officialInvitesTab === "canInviteTo" ? invite.tracker : selectedNodeOfficialData.sourceName;
-                    const joinSourceTracker = officialInvitesTab === "canInviteTo" ? selectedNodeOfficialData.sourceName : invite.tracker;
-                    const unlockAfterTooltip = unlockAfterParts.length > 0
-                      ? `You can join ${joinTargetTracker} from ${joinSourceTracker} after ${unlockAfterValue}.`
-                      : null;
 
                     return (
                     <div key={invite.tracker} className="rounded-lg border border-foreground/10 bg-card p-3">
@@ -1420,13 +1289,13 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                             }));
                           }
                         }}
-                        className="flex flex-wrap items-center justify-between gap-2 cursor-pointer rounded-md -mx-1 px-1 py-0.5"
+                        className="flex items-center justify-between gap-3 cursor-pointer rounded-md -mx-1 px-1 py-0.5"
                         aria-expanded={isInviteCardOpen}
                         aria-label={`${isInviteCardOpen ? "Collapse" : "Expand"} ${invite.tracker} details`}
                       >
-                        <div className="flex items-center gap-2 min-w-0 flex-wrap">
-                          <h4 className="text-sm font-semibold text-foreground">{invite.tracker}</h4>
-                          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground/80 bg-foreground/10 px-2 py-0.5 rounded-md shrink-0 whitespace-nowrap">
+                        <div className="flex flex-wrap items-center gap-2 min-w-0 flex-1">
+                          <h4 className="text-sm font-semibold text-foreground truncate max-w-full">{invite.tracker}</h4>
+                          <span className={badgeClass}>
                             {getAbbr(invite.tracker)}
                           </span>
                           <button
@@ -1450,42 +1319,27 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                                 fgRef.current.zoom(2.5, 2000);
                               }
                             }}
-                            className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-900/40 transition-colors cursor-pointer"
+                            className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-900/40 transition-colors cursor-pointer shrink-0"
                             aria-label={`Open official invites for ${invite.tracker}`}
                           >
                             <span className="material-symbols-rounded text-sm">outbound</span>
-                            {invite.officialInvites}
-                            <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
-                              Official Invites: {invite.officialInvites}
-                            </span>
+                            <span>{invite.officialInvites}</span>
                           </button>
                         </div>
-                        <div className="flex items-center gap-2">
-                          {unlockAfterText && (
-                            <div className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-foreground/75 bg-foreground/10 rounded-md px-1.5 py-1 shrink-0 max-w-full">
-                              <span className="material-symbols-rounded text-[13px] shrink-0">schedule</span>
-                              <span className="wrap-break-words text-left leading-tight">{unlockAfterText}</span>
-                              {unlockAfterTooltip && (
-                                <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
-                                  {unlockAfterTooltip}
-                                </span>
-                              )}
-                            </div>
-                          )}
-                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${getStatusColor(invite.details.active)}`}>
-                            {getStatusLabel(invite.details.active)}
-                          </span>
+                        
+                        <div className="flex items-center shrink-0 ml-1">
                           <span className={`material-symbols-rounded text-lg text-foreground/60 transition-transform duration-200 ${isInviteCardOpen ? "rotate-180" : ""}`}>
                             keyboard_arrow_down
                           </span>
                         </div>
                       </div>
+                      
                       <div
                         className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
                           isInviteCardOpen ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0"
                         }`}
                       >
-                        <div className="overflow-hidden border-t border-foreground/10 pt-2.5">
+                        <div className="overflow-hidden pt-1">
                           {joinRequirementSections.length > 0 ? (
                             <div className="space-y-2">
                               {joinRequirementSections.map((section, sectionIndex) => (
@@ -1499,15 +1353,15 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                                   )}
                                   {section.rank && (
                                     <div className="mb-2">
-                                      <h5 className="text-sm font-semibold text-foreground">{section.rank}</h5>
+                                      <h5 className="text-sm font-semibold text-foreground wrap-break-words">{section.rank}</h5>
                                     </div>
                                   )}
                                   {section.requirements.length > 0 ? (
-                                    <ul className="space-y-1.5">
+                                    <ul className="space-y-1.5 min-w-0">
                                       {section.requirements.map((requirement, requirementIndex) => (
                                         <li key={`${section.key}-join-${requirementIndex}`} className="text-sm text-foreground/80 leading-snug flex items-start gap-2">
                                           <span className="mt-[7px] h-1 w-1 rounded-full bg-foreground/45 shrink-0" />
-                                          <span className="wrap-break-words">{renderReqs(requirement)}</span>
+                                          <span className="wrap-break-words min-w-0 flex-1">{renderReqs(requirement)}</span>
                                         </li>
                                       ))}
                                     </ul>
@@ -1524,9 +1378,18 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                               No specific requirements.
                             </p>
                           )}
-                          <div className="text-xs text-foreground/50 mt-2">
-                            Checked: {invite.details.updated}
+                          
+                          <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-foreground/5 border-dashed">
+                            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+                              <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${getStatusColor(invite.details.active)}`}>
+                                {getStatusLabel(invite.details.active)}
+                              </span>
+                              <div className="flex items-center gap-1 text-foreground/30">
+                                <span className="text-xs font-medium">Checked: {invite.details.updated}</span>
+                              </div>
+                            </div>
                           </div>
+
                         </div>
                       </div>
                     </div>
@@ -1534,7 +1397,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                   })}
                 </div>
               ) : (
-                <p className="text-sm text-foreground/70">
+                <p className="text-sm text-foreground/70 text-center py-4 border border-dashed border-foreground/10 rounded-lg">
                   {officialInvitesTab === "canInviteTo"
                     ? "No active official invites were found for this tracker."
                     : "No active invite routes into this tracker were found."}
