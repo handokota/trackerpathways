@@ -13,7 +13,6 @@ interface UnlockRequirementSection {
   rank: string;
   requirements: string[];
   requirementText: string;
-  ageText: string | null;
 }
 
 interface OfficialInviteEntry {
@@ -24,12 +23,11 @@ interface OfficialInviteEntry {
 
 type OfficialInvitesTab = "canInviteTo" | "invitedFrom";
 type SortByOption = "days" | "jumps" | "officialInvites";
-type DialogSortByOption = "officialInvites" | "unlockAfter";
+type DialogSortByOption = "officialInvites" | "alphabetical";
 type SortDirection = "asc" | "desc";
 
 interface OfficialInvitesDialogState {
   sourceName: string;
-  unlockDays: number | null;
   sections: UnlockRequirementSection[];
   canInviteTo: OfficialInviteEntry[];
   invitedFrom: OfficialInviteEntry[];
@@ -123,7 +121,7 @@ export default function TrackerSearchApp() {
     }
   }, []);
 
-useEffect(() => {
+  useEffect(() => {
     if (!mounted) return;
 
     const params = new URLSearchParams();
@@ -560,74 +558,13 @@ useEffect(() => {
           .map(item => item.trim())
           .filter(item => item.length > 0);
 
-        let ageText = null;
-        let updatedRequirementText = requirementText;
-
-        const ageIndex = rawRequirements.findIndex(req =>
-          /(?<!\d+x\s)(?:\b\d+\s+)?(?:year|month|week|day)s?|\b\d+d\b/i.test(req) &&
-          !/(seedtime|seed size|seedsize|upload|ratio|adoptions|bp|torrents|seeds|bonus|profile|links)/i.test(req)
-        );
-
-        const requirements = [...rawRequirements];
-        if (ageIndex !== -1) {
-          ageText = requirements[ageIndex];
-          requirements.splice(ageIndex, 1);
-          updatedRequirementText = requirements.join(", ");
-        }
-
         return {
           key: `${keyPrefix}-${index}`,
           rank,
-          requirements,
-          requirementText: updatedRequirementText,
-          ageText,
+          requirements: rawRequirements,
+          requirementText: requirementText,
         };
       });
-  };
-
-  const parseAgeTextToDays = (ageText: string): number | null => {
-    const normalizedAgeText = ageText.toLowerCase();
-    let totalDays = 0;
-    let matched = false;
-
-    const durationMatches = normalizedAgeText.matchAll(/(\d+(?:\.\d+)?)\s*(years?|yrs?|y|months?|mos?|weeks?|w|days?|d)\b/g);
-    for (const match of durationMatches) {
-      const value = Number.parseFloat(match[1]);
-      if (Number.isNaN(value)) {
-        continue;
-      }
-
-      const unit = match[2];
-      matched = true;
-      if (unit.startsWith("y")) {
-        totalDays += value * 365;
-      } else if (unit.startsWith("mo") || unit.startsWith("month")) {
-        totalDays += value * 30;
-      } else if (unit.startsWith("w")) {
-        totalDays += value * 7;
-      } else {
-        totalDays += value;
-      }
-    }
-
-    if (!matched) {
-      return null;
-    }
-
-    return Math.round(totalDays);
-  };
-
-  const getInviteUnlockAfterDays = (invite: OfficialInviteEntry, keyPrefix: string): number | null => {
-    const requirementSections = parseRequirementSections(invite.details.reqs || "", keyPrefix);
-    const unlockAfterDays = requirementSections
-      .map((section) => section.ageText ? parseAgeTextToDays(section.ageText) : null)
-      .filter((days): days is number => days !== null);
-
-    if (unlockAfterDays.length === 0) {
-      return null;
-    }
-
-    return Math.min(...unlockAfterDays);
   };
 
   const getUnlockRequirementSections = (sourceName: string): UnlockRequirementSection[] => {
@@ -692,45 +629,15 @@ useEffect(() => {
     const currentInvites = officialInvitesTab === "canInviteTo"
       ? officialInvitesDialog.canInviteTo
       : officialInvitesDialog.invitedFrom;
-    const unlockAfterCache: { [key: string]: number | null } = {};
-    const getCachedUnlockAfterDays = (invite: OfficialInviteEntry) => {
-      if (invite.tracker in unlockAfterCache) {
-        return unlockAfterCache[invite.tracker];
-      }
-
-      const unlockAfterDays = getInviteUnlockAfterDays(
-        invite,
-        `${officialInvitesDialog.sourceName}-${invite.tracker}-${officialInvitesTab}-sort`
-      );
-      unlockAfterCache[invite.tracker] = unlockAfterDays;
-      return unlockAfterDays;
-    };
 
     return [...currentInvites].sort((a, b) => {
-      if (officialInvitesSortBy === "unlockAfter") {
-        const aUnlockAfterDays = getCachedUnlockAfterDays(a);
-        const bUnlockAfterDays = getCachedUnlockAfterDays(b);
-
-        if (aUnlockAfterDays === null && bUnlockAfterDays !== null) {
-          return 1;
-        }
-        if (aUnlockAfterDays !== null && bUnlockAfterDays === null) {
-          return -1;
-        }
-        if (
-          aUnlockAfterDays !== null
-          && bUnlockAfterDays !== null
-          && aUnlockAfterDays !== bUnlockAfterDays
-        ) {
-          return (aUnlockAfterDays - bUnlockAfterDays) * directionMultiplier;
+      if (officialInvitesSortBy === "officialInvites") {
+        if (a.officialInvites !== b.officialInvites) {
+          return (a.officialInvites - b.officialInvites) * directionMultiplier;
         }
       }
 
-      if (a.officialInvites !== b.officialInvites) {
-        return (a.officialInvites - b.officialInvites) * directionMultiplier;
-      }
-
-      return a.tracker.localeCompare(b.tracker);
+      return a.tracker.localeCompare(b.tracker) * (officialInvitesSortBy === "alphabetical" ? directionMultiplier : 1);
     });
   }, [officialInvitesDialog, officialInvitesSortBy, officialInvitesSortDirection, officialInvitesTab]);
 
@@ -764,13 +671,7 @@ useEffect(() => {
     router.push(nextUrl, { scroll: false });
   };
 
-  const openOfficialInvitesDialog = (
-    sourceName: string,
-    canInviteTo: OfficialInviteEntry[],
-    invitedFrom: OfficialInviteEntry[],
-    updateUrl = true
-  ) => {
-    const unlockInfo = data.unlockInviteClass[sourceName];
+  const openOfficialInvitesDialog = (sourceName: string, updateUrl = true) => {
     setOfficialInvitesTab("canInviteTo");
     setOfficialInvitesSortBy("officialInvites");
     setOfficialInvitesSortDirection("desc");
@@ -778,10 +679,9 @@ useEffect(() => {
     setExpandedOfficialInviteCards({});
     setOfficialInvitesDialog({
       sourceName,
-      unlockDays: unlockInfo?.[0] ?? null,
       sections: getUnlockRequirementSections(sourceName),
-      canInviteTo,
-      invitedFrom,
+      canInviteTo: trackerCanInviteTo[sourceName] || [],
+      invitedFrom: trackerInvitedFrom[sourceName] || [],
     });
 
     if (updateUrl) {
@@ -815,12 +715,7 @@ useEffect(() => {
       return;
     }
 
-    openOfficialInvitesDialog(
-      trackerParam,
-      trackerCanInviteTo[trackerParam] || [],
-      trackerInvitedFrom[trackerParam] || [],
-      false
-    );
+    openOfficialInvitesDialog(trackerParam, false);
   }, [allTrackers, searchParams, trackerCanInviteTo, trackerInvitedFrom]);
 
 
@@ -1169,7 +1064,7 @@ useEffect(() => {
 
                           <button
                             type="button"
-                            onClick={() => openOfficialInvitesDialog(sourceName, officialInvites, invitedFrom)}
+                            onClick={() => openOfficialInvitesDialog(sourceName)}
                             className="relative group inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 transition-colors hover:bg-blue-200 dark:hover:bg-blue-900/40 cursor-pointer"
                             aria-label={`Official invites for ${sourceName}: ${officialInvites.length}`}
                           >
@@ -1239,7 +1134,6 @@ useEffect(() => {
                     {displayedSourcePaths.map((path) => {
                       const targetAbbr = getAbbr(path.target);
                       const targetOfficialInvites = trackerCanInviteTo[path.target] || [];
-                      const targetInvitedFrom = trackerInvitedFrom[path.target] || [];
                       const isDirect = path.routes.length === 1;
                       const pathId = getPathId(path);
                       const isBestPath = pathId === bestPathId;
@@ -1267,7 +1161,7 @@ useEffect(() => {
                                   {!isDirect && <span className={badgeClass}>{path.routes.length} hop</span>}
                                   <button
                                     type="button"
-                                    onClick={() => openOfficialInvitesDialog(path.target, targetOfficialInvites, targetInvitedFrom)}
+                                    onClick={() => openOfficialInvitesDialog(path.target)}
                                     className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 transition-colors hover:bg-blue-200 dark:hover:bg-blue-900/40 cursor-pointer"
                                     aria-label={`Official invites for ${path.target}: ${targetOfficialInvites.length}`}
                                   >
@@ -1450,15 +1344,6 @@ useEffect(() => {
                                   ) : (
                                     <h4 className="text-sm font-semibold text-foreground">Requirements</h4>
                                   )}
-
-                                  {section.ageText && (
-                                    <div className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-foreground/75 bg-foreground/10 rounded-md px-1.5 py-1 shrink-0 max-w-full">
-                                      <span className="material-symbols-rounded text-[13px] shrink-0">schedule</span>
-                                      <span className="wrap-break-words text-left leading-tight">
-                                        After {section.ageText.trim()}
-                                      </span>
-                                    </div>
-                                  )}
                                 </div>
 
                                 {section.requirements.length > 0 ? (
@@ -1524,11 +1409,11 @@ useEffect(() => {
                             setOfficialInvitesSortBy(nextSortBy);
                             setOfficialInvitesSortDirection(nextSortBy === "officialInvites" ? "desc" : "asc");
                           }}
-                          className="w-full sm:w-auto sm:min-w-[156px] h-8 appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-2.5 pr-7 text-xs font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
+                          className="w-full sm:w-auto sm:min-w-40 h-8 appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-2.5 pr-7 text-xs font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
                           aria-label="Sort dialog invite trackers"
                         >
                           <option value="officialInvites">Official Invites</option>
-                          <option value="unlockAfter">Days</option>
+                          <option value="alphabetical">Alphabetical</option>
                         </select>
                         <span className="pointer-events-none material-symbols-rounded absolute right-1.5 top-1/2 -translate-y-1/2 text-sm text-foreground/50">
                           expand_more
@@ -1555,13 +1440,6 @@ useEffect(() => {
                         );
                         const inviteCardKey = `${officialInvitesDialog.sourceName}:${officialInvitesTab}:${invite.tracker}`;
                         const isInviteCardOpen = expandedOfficialInviteCards[inviteCardKey] ?? true;
-                        const unlockAfterParts = Array.from(new Set(
-                          joinRequirementSections
-                            .map((section) => section.ageText?.trim())
-                            .filter((value): value is string => Boolean(value))
-                        ));
-                        const unlockAfterValue = unlockAfterParts.join(" / ");
-                        const unlockAfterText = unlockAfterParts.length > 0 ? `After ${unlockAfterValue}` : null;
                         
                         return (
                         <div key={invite.tracker} className="rounded-lg border border-foreground/10 bg-card p-3">
@@ -1581,12 +1459,12 @@ useEffect(() => {
                                 }));
                               }
                             }}
-                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 cursor-pointer rounded-md -mx-1 px-1 py-0.5"
+                            className="flex items-center justify-between gap-3 cursor-pointer rounded-md -mx-1 px-1 py-0.5"
                             aria-expanded={isInviteCardOpen}
                             aria-label={`${isInviteCardOpen ? "Collapse" : "Expand"} ${invite.tracker} details`}
                           >
-                            <div className="flex items-center gap-2 min-w-0 w-full sm:w-auto">
-                              <h4 className="text-sm font-semibold text-foreground truncate">{invite.tracker}</h4>
+                            <div className="flex flex-wrap items-center gap-2 min-w-0 flex-1">
+                              <h4 className="text-sm font-semibold text-foreground truncate max-w-full">{invite.tracker}</h4>
                               <span className={badgeClass}>
                                 {getAbbr(invite.tracker)}
                               </span>
@@ -1594,11 +1472,7 @@ useEffect(() => {
                                 type="button"
                                 onClick={(event) => {
                                   event.stopPropagation();
-                                  openOfficialInvitesDialog(
-                                    invite.tracker,
-                                    trackerCanInviteTo[invite.tracker] || [],
-                                    trackerInvitedFrom[invite.tracker] || []
-                                  );
+                                  openOfficialInvitesDialog(invite.tracker);
                                 }}
                                 className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-900/40 transition-colors cursor-pointer shrink-0"
                                 aria-label={`Open official invites for ${invite.tracker}`}
@@ -1608,22 +1482,10 @@ useEffect(() => {
                               </button>
                             </div>
                             
-                            <div className="flex items-center gap-2 mt-2 sm:mt-0 ml-auto sm:ml-0 shrink-0 w-full sm:w-auto justify-start sm:justify-end">
-                              {unlockAfterText && (
-                                <div className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-foreground/75 bg-foreground/10 rounded-md px-1.5 py-1 shrink-0">
-                                  <span className="material-symbols-rounded text-[13px] shrink-0">schedule</span>
-                                  <span className="wrap-break-words text-left leading-tight hidden sm:inline">{unlockAfterText}</span>
-                                  <span className="wrap-break-words text-left leading-tight sm:hidden">{unlockAfterValue}</span>
-                                </div>
-                              )}
-                              <div className="flex items-center gap-2">
-                                <span className={`text-xs font-semibold px-2 py-0.5 rounded-md shrink-0 ${getStatusColor(invite.details.active)}`}>
-                                  {getStatusLabel(invite.details.active)}
-                                </span>
-                                <span className={`material-symbols-rounded text-lg text-foreground/60 transition-transform duration-200 shrink-0 ${isInviteCardOpen ? "rotate-180" : ""}`}>
-                                  keyboard_arrow_down
-                                </span>
-                              </div>
+                            <div className="flex items-center shrink-0 ml-1">
+                              <span className={`material-symbols-rounded text-lg text-foreground/60 transition-transform duration-200 ${isInviteCardOpen ? "rotate-180" : ""}`}>
+                                keyboard_arrow_down
+                              </span>
                             </div>
                           </div>
                           
@@ -1632,7 +1494,7 @@ useEffect(() => {
                               isInviteCardOpen ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0"
                             }`}
                           >
-                            <div className="overflow-hidden border-t border-foreground/10 pt-2.5">
+                            <div className="overflow-hidden pt-1">
                               {joinRequirementSections.length > 0 ? (
                                 <div className="space-y-2">
                                   {joinRequirementSections.map((section, sectionIndex) => (
@@ -1671,9 +1533,18 @@ useEffect(() => {
                                   No specific requirements.
                                 </p>
                               )}
-                              <div className="text-xs text-foreground/50 mt-2">
-                                Checked: {invite.details.updated}
+                              
+                              <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-foreground/5 border-dashed">
+                                <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+                                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${getStatusColor(invite.details.active)}`}>
+                                    {getStatusLabel(invite.details.active)}
+                                  </span>
+                                  <div className="flex items-center gap-1 text-foreground/30">
+                                    <span className="text-xs font-medium">Checked: {invite.details.updated}</span>
+                                  </div>
+                                </div>
                               </div>
+
                             </div>
                           </div>
                         </div>

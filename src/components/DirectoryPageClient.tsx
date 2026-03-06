@@ -13,7 +13,6 @@ interface UnlockRequirementSection {
   rank: string;
   requirements: string[];
   requirementText: string;
-  ageText: string | null;
 }
 
 interface OfficialInviteEntry {
@@ -24,12 +23,11 @@ interface OfficialInviteEntry {
 
 type OfficialInvitesTab = "canInviteTo" | "invitedFrom";
 type DirectorySortByOption = "alphabetical" | "officialInvites";
-type DialogSortByOption = "officialInvites" | "unlockAfter";
+type DialogSortByOption = "officialInvites" | "alphabetical";
 type SortDirection = "asc" | "desc";
 
 interface OfficialInvitesDialogState {
   sourceName: string;
-  unlockDays: number | null;
   sections: UnlockRequirementSection[];
   canInviteTo: OfficialInviteEntry[];
   invitedFrom: OfficialInviteEntry[];
@@ -115,74 +113,13 @@ export default function DirectoryPageClient() {
           .map(item => item.trim())
           .filter(item => item.length > 0);
 
-        let ageText = null;
-        let updatedRequirementText = requirementText;
-
-        const ageIndex = rawRequirements.findIndex(req =>
-          /(?:year|month|week|day)s?|\b\d+d\b/i.test(req) &&
-          !/(seedtime|seed size|seedsize|upload|ratio|adoptions|bp|torrents|seeds|bonus)/i.test(req)
-        );
-
-        const requirements = [...rawRequirements];
-        if (ageIndex !== -1) {
-          ageText = requirements[ageIndex];
-          requirements.splice(ageIndex, 1);
-          updatedRequirementText = requirements.join(", ");
-        }
-
         return {
           key: `${keyPrefix}-${index}`,
           rank,
-          requirements,
-          requirementText: updatedRequirementText,
-          ageText,
+          requirements: rawRequirements,
+          requirementText: requirementText,
         };
       });
-  };
-
-  const parseAgeTextToDays = (ageText: string): number | null => {
-    const normalizedAgeText = ageText.toLowerCase();
-    let totalDays = 0;
-    let matched = false;
-
-    const durationMatches = normalizedAgeText.matchAll(/(\d+(?:\.\d+)?)\s*(years?|yrs?|y|months?|mos?|weeks?|w|days?|d)\b/g);
-    for (const match of durationMatches) {
-      const value = Number.parseFloat(match[1]);
-      if (Number.isNaN(value)) {
-        continue;
-      }
-
-      const unit = match[2];
-      matched = true;
-      if (unit.startsWith("y")) {
-        totalDays += value * 365;
-      } else if (unit.startsWith("mo") || unit.startsWith("month")) {
-        totalDays += value * 30;
-      } else if (unit.startsWith("w")) {
-        totalDays += value * 7;
-      } else {
-        totalDays += value;
-      }
-    }
-
-    if (!matched) {
-      return null;
-    }
-
-    return Math.round(totalDays);
-  };
-
-  const getInviteUnlockAfterDays = (invite: OfficialInviteEntry, keyPrefix: string): number | null => {
-    const requirementSections = parseRequirementSections(invite.details.reqs || "", keyPrefix);
-    const unlockAfterDays = requirementSections
-      .map((section) => section.ageText ? parseAgeTextToDays(section.ageText) : null)
-      .filter((days): days is number => days !== null);
-
-    if (unlockAfterDays.length === 0) {
-      return null;
-    }
-
-    return Math.min(...unlockAfterDays);
   };
 
   const getUnlockRequirementSections = (sourceName: string): UnlockRequirementSection[] => {
@@ -235,45 +172,15 @@ export default function DirectoryPageClient() {
     const currentInvites = officialInvitesTab === "canInviteTo"
       ? officialInvitesDialog.canInviteTo
       : officialInvitesDialog.invitedFrom;
-    const unlockAfterCache: { [key: string]: number | null } = {};
-    const getCachedUnlockAfterDays = (invite: OfficialInviteEntry) => {
-      if (invite.tracker in unlockAfterCache) {
-        return unlockAfterCache[invite.tracker];
-      }
-
-      const unlockAfterDays = getInviteUnlockAfterDays(
-        invite,
-        `${officialInvitesDialog.sourceName}-${invite.tracker}-${officialInvitesTab}-sort`
-      );
-      unlockAfterCache[invite.tracker] = unlockAfterDays;
-      return unlockAfterDays;
-    };
 
     return [...currentInvites].sort((a, b) => {
-      if (officialInvitesSortBy === "unlockAfter") {
-        const aUnlockAfterDays = getCachedUnlockAfterDays(a);
-        const bUnlockAfterDays = getCachedUnlockAfterDays(b);
-
-        if (aUnlockAfterDays === null && bUnlockAfterDays !== null) {
-          return 1;
-        }
-        if (aUnlockAfterDays !== null && bUnlockAfterDays === null) {
-          return -1;
-        }
-        if (
-          aUnlockAfterDays !== null
-          && bUnlockAfterDays !== null
-          && aUnlockAfterDays !== bUnlockAfterDays
-        ) {
-          return (aUnlockAfterDays - bUnlockAfterDays) * directionMultiplier;
+      if (officialInvitesSortBy === "officialInvites") {
+        if (a.officialInvites !== b.officialInvites) {
+          return (a.officialInvites - b.officialInvites) * directionMultiplier;
         }
       }
 
-      if (a.officialInvites !== b.officialInvites) {
-        return (a.officialInvites - b.officialInvites) * directionMultiplier;
-      }
-
-      return a.tracker.localeCompare(b.tracker);
+      return a.tracker.localeCompare(b.tracker) * (officialInvitesSortBy === "alphabetical" ? directionMultiplier : 1);
     });
   }, [officialInvitesDialog, officialInvitesSortBy, officialInvitesSortDirection, officialInvitesTab]);
 
@@ -296,7 +203,6 @@ export default function DirectoryPageClient() {
   };
 
   const openOfficialInvitesDialog = (sourceName: string, updateUrl = true) => {
-    const unlockInfo = data.unlockInviteClass[sourceName];
     setOfficialInvitesTab("canInviteTo");
     setOfficialInvitesSortBy("officialInvites");
     setOfficialInvitesSortDirection("desc");
@@ -304,7 +210,6 @@ export default function DirectoryPageClient() {
     setExpandedOfficialInviteCards({});
     setOfficialInvitesDialog({
       sourceName,
-      unlockDays: unlockInfo?.[0] ?? null,
       sections: getUnlockRequirementSections(sourceName),
       canInviteTo: getOfficialInvitesForSource(sourceName),
       invitedFrom: getInvitedFromForSource(sourceName),
@@ -369,7 +274,7 @@ export default function DirectoryPageClient() {
             href={part}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-500 hover:underline wrap-break-words"
+            className="text-blue-500 hover:underline break-all sm:wrap-break-words"
           >
             {part}
           </a>
@@ -442,15 +347,15 @@ export default function DirectoryPageClient() {
 
   return (
     <main className="w-full px-6 pt-24 md:pt-32 pb-10 min-h-screen">
-      <div className="mb-12 grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(20rem,26rem)_minmax(0,1fr)] md:items-end md:gap-6">
-        <div>
+      <div className="mb-8 md:mb-12 flex flex-col md:grid md:grid-cols-[minmax(0,1fr)_minmax(20rem,26rem)_minmax(0,1fr)] items-start md:items-end gap-4 md:gap-6">
+        <div className="w-full">
           <h1 className="text-2xl font-bold tracking-tight mb-1 text-foreground">Tracker Directory</h1>
           <p className="text-sm text-foreground/60">
             Browse all {trackers.length} trackers and abbreviations.
           </p>
         </div>
 
-        <div className="relative w-full md:w-full md:justify-self-center">
+        <div className="relative w-full md:justify-self-center shrink-0">
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/30 flex items-center">
             <span className="material-symbols-rounded">search</span>
           </span>
@@ -466,9 +371,9 @@ export default function DirectoryPageClient() {
           />
         </div>
 
-        <div className="w-full flex items-center justify-end gap-2">
-          <span className="text-sm font-medium text-foreground/60">Sort by</span>
-          <div className="relative">
+        <div className="w-full flex items-center justify-between md:justify-end gap-2 pt-2 md:pt-0 border-t border-foreground/5 md:border-0">
+          <span className="text-sm font-medium text-foreground/60 shrink-0">Sort by</span>
+          <div className="relative flex-1 md:flex-none">
             <select
               value={sortBy}
               onChange={(event) => {
@@ -477,7 +382,7 @@ export default function DirectoryPageClient() {
                 setSortDirection(nextSortBy === "officialInvites" ? "desc" : "asc");
                 setVisibleTrackersCount(TRACKERS_PAGE_SIZE);
               }}
-              className="h-9 min-w-[176px] appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-3 pr-8 text-sm font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
+              className="w-full md:min-w-44 h-9 appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-3 pr-8 text-sm font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
               aria-label="Sort directory results"
             >
               <option value="alphabetical">Alphabetically</option>
@@ -490,13 +395,13 @@ export default function DirectoryPageClient() {
           <button
             type="button"
             onClick={() => setSortDirection((current) => current === "asc" ? "desc" : "asc")}
-            className="relative group h-9 w-9 inline-flex items-center justify-center rounded-md border border-foreground/10 bg-foreground/5 text-foreground/70 outline-none transition-colors hover:border-foreground/20 focus-visible:border-foreground/30"
+            className="relative group shrink-0 h-9 w-9 inline-flex items-center justify-center rounded-md border border-foreground/10 bg-foreground/5 text-foreground/70 outline-none transition-colors hover:border-foreground/20 focus-visible:border-foreground/30"
             aria-label={`Sort ${sortDirection === "asc" ? "ascending" : "descending"}`}
           >
             <span className="material-symbols-rounded text-base">
               {sortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
             </span>
-            <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+            <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 hidden md:block">
               Sort: {sortDirection === "asc" ? "Ascending" : "Descending"}
             </span>
           </button>
@@ -555,39 +460,39 @@ export default function DirectoryPageClient() {
 
       {officialInvitesDialog && (
         <div
-          className="fixed inset-0 z-50 h-dvh w-screen bg-black/55 backdrop-blur-sm p-0 md:p-4 flex items-end md:items-center justify-center animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-end justify-center md:items-center bg-black/55 backdrop-blur-sm p-0 md:p-4 animate-in fade-in duration-200 overscroll-none touch-none"
           onClick={() => closeOfficialInvitesDialog()}
         >
           <div
             role="dialog"
             aria-modal="true"
             aria-labelledby="official-invites-dialog-title"
-            className="w-full md:max-w-2xl max-h-[82dvh] md:max-h-[85dvh] rounded-t-2xl md:rounded-xl border border-foreground/15 bg-card shadow-2xl overflow-hidden mt-auto md:mt-0 flex flex-col overscroll-none animate-in zoom-in-95 slide-in-from-bottom-4 md:slide-in-from-bottom-0 duration-300"
+            className="w-full md:max-w-2xl max-h-[85dvh] rounded-t-2xl md:rounded-xl border border-foreground/15 bg-card shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 md:slide-in-from-bottom-0 duration-300 pointer-events-auto touch-auto"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex justify-center pt-2 md:hidden shrink-0">
-              <span className="h-1 w-10 rounded-full bg-foreground/20" />
+            <div className="flex justify-center pt-3 pb-1 md:hidden shrink-0">
+              <span className="h-1.5 w-12 rounded-full bg-foreground/20" />
             </div>
-            <div className="flex items-start justify-between gap-4 p-4 border-b border-foreground/10 shrink-0">
+            <div className="flex items-start justify-between gap-4 px-4 pb-4 md:pt-4 border-b border-foreground/10 shrink-0">
               <div>
                 <h2 id="official-invites-dialog-title" className="text-lg font-bold text-foreground">
                   {officialInvitesDialog.sourceName}
                 </h2>
-                <p className="text-sm text-foreground/70 mt-1">
+                <p className="text-sm text-foreground/70 mt-0.5">
                   Official invite forum and official invites
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => closeOfficialInvitesDialog()}
-                className="p-1.5 rounded-md text-foreground/70 transition-colors"
+                className="p-1.5 rounded-md text-foreground/70 transition-colors hover:text-foreground"
                 aria-label="Close dialog"
               >
                 <span className="material-symbols-rounded text-lg">close</span>
               </button>
             </div>
 
-            <div className="p-4 pb-6 overflow-y-auto overscroll-contain space-y-3 custom-scrollbar flex-1 min-h-0">
+            <div className="p-4 overflow-y-auto overflow-x-hidden overscroll-contain space-y-4 custom-scrollbar flex-1 min-h-0">
               <div className="space-y-2.5">
                 <div className="rounded-lg border border-foreground/10 bg-foreground/5 p-3">
                   <button
@@ -619,36 +524,24 @@ export default function DirectoryPageClient() {
                               <div className="rounded-lg border border-foreground/10 bg-card p-3">
                                 <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
                                   {section.rank ? (
-                                    <h4 className="text-sm font-semibold text-foreground">{section.rank}</h4>
+                                    <h4 className="text-sm font-semibold text-foreground wrap-break-words">{section.rank}</h4>
                                   ) : (
                                     <h4 className="text-sm font-semibold text-foreground">Requirements</h4>
-                                  )}
-
-                                  {section.ageText && (
-                                    <div className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-foreground/75 bg-foreground/10 rounded-md px-1.5 py-1 shrink-0 max-w-full">
-                                      <span className="material-symbols-rounded text-[13px] shrink-0">schedule</span>
-                                      <span className="wrap-break-words text-left leading-tight">
-                                        After {section.ageText.trim()}
-                                      </span>
-                                      <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
-                                        You can join the official invite forum from {officialInvitesDialog.sourceName} after {section.ageText.trim()}.
-                                      </span>
-                                    </div>
                                   )}
                                 </div>
 
                                 {section.requirements.length > 0 ? (
-                                  <ul className="space-y-1.5">
+                                  <ul className="space-y-1.5 min-w-0">
                                     {section.requirements.map((requirement, requirementIndex) => (
                                       <li key={`${section.key}-${requirementIndex}`} className="text-sm text-foreground/80 leading-snug flex items-start gap-2">
                                         <span className="mt-[7px] h-1 w-1 rounded-full bg-foreground/45 shrink-0" />
-                                        <span className="wrap-break-words">{requirement}</span>
+                                        <span className="wrap-break-words min-w-0 flex-1">{renderReqs(requirement)}</span>
                                       </li>
                                     ))}
                                   </ul>
                                 ) : (
                                   <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
-                                    {section.requirementText || "No additional requirements."}
+                                    {section.requirementText ? renderReqs(section.requirementText) : "No additional requirements."}
                                   </p>
                                 )}
                               </div>
@@ -663,36 +556,36 @@ export default function DirectoryPageClient() {
                 </div>
 
                 <div className="rounded-lg border border-foreground/10 bg-foreground/5 p-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                    <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                    <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
                       <button
                         type="button"
                         onClick={() => setOfficialInvitesTab("canInviteTo")}
-                        className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition-colors ${
+                        className={`justify-center sm:justify-start w-full sm:w-auto inline-flex items-center gap-1.5 px-2 py-1.5 rounded-md text-xs font-semibold transition-colors ${
                           officialInvitesTab === "canInviteTo"
                             ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
                             : "bg-foreground/8 text-foreground/70 border border-foreground/10 hover:bg-foreground/12"
                         }`}
                       >
-                        <span className="material-symbols-rounded text-sm">outbound</span>
-                        <span>Can Invite To ({officialInvitesDialog.canInviteTo.length})</span>
+                        <span className="material-symbols-rounded text-sm shrink-0">outbound</span>
+                        <span className="truncate">Can Invite To ({officialInvitesDialog.canInviteTo.length})</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => setOfficialInvitesTab("invitedFrom")}
-                        className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition-colors ${
+                        className={`justify-center sm:justify-start w-full sm:w-auto inline-flex items-center gap-1.5 px-2 py-1.5 rounded-md text-xs font-semibold transition-colors ${
                           officialInvitesTab === "invitedFrom"
                             ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
                             : "bg-foreground/8 text-foreground/70 border border-foreground/10 hover:bg-foreground/12"
                         }`}
                       >
-                        <span className="material-symbols-rounded text-sm">south_west</span>
-                        <span>Invited From ({officialInvitesDialog.invitedFrom.length})</span>
+                        <span className="material-symbols-rounded text-sm shrink-0">south_west</span>
+                        <span className="truncate">Invited From ({officialInvitesDialog.invitedFrom.length})</span>
                       </button>
                     </div>
-                    <div className="flex items-center gap-2 ml-auto">
-                      <span className="text-xs font-semibold text-foreground/60">Sort by</span>
-                      <div className="relative">
+                    <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t border-foreground/5 sm:border-0">
+                      <span className="text-xs font-semibold text-foreground/60 shrink-0">Sort by</span>
+                      <div className="relative flex-1 sm:flex-none">
                         <select
                           value={officialInvitesSortBy}
                           onChange={(event) => {
@@ -700,11 +593,11 @@ export default function DirectoryPageClient() {
                             setOfficialInvitesSortBy(nextSortBy);
                             setOfficialInvitesSortDirection(nextSortBy === "officialInvites" ? "desc" : "asc");
                           }}
-                          className="h-8 min-w-[156px] appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-2.5 pr-7 text-xs font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
+                          className="w-full sm:w-auto sm:min-w-40 h-8 appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-2.5 pr-7 text-xs font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
                           aria-label="Sort dialog invite trackers"
                         >
                           <option value="officialInvites">Official Invites</option>
-                          <option value="unlockAfter">Days</option>
+                          <option value="alphabetical">Alphabetical</option>
                         </select>
                         <span className="pointer-events-none material-symbols-rounded absolute right-1.5 top-1/2 -translate-y-1/2 text-sm text-foreground/50">
                           expand_more
@@ -713,14 +606,11 @@ export default function DirectoryPageClient() {
                       <button
                         type="button"
                         onClick={() => setOfficialInvitesSortDirection((current) => current === "asc" ? "desc" : "asc")}
-                        className="relative group h-8 w-8 inline-flex items-center justify-center rounded-md border border-foreground/10 bg-foreground/5 text-foreground/70 outline-none transition-colors hover:border-foreground/20 focus-visible:border-foreground/30"
+                        className="relative group shrink-0 h-8 w-8 inline-flex items-center justify-center rounded-md border border-foreground/10 bg-foreground/5 text-foreground/70 outline-none transition-colors hover:border-foreground/20 focus-visible:border-foreground/30"
                         aria-label={`Sort ${officialInvitesSortDirection === "asc" ? "ascending" : "descending"}`}
                       >
                         <span className="material-symbols-rounded text-sm">
                           {officialInvitesSortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
-                        </span>
-                        <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
-                          Sort: {officialInvitesSortDirection === "asc" ? "Ascending" : "Descending"}
                         </span>
                       </button>
                     </div>
@@ -734,19 +624,7 @@ export default function DirectoryPageClient() {
                         );
                         const inviteCardKey = `${officialInvitesDialog.sourceName}:${officialInvitesTab}:${invite.tracker}`;
                         const isInviteCardOpen = expandedOfficialInviteCards[inviteCardKey] ?? true;
-                        const unlockAfterParts = Array.from(new Set(
-                          joinRequirementSections
-                            .map((section) => section.ageText?.trim())
-                            .filter((value): value is string => Boolean(value))
-                        ));
-                        const unlockAfterValue = unlockAfterParts.join(" / ");
-                        const unlockAfterText = unlockAfterParts.length > 0 ? `After ${unlockAfterValue}` : null;
-                        const joinTargetTracker = officialInvitesTab === "canInviteTo" ? invite.tracker : officialInvitesDialog.sourceName;
-                        const joinSourceTracker = officialInvitesTab === "canInviteTo" ? officialInvitesDialog.sourceName : invite.tracker;
-                        const unlockAfterTooltip = unlockAfterParts.length > 0
-                          ? `You can join ${joinTargetTracker} from ${joinSourceTracker} after ${unlockAfterValue}.`
-                          : null;
-
+                        
                         return (
                         <div key={invite.tracker} className="rounded-lg border border-foreground/10 bg-card p-3">
                           <div
@@ -765,12 +643,12 @@ export default function DirectoryPageClient() {
                                 }));
                               }
                             }}
-                            className="flex flex-wrap items-center justify-between gap-2 cursor-pointer rounded-md -mx-1 px-1 py-0.5"
+                            className="flex items-center justify-between gap-3 cursor-pointer rounded-md -mx-1 px-1 py-0.5"
                             aria-expanded={isInviteCardOpen}
                             aria-label={`${isInviteCardOpen ? "Collapse" : "Expand"} ${invite.tracker} details`}
                           >
-                            <div className="flex items-center gap-2 min-w-0 flex-wrap">
-                              <h4 className="text-sm font-semibold text-foreground">{invite.tracker}</h4>
+                            <div className="flex flex-wrap items-center gap-2 min-w-0 flex-1">
+                              <h4 className="text-sm font-semibold text-foreground truncate max-w-full">{invite.tracker}</h4>
                               <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground/80 bg-foreground/10 px-2 py-0.5 rounded-md shrink-0 whitespace-nowrap">
                                 {data.abbrList[invite.tracker] || invite.tracker.substring(0, 3).toUpperCase()}
                               </span>
@@ -780,42 +658,27 @@ export default function DirectoryPageClient() {
                                   event.stopPropagation();
                                   openOfficialInvitesDialog(invite.tracker);
                                 }}
-                                className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-900/40 transition-colors cursor-pointer"
+                                className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-900/40 transition-colors cursor-pointer shrink-0"
                                 aria-label={`Open official invites for ${invite.tracker}`}
                               >
                                 <span className="material-symbols-rounded text-sm">outbound</span>
                                 <span>{invite.officialInvites}</span>
-                                <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
-                                  Official Invites: {invite.officialInvites}
-                                </span>
                               </button>
                             </div>
-                            <div className="flex items-center gap-2">
-                              {unlockAfterText && (
-                                <div className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-foreground/75 bg-foreground/10 rounded-md px-1.5 py-1 shrink-0 max-w-full">
-                                  <span className="material-symbols-rounded text-[13px] shrink-0">schedule</span>
-                                  <span className="wrap-break-words text-left leading-tight">{unlockAfterText}</span>
-                                  {unlockAfterTooltip && (
-                                    <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
-                                      {unlockAfterTooltip}
-                                    </span>
-                                  )}
-                                </div>
-                              )}
-                              <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${getStatusColor(invite.details.active)}`}>
-                                {getStatusLabel(invite.details.active)}
-                              </span>
+                            
+                            <div className="flex items-center shrink-0 ml-1">
                               <span className={`material-symbols-rounded text-lg text-foreground/60 transition-transform duration-200 ${isInviteCardOpen ? "rotate-180" : ""}`}>
                                 keyboard_arrow_down
                               </span>
                             </div>
                           </div>
+                          
                           <div
                             className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
                               isInviteCardOpen ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0"
                             }`}
                           >
-                            <div className="overflow-hidden border-t border-foreground/10 pt-2.5">
+                            <div className="overflow-hidden pt-1">
                               {joinRequirementSections.length > 0 ? (
                                 <div className="space-y-2">
                                   {joinRequirementSections.map((section, sectionIndex) => (
@@ -829,15 +692,15 @@ export default function DirectoryPageClient() {
                                       )}
                                       {section.rank && (
                                         <div className="mb-2">
-                                          <h5 className="text-sm font-semibold text-foreground">{section.rank}</h5>
+                                          <h5 className="text-sm font-semibold text-foreground wrap-break-words">{section.rank}</h5>
                                         </div>
                                       )}
                                       {section.requirements.length > 0 ? (
-                                        <ul className="space-y-1.5">
+                                        <ul className="space-y-1.5 min-w-0">
                                           {section.requirements.map((requirement, requirementIndex) => (
                                             <li key={`${section.key}-join-${requirementIndex}`} className="text-sm text-foreground/80 leading-snug flex items-start gap-2">
                                               <span className="mt-[7px] h-1 w-1 rounded-full bg-foreground/45 shrink-0" />
-                                              <span className="wrap-break-words">{renderReqs(requirement)}</span>
+                                              <span className="wrap-break-words min-w-0 flex-1">{renderReqs(requirement)}</span>
                                             </li>
                                           ))}
                                         </ul>
@@ -854,9 +717,18 @@ export default function DirectoryPageClient() {
                                   No specific requirements.
                                 </p>
                               )}
-                              <div className="text-xs text-foreground/50 mt-2">
-                                Checked: {invite.details.updated}
+                              
+                              <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-foreground/5 border-dashed">
+                                <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+                                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${getStatusColor(invite.details.active)}`}>
+                                    {getStatusLabel(invite.details.active)}
+                                  </span>
+                                  <div className="flex items-center gap-1 text-foreground/30">
+                                    <span className="text-xs font-medium">Checked: {invite.details.updated}</span>
+                                  </div>
+                                </div>
                               </div>
+
                             </div>
                           </div>
                         </div>
@@ -864,7 +736,7 @@ export default function DirectoryPageClient() {
                       })}
                     </div>
                   ) : (
-                    <p className="text-sm text-foreground/70">
+                    <p className="text-sm text-foreground/70 text-center py-4 border border-dashed border-foreground/10 rounded-lg">
                       {officialInvitesTab === "canInviteTo"
                         ? "No active official invites were found for this tracker."
                         : "No active invite routes into this tracker were found."}
