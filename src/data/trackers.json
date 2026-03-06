@@ -173,6 +173,7 @@
     "AnimeWorld": [30, "PowerUser: 1 month, 1TB Upload, ratio>=1.0"],
     "Anthelion": [30, "PU: 5 uploads and/or 10 adoptions, 1TiB upload, ratio>=1, 25k BP, 1 month"],
     "AsianCinema": [30, "PU: 1 month, 1TB Upload"],
+    "Aura4K": [90, "Luminous: 20TB Upload, 3 month, ratio>0.75"],
     "Bemaniso": [14, "PU: 2 weeks, 25GB upload, ratio>1.05"],
     "BeyondHD": [180, "Pro: ratio 0.70, upload 1.25TB, average seedtime 1 month, total seedtime 4 years 11 months, completed seeds 60, special seedsize 500GB,6 months"],
     "Bibliotik": [14, "PU: 2 weeks, ratio>1.05, (10GB upload, 10 torrents) or (1GB upload, 100 torrents)"],
@@ -306,6 +307,10 @@
     "AsianCinema": {
       "Luminarr": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Feb 2026" },
       "Nebulance": { "days": 0, "reqs": "No requirement", "active": "YES", "updated": "Nov 2025" }
+    },
+    "Aura4K": {
+      "seedpool": { "days": 0, "reqs": "1 TiB seeding size", "active": "Yes", "updated": "Feb 2026" },
+      "YuScene": { "days": 0, "reqs": "No Requirement", "active": "Yes", "updated": "Feb 2026" }
     },
     "AvistaZ": {
       "CinemaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Nov 2025" },
@@ -908,6 +913,7 @@
       "YuScene": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Dec 2025" }
     },
     "YuScene": {
+      "Aura4K": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Feb 2026" },
       "CapybaraBR": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Jan 2026" },
       "DarkPeers": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Jan 2026" },
       "DigitalCore.Club": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Jan 2026" },
