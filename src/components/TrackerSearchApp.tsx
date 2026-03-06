@@ -558,8 +558,8 @@ export default function TrackerSearchApp() {
         let updatedRequirementText = requirementText;
 
         const ageIndex = rawRequirements.findIndex(req =>
-          /(?:year|month|week|day)s?|\b\d+d\b/i.test(req) &&
-          !/(seedtime|seed size|seedsize|upload|ratio|adoptions|bp|torrents|seeds|bonus)/i.test(req)
+          /(?<!\d+x\s)(?:\b\d+\s+)?(?:year|month|week|day)s?|\b\d+d\b/i.test(req) &&
+          !/(seedtime|seed size|seedsize|upload|ratio|adoptions|bp|torrents|seeds|bonus|profile|links)/i.test(req)
         );
 
         const requirements = [...rawRequirements];
