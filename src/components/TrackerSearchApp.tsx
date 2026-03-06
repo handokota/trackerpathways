@@ -1608,7 +1608,7 @@ useEffect(() => {
                               </button>
                             </div>
                             
-                            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0 w-full sm:w-auto justify-between sm:justify-end">
+                            <div className="flex items-center gap-2 mt-2 sm:mt-0 ml-auto sm:ml-0 shrink-0 w-full sm:w-auto justify-start sm:justify-end">
                               {unlockAfterText && (
                                 <div className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-foreground/75 bg-foreground/10 rounded-md px-1.5 py-1 shrink-0">
                                   <span className="material-symbols-rounded text-[13px] shrink-0">schedule</span>
