@@ -123,17 +123,23 @@ export default function TrackerSearchApp() {
     }
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
     if (!mounted) return;
 
     const params = new URLSearchParams();
     if (deferredSource) params.set("source", deferredSource);
     if (deferredTarget) params.set("target", deferredTarget);
-    if (viewMode !== 'grid') params.set("view", viewMode);
-    if (maxJumps !== 5) params.set("jumps", maxJumps.toString());
-    if (maxDays !== null) params.set("days", maxDays.toString());
-    if (sortBy !== 'jumps') params.set("sort", sortBy);
-    params.set("order", sortDirection);
+    
+    if (deferredSource || deferredTarget) {
+      if (viewMode !== 'grid') params.set("view", viewMode);
+      if (maxJumps !== 5) params.set("jumps", maxJumps.toString());
+      if (maxDays !== null) params.set("days", maxDays.toString());
+      if (sortBy !== 'jumps') params.set("sort", sortBy);
+      if (sortDirection !== 'asc' || sortBy === 'officialInvites') {
+        params.set("order", sortDirection);
+      }
+    }
+
     const trackerParam = searchParams.get("tracker");
     if (trackerParam) params.set("tracker", trackerParam);
 
