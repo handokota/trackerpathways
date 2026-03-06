@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import DirectoryPageClient from "@/components/DirectoryPageClient";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function DirectoryPage() {
-  return <DirectoryPageClient />;
+  return (
+    <Suspense fallback={<div className="w-full min-h-[50vh]" />}>
+      <DirectoryPageClient />
+    </Suspense>
+  );
 }

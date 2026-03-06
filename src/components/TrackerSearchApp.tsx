@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useDeferredValue, useRef } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import rawData from "@/data/trackers.json"; 
-import { DataStructure, PathResult } from "@/types"; 
+import { DataStructure, PathResult, RouteDetail } from "@/types"; 
 
 const data = rawData as unknown as DataStructure;
 const PATHS_PAGE_SIZE = 12;
@@ -16,10 +16,23 @@ interface UnlockRequirementSection {
   ageText: string | null;
 }
 
-interface UnlockRequirementsDialogState {
+interface OfficialInviteEntry {
+  tracker: string;
+  details: RouteDetail;
+  officialInvites: number;
+}
+
+type OfficialInvitesTab = "canInviteTo" | "invitedFrom";
+type SortByOption = "days" | "jumps" | "officialInvites";
+type DialogSortByOption = "officialInvites" | "unlockAfter";
+type SortDirection = "asc" | "desc";
+
+interface OfficialInvitesDialogState {
   sourceName: string;
   unlockDays: number | null;
   sections: UnlockRequirementSection[];
+  canInviteTo: OfficialInviteEntry[];
+  invitedFrom: OfficialInviteEntry[];
 }
 
 export default function TrackerSearchApp() {
@@ -37,7 +50,21 @@ export default function TrackerSearchApp() {
   const [maxDays, setMaxDays] = useState<number | null>(
     searchParams.get("days") ? Number.parseInt(searchParams.get("days")!, 10) : null
   );
-  const [sortBy, setSortBy] = useState<'days' | 'jumps'>((searchParams.get("sort") as 'days' | 'jumps') || 'jumps');
+  const [sortBy, setSortBy] = useState<SortByOption>(() => {
+    const sortParam = searchParams.get("sort");
+    if (sortParam === "days" || sortParam === "jumps" || sortParam === "officialInvites") {
+      return sortParam;
+    }
+    return "jumps";
+  });
+  const [sortDirection, setSortDirection] = useState<SortDirection>(() => {
+    const orderParam = searchParams.get("order");
+    if (orderParam === "asc" || orderParam === "desc") {
+      return orderParam;
+    }
+
+    return searchParams.get("sort") === "officialInvites" ? "desc" : "asc";
+  });
 
   const [showFilters, setShowFilters] = useState(false);
   const [showCollectionManager, setShowCollectionManager] = useState(false);
@@ -66,7 +93,12 @@ export default function TrackerSearchApp() {
 
   const [foundPaths, setFoundPaths] = useState<PathResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [unlockRequirementsDialog, setUnlockRequirementsDialog] = useState<UnlockRequirementsDialogState | null>(null);
+  const [officialInvitesDialog, setOfficialInvitesDialog] = useState<OfficialInvitesDialogState | null>(null);
+  const [officialInvitesTab, setOfficialInvitesTab] = useState<OfficialInvitesTab>("canInviteTo");
+  const [officialInvitesSortBy, setOfficialInvitesSortBy] = useState<DialogSortByOption>("officialInvites");
+  const [officialInvitesSortDirection, setOfficialInvitesSortDirection] = useState<SortDirection>("desc");
+  const [isUnlockAccordionOpen, setIsUnlockAccordionOpen] = useState(true);
+  const [expandedOfficialInviteCards, setExpandedOfficialInviteCards] = useState<Record<string, boolean>>({});
   
   const [myTrackers, setMyTrackers] = useState<string[]>([]);
   const [collectionInput, setCollectionInput] = useState("");
@@ -102,9 +134,13 @@ export default function TrackerSearchApp() {
     if (maxJumps !== 5) params.set("jumps", maxJumps.toString());
     if (maxDays !== null) params.set("days", maxDays.toString());
     if (sortBy !== 'jumps') params.set("sort", sortBy);
+    params.set("order", sortDirection);
+    const trackerParam = searchParams.get("tracker");
+    if (trackerParam) params.set("tracker", trackerParam);
 
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [deferredSource, deferredTarget, viewMode, maxJumps, maxDays, sortBy, mounted, pathname, router]);
+    const nextQuery = params.toString();
+    router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
+  }, [deferredSource, deferredTarget, viewMode, maxJumps, maxDays, sortBy, sortDirection, mounted, pathname, router]);
 
   useEffect(() => {
     const fetchPaths = async () => {
@@ -218,13 +254,17 @@ export default function TrackerSearchApp() {
   }, [collectionActiveIndex]);
 
   useEffect(() => {
-    if (!unlockRequirementsDialog) {
+    if (!officialInvitesDialog) {
       return;
     }
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setUnlockRequirementsDialog(null);
+        setOfficialInvitesDialog(null);
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("tracker");
+        const nextQuery = params.toString();
+        router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
       }
     };
 
@@ -234,7 +274,7 @@ export default function TrackerSearchApp() {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [unlockRequirementsDialog]);
+  }, [officialInvitesDialog, pathname, router, searchParams]);
 
   const getAbbr = (name: string) => {
     if (data.abbrList[name]) return data.abbrList[name];
@@ -423,21 +463,47 @@ export default function TrackerSearchApp() {
     });
   };
 
+  const activeInviteCountBySource = useMemo(() => {
+    const counts: { [key: string]: number } = {};
+    Object.keys(data.routeInfo).forEach(sourceName => {
+      counts[sourceName] = Object.values(data.routeInfo[sourceName] || {})
+        .filter(route => route.active.toLowerCase() === "yes")
+        .length;
+    });
+    return counts;
+  }, []);
+
   const sortedPaths = useMemo(() => {
+    const directionMultiplier = sortDirection === "asc" ? 1 : -1;
     return [...foundPaths].sort((a, b) => {
       const aTotalDays = a.totalDays ?? Number.POSITIVE_INFINITY;
       const bTotalDays = b.totalDays ?? Number.POSITIVE_INFINITY;
+      const aOfficialInvites = activeInviteCountBySource[a.target] || 0;
+      const bOfficialInvites = activeInviteCountBySource[b.target] || 0;
+
+      if (sortBy === "officialInvites") {
+        if (aOfficialInvites !== bOfficialInvites) {
+          return (aOfficialInvites - bOfficialInvites) * directionMultiplier;
+        }
+        if (a.routes.length !== b.routes.length) {
+          return a.routes.length - b.routes.length;
+        }
+        if (aTotalDays !== bTotalDays) {
+          return aTotalDays - bTotalDays;
+        }
+        return a.target.localeCompare(b.target);
+      }
 
       if (sortBy === 'days') {
         if (aTotalDays !== bTotalDays) {
-          return aTotalDays - bTotalDays;
+          return (aTotalDays - bTotalDays) * directionMultiplier;
         }
         if (a.routes.length !== b.routes.length) {
           return a.routes.length - b.routes.length;
         }
       } else {
         if (a.routes.length !== b.routes.length) {
-          return a.routes.length - b.routes.length;
+          return (a.routes.length - b.routes.length) * directionMultiplier;
         }
         if (aTotalDays !== bTotalDays) {
           return aTotalDays - bTotalDays;
@@ -446,7 +512,7 @@ export default function TrackerSearchApp() {
         
       return a.target.localeCompare(b.target);
     });
-  }, [foundPaths, sortBy]);
+  }, [activeInviteCountBySource, foundPaths, sortBy, sortDirection]);
 
   const bestPathId = (deferredTarget && sortedPaths.length > 0) ? getPathId(sortedPaths[0]) : null;
   const displayedPaths = useMemo(() => {
@@ -461,6 +527,299 @@ export default function TrackerSearchApp() {
     });
     return groups;
   }, [displayedPaths]);
+
+  const parseRequirementSections = (text: string, keyPrefix: string): UnlockRequirementSection[] => {
+    if (!text.trim()) {
+      return [];
+    }
+
+    return text
+      .replace(
+        /(\d+(?:\.\d+)?\s*(?:years?|yrs?|y|months?|mos?|weeks?|w|days?|d)\b)\s+or\s+([A-Za-z_+\- ]+),\s*(\d+(?:\.\d+)?\s*(?:years?|yrs?|y|months?|mos?|weeks?|w|days?|d)\b)/gi,
+        "$1; $2: $3"
+      )
+      .replace(/,?\s*or\s+([A-Za-z0-9_+\- ]+):/gi, "; $1:")
+      .split(";")
+      .map(part => part.trim())
+      .filter(part => part.length > 0)
+      .map((part, index) => {
+        const rankMatch = part.match(/^([A-Za-z0-9_+\- ]{1,40}):\s+(.+)$/);
+        const potentialRank = rankMatch?.[1].trim() || "";
+        const isRankPrefix = Boolean(
+          rankMatch
+          && potentialRank.split(/\s+/).length <= 4
+          && !/requirements?/i.test(potentialRank)
+        );
+        const rank = isRankPrefix ? potentialRank : "";
+        const requirementText = isRankPrefix && rankMatch ? rankMatch[2].trim() : part;
+
+        const rawRequirements = requirementText
+          .split(",")
+          .map(item => item.trim())
+          .filter(item => item.length > 0);
+
+        let ageText = null;
+        let updatedRequirementText = requirementText;
+
+        const ageIndex = rawRequirements.findIndex(req =>
+          /(?:year|month|week|day)s?|\b\d+d\b/i.test(req) &&
+          !/(seedtime|seed size|seedsize|upload|ratio|adoptions|bp|torrents|seeds|bonus)/i.test(req)
+        );
+
+        const requirements = [...rawRequirements];
+        if (ageIndex !== -1) {
+          ageText = requirements[ageIndex];
+          requirements.splice(ageIndex, 1);
+          updatedRequirementText = requirements.join(", ");
+        }
+
+        return {
+          key: `${keyPrefix}-${index}`,
+          rank,
+          requirements,
+          requirementText: updatedRequirementText,
+          ageText,
+        };
+      });
+  };
+
+  const parseAgeTextToDays = (ageText: string): number | null => {
+    const normalizedAgeText = ageText.toLowerCase();
+    let totalDays = 0;
+    let matched = false;
+
+    const durationMatches = normalizedAgeText.matchAll(/(\d+(?:\.\d+)?)\s*(years?|yrs?|y|months?|mos?|weeks?|w|days?|d)\b/g);
+    for (const match of durationMatches) {
+      const value = Number.parseFloat(match[1]);
+      if (Number.isNaN(value)) {
+        continue;
+      }
+
+      const unit = match[2];
+      matched = true;
+      if (unit.startsWith("y")) {
+        totalDays += value * 365;
+      } else if (unit.startsWith("mo") || unit.startsWith("month")) {
+        totalDays += value * 30;
+      } else if (unit.startsWith("w")) {
+        totalDays += value * 7;
+      } else {
+        totalDays += value;
+      }
+    }
+
+    if (!matched) {
+      return null;
+    }
+
+    return Math.round(totalDays);
+  };
+
+  const getInviteUnlockAfterDays = (invite: OfficialInviteEntry, keyPrefix: string): number | null => {
+    const requirementSections = parseRequirementSections(invite.details.reqs || "", keyPrefix);
+    const unlockAfterDays = requirementSections
+      .map((section) => section.ageText ? parseAgeTextToDays(section.ageText) : null)
+      .filter((days): days is number => days !== null);
+
+    if (unlockAfterDays.length === 0) {
+      return null;
+    }
+
+    return Math.min(...unlockAfterDays);
+  };
+
+  const getUnlockRequirementSections = (sourceName: string): UnlockRequirementSection[] => {
+    const unlockInfo = data.unlockInviteClass[sourceName];
+    if (!unlockInfo) {
+      return [];
+    }
+
+    return parseRequirementSections(unlockInfo[1], sourceName);
+  };
+
+  const trackerCanInviteTo = useMemo(() => {
+    const invitesByTracker: { [key: string]: OfficialInviteEntry[] } = {};
+
+    Object.keys(data.routeInfo).forEach(sourceName => {
+      invitesByTracker[sourceName] = Object.entries(data.routeInfo[sourceName] || {})
+        .filter(([, route]) => route.active.toLowerCase() === "yes")
+        .map(([target, details]) => ({
+          tracker: target,
+          details,
+          officialInvites: activeInviteCountBySource[target] || 0,
+        }))
+        .sort((a, b) => {
+          if (a.officialInvites !== b.officialInvites) {
+            return b.officialInvites - a.officialInvites;
+          }
+          return a.tracker.localeCompare(b.tracker);
+        });
+    });
+
+    return invitesByTracker;
+  }, [activeInviteCountBySource]);
+
+  const trackerInvitedFrom = useMemo(() => {
+    const invitesByTracker: { [key: string]: OfficialInviteEntry[] } = {};
+
+    Object.keys(data.routeInfo).forEach(sourceName => {
+      invitesByTracker[sourceName] = Object.entries(data.routeInfo)
+        .filter(([, routes]) => routes[sourceName]?.active.toLowerCase() === "yes")
+        .map(([tracker, routes]) => ({
+          tracker,
+          details: routes[sourceName] as RouteDetail,
+          officialInvites: activeInviteCountBySource[tracker] || 0,
+        }))
+        .sort((a, b) => {
+          if (a.officialInvites !== b.officialInvites) {
+            return b.officialInvites - a.officialInvites;
+          }
+          return a.tracker.localeCompare(b.tracker);
+        });
+    });
+
+    return invitesByTracker;
+  }, [activeInviteCountBySource]);
+
+  const sortedDialogInvites = useMemo(() => {
+    if (!officialInvitesDialog) {
+      return [];
+    }
+
+    const directionMultiplier = officialInvitesSortDirection === "asc" ? 1 : -1;
+    const currentInvites = officialInvitesTab === "canInviteTo"
+      ? officialInvitesDialog.canInviteTo
+      : officialInvitesDialog.invitedFrom;
+    const unlockAfterCache: { [key: string]: number | null } = {};
+    const getCachedUnlockAfterDays = (invite: OfficialInviteEntry) => {
+      if (invite.tracker in unlockAfterCache) {
+        return unlockAfterCache[invite.tracker];
+      }
+
+      const unlockAfterDays = getInviteUnlockAfterDays(
+        invite,
+        `${officialInvitesDialog.sourceName}-${invite.tracker}-${officialInvitesTab}-sort`
+      );
+      unlockAfterCache[invite.tracker] = unlockAfterDays;
+      return unlockAfterDays;
+    };
+
+    return [...currentInvites].sort((a, b) => {
+      if (officialInvitesSortBy === "unlockAfter") {
+        const aUnlockAfterDays = getCachedUnlockAfterDays(a);
+        const bUnlockAfterDays = getCachedUnlockAfterDays(b);
+
+        if (aUnlockAfterDays === null && bUnlockAfterDays !== null) {
+          return 1;
+        }
+        if (aUnlockAfterDays !== null && bUnlockAfterDays === null) {
+          return -1;
+        }
+        if (
+          aUnlockAfterDays !== null
+          && bUnlockAfterDays !== null
+          && aUnlockAfterDays !== bUnlockAfterDays
+        ) {
+          return (aUnlockAfterDays - bUnlockAfterDays) * directionMultiplier;
+        }
+      }
+
+      if (a.officialInvites !== b.officialInvites) {
+        return (a.officialInvites - b.officialInvites) * directionMultiplier;
+      }
+
+      return a.tracker.localeCompare(b.tracker);
+    });
+  }, [officialInvitesDialog, officialInvitesSortBy, officialInvitesSortDirection, officialInvitesTab]);
+
+  const sortedSourceNames = useMemo(() => {
+    return Object.keys(groupedResults);
+  }, [groupedResults]);
+
+  const foundCountBySource = useMemo(() => {
+    const counts: { [key: string]: number } = {};
+    sortedPaths.forEach(path => {
+      counts[path.source] = (counts[path.source] || 0) + 1;
+    });
+    return counts;
+  }, [sortedPaths]);
+
+  const setDialogTrackerInUrl = (trackerName: string | null, method: "push" | "replace" = "push") => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (trackerName) {
+      params.set("tracker", trackerName);
+    } else {
+      params.delete("tracker");
+    }
+
+    const nextQuery = params.toString();
+    const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+    if (method === "replace") {
+      router.replace(nextUrl, { scroll: false });
+      return;
+    }
+
+    router.push(nextUrl, { scroll: false });
+  };
+
+  const openOfficialInvitesDialog = (
+    sourceName: string,
+    canInviteTo: OfficialInviteEntry[],
+    invitedFrom: OfficialInviteEntry[],
+    updateUrl = true
+  ) => {
+    const unlockInfo = data.unlockInviteClass[sourceName];
+    setOfficialInvitesTab("canInviteTo");
+    setOfficialInvitesSortBy("officialInvites");
+    setOfficialInvitesSortDirection("desc");
+    setIsUnlockAccordionOpen(true);
+    setExpandedOfficialInviteCards({});
+    setOfficialInvitesDialog({
+      sourceName,
+      unlockDays: unlockInfo?.[0] ?? null,
+      sections: getUnlockRequirementSections(sourceName),
+      canInviteTo,
+      invitedFrom,
+    });
+
+    if (updateUrl) {
+      setDialogTrackerInUrl(sourceName);
+    }
+  };
+
+  const closeOfficialInvitesDialog = (updateUrl = true) => {
+    setOfficialInvitesDialog(null);
+    if (updateUrl) {
+      setDialogTrackerInUrl(null);
+    }
+  };
+
+  useEffect(() => {
+    const trackerParam = searchParams.get("tracker");
+    if (!trackerParam) {
+      if (officialInvitesDialog) {
+        closeOfficialInvitesDialog(false);
+      }
+      return;
+    }
+
+    if (!allTrackers.includes(trackerParam)) {
+      closeOfficialInvitesDialog(false);
+      setDialogTrackerInUrl(null, "replace");
+      return;
+    }
+
+    if (officialInvitesDialog?.sourceName === trackerParam) {
+      return;
+    }
+
+    openOfficialInvitesDialog(
+      trackerParam,
+      trackerCanInviteTo[trackerParam] || [],
+      trackerInvitedFrom[trackerParam] || [],
+      false
+    );
+  }, [allTrackers, searchParams, trackerCanInviteTo, trackerInvitedFrom]);
 
 
   if (!mounted) return <div className="w-full" />;
@@ -660,7 +1019,7 @@ export default function TrackerSearchApp() {
 
         {showFilters && (
           <div className="max-w-2xl mx-auto mt-2 p-6 bg-foreground/3 border border-foreground/10 rounded-xl animate-in fade-in slide-in-from-top-2 duration-200">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
               <div>
                 <label className="text-sm font-medium text-foreground/50 mb-2 block">Max jumps</label>
@@ -702,31 +1061,6 @@ export default function TrackerSearchApp() {
                       }}
                       className={`flex-1 px-2 py-1.5 text-sm rounded-md whitespace-nowrap transition-all ring-0 focus:ring-0 font-medium ${
                         maxDays === opt.v 
-                          ? 'bg-foreground/10 text-foreground' 
-                          : 'text-foreground/60 hover:text-foreground'
-                      }`}
-                    >
-                      {opt.l}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-foreground/50 mb-2 block">Sort by</label>
-                <div className="flex rounded-lg bg-foreground/5 p-1">
-                  {[
-                    { l: 'Jumps', v: 'jumps' },
-                    { l: 'Days', v: 'days' }
-                  ].map((opt) => (
-                    <button
-                      key={opt.l}
-                      onClick={() => {
-                        setSortBy(opt.v as 'days' | 'jumps');
-                        setVisiblePathsCount(PATHS_PAGE_SIZE);
-                      }}
-                      className={`flex-1 px-3 py-1.5 text-sm rounded-md transition-all ring-0 focus:ring-0 font-medium ${
-                        sortBy === opt.v 
                           ? 'bg-foreground/10 text-foreground' 
                           : 'text-foreground/60 hover:text-foreground'
                       }`}
@@ -806,99 +1140,89 @@ export default function TrackerSearchApp() {
 
       {(sourceSearch || targetSearch) && (
         <div className="mt-12 animate-in fade-in slide-in-from-bottom-8 duration-500">
-          <div className="flex items-center gap-3 mb-5 px-1">
-            <h2 className="text-sm font-medium text-foreground/50">
-              Search results
-            </h2>
-            {isLoading || isStale ? (
-              <div className="flex items-center gap-2 px-3 py-1 bg-foreground/5 rounded-md">
-                <span className="material-symbols-rounded text-lg text-foreground/50 animate-spin">progress_activity</span>
-              </div>
-            ) : (
-              <span className={badgeClass}>{foundPaths.length} Found</span>
-            )}
-          </div>
-
           <div className="flex flex-col gap-10 pb-10">
-            {Object.keys(groupedResults).sort().map((sourceName) => {
+            {sortedSourceNames.map((sourceName) => {
               const paths = groupedResults[sourceName];
               const sourceAbbr = getAbbr(sourceName);
-              const unlockInfo = data.unlockInviteClass[sourceName];
-              const unlockRequirementSections: UnlockRequirementSection[] = unlockInfo
-                ? unlockInfo[1]
-                  .replace(/,?\s*or\s+([A-Za-z0-9_+\- ]+):/gi, "; $1:")
-                  .split(";")
-                  .map(part => part.trim())
-                  .filter(part => part.length > 0)
-                  .map((part, index) => {
-                    const colonIndex = part.indexOf(":");
-                    const rank = colonIndex >= 0 ? part.slice(0, colonIndex).trim() : "";
-                    const requirementText = colonIndex >= 0 ? part.slice(colonIndex + 1).trim() : part;
-                    
-                    const rawRequirements = requirementText
-                      .split(",")
-                      .map(item => item.trim())
-                      .filter(item => item.length > 0);
-
-                    let ageText = null;
-                    let updatedRequirementText = requirementText;
-                    
-                    const ageIndex = rawRequirements.findIndex(req => 
-                      /(?:year|month|week|day)s?|\b\d+d\b/i.test(req) && 
-                      !/(seedtime|seed size|seedsize|upload|ratio|adoptions|bp|torrents|seeds|bonus)/i.test(req)
-                    );
-
-                    const requirements = [...rawRequirements];
-                    if (ageIndex !== -1) {
-                      ageText = requirements[ageIndex];
-                      requirements.splice(ageIndex, 1);
-                      updatedRequirementText = requirements.join(", ");
-                    }
-
-                    return {
-                      key: `${sourceName}-${index}`,
-                      rank,
-                      requirements,
-                      requirementText: updatedRequirementText,
-                      ageText,
-                    };
-                  })
-                : [];
+              const officialInvites = trackerCanInviteTo[sourceName] || [];
+              const invitedFrom = trackerInvitedFrom[sourceName] || [];
+              const sourceFoundCount = foundCountBySource[sourceName] || 0;
 
               return (
                 <div key={sourceName} className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                   
                   <div className="flex flex-col gap-2 px-1 pb-2 mb-1">
-                    <div className="flex flex-col gap-1.5">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-lg font-bold text-foreground tracking-tight mr-1">{sourceName}</h3>
-                        
-                        {sourceAbbr && (
-                          <span className={badgeClass}>
-                            {sourceAbbr}
-                          </span>
+                    <div className="flex items-end justify-between gap-3">
+                      <div className="flex flex-col gap-1.5 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="text-lg font-bold text-foreground tracking-tight mr-1">{sourceName}</h3>
+                          
+                          {sourceAbbr && (
+                            <span className={badgeClass}>
+                              {sourceAbbr}
+                            </span>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => openOfficialInvitesDialog(sourceName, officialInvites, invitedFrom)}
+                            className="relative group inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 transition-colors hover:bg-blue-200 dark:hover:bg-blue-900/40 cursor-pointer"
+                            aria-label={`Official invites for ${sourceName}: ${officialInvites.length}`}
+                          >
+                            <span className="material-symbols-rounded text-sm">outbound</span>
+                            <span>Official Invites {officialInvites.length}</span>
+                            <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+                              Official Invites: {officialInvites.length}
+                            </span>
+                          </button>
+                        </div>
+                        {isLoading || isStale ? (
+                          <div className="flex items-center gap-2 text-sm text-foreground/50">
+                            <span className="material-symbols-rounded text-sm animate-spin">progress_activity</span>
+                            <span>Updating search results</span>
+                          </div>
+                        ) : (
+                          <p className="text-sm font-medium text-foreground/50">
+                            Search results {sourceFoundCount} found
+                          </p>
                         )}
                       </div>
-
-                      {unlockInfo && (
+                        <div className="shrink-0 self-end flex items-center gap-2">
+                        <span className="text-sm font-medium text-foreground/60">Sort by</span>
+                        <div className="relative">
+                          <select
+                            value={sortBy}
+                            onChange={(event) => {
+                              const nextSortBy = event.target.value as SortByOption;
+                              setSortBy(nextSortBy);
+                              setSortDirection(nextSortBy === "officialInvites" ? "desc" : "asc");
+                              setVisiblePathsCount(PATHS_PAGE_SIZE);
+                            }}
+                            className="h-9 min-w-[176px] appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-3 pr-8 text-sm font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
+                            aria-label="Sort search results"
+                          >
+                            <option value="jumps">Jumps</option>
+                            <option value="days">Days</option>
+                            <option value="officialInvites">Official Invites</option>
+                          </select>
+                          <span className="pointer-events-none material-symbols-rounded absolute right-2 top-1/2 -translate-y-1/2 text-base text-foreground/50">
+                            expand_more
+                          </span>
+                        </div>
                         <button
                           type="button"
-                          onClick={() => setUnlockRequirementsDialog({
-                            sourceName,
-                            unlockDays: unlockInfo[0],
-                            sections: unlockRequirementSections,
-                          })}
-                          className="flex items-center justify-between gap-3 text-sm text-foreground/70 hover:text-foreground bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 px-2.5 py-1.5 rounded-md transition-colors self-start w-fit max-w-full md:max-w-md text-left cursor-pointer group"
+                          onClick={() => setSortDirection((current) => current === "asc" ? "desc" : "asc")}
+                          className="relative group h-9 w-9 inline-flex items-center justify-center rounded-md border border-foreground/10 bg-foreground/5 text-foreground/70 outline-none transition-colors hover:border-foreground/20 focus-visible:border-foreground/30"
+                          aria-label={`Sort ${sortDirection === "asc" ? "ascending" : "descending"}`}
                         >
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            <span className="material-symbols-rounded text-sm shrink-0">lock_open</span>
-                            <span className="leading-tight truncate">Official invite forum unlock</span>
-                          </div>
-                          <div className="flex items-center text-foreground/40 group-hover:text-foreground/70 transition-colors shrink-0">
-                            <span className="material-symbols-rounded text-base">chevron_right</span>
-                          </div>
+                          <span className="material-symbols-rounded text-base">
+                            {sortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
+                          </span>
+                          <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+                            Sort: {sortDirection === "asc" ? "Ascending" : "Descending"}
+                          </span>
                         </button>
-                      )}
+                      </div>
                     </div>
                   </div>
 
@@ -909,6 +1233,8 @@ export default function TrackerSearchApp() {
                   }>
                     {paths.map((path) => {
                       const targetAbbr = getAbbr(path.target);
+                      const targetOfficialInvites = trackerCanInviteTo[path.target] || [];
+                      const targetInvitedFrom = trackerInvitedFrom[path.target] || [];
                       const isDirect = path.routes.length === 1;
                       const pathId = getPathId(path);
                       const isBestPath = pathId === bestPathId;
@@ -934,6 +1260,18 @@ export default function TrackerSearchApp() {
                                     {targetAbbr}
                                   </span>
                                   {!isDirect && <span className={badgeClass}>{path.routes.length} hop</span>}
+                                  <button
+                                    type="button"
+                                    onClick={() => openOfficialInvitesDialog(path.target, targetOfficialInvites, targetInvitedFrom)}
+                                    className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 transition-colors hover:bg-blue-200 dark:hover:bg-blue-900/40 cursor-pointer"
+                                    aria-label={`Official invites for ${path.target}: ${targetOfficialInvites.length}`}
+                                  >
+                                    <span className="material-symbols-rounded text-sm">outbound</span>
+                                    <span>{targetOfficialInvites.length}</span>
+                                    <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+                                      Official Invites: {targetOfficialInvites.length}
+                                    </span>
+                                  </button>
                                 </div>
                               </div>
                               
@@ -950,7 +1288,11 @@ export default function TrackerSearchApp() {
                                   <div className="mt-1.5">
                                     <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded-md">
                                       <span className="material-symbols-rounded text-sm">workspace_premium</span>
-                                      {sortBy === 'days' ? "Fastest route" : "Fewest hops"}
+                                      {sortBy === 'days'
+                                        ? sortDirection === "asc" ? "Fastest route" : "Slowest route"
+                                        : sortBy === "officialInvites"
+                                          ? sortDirection === "asc" ? "Fewest official invites" : "Most official invites"
+                                          : sortDirection === "asc" ? "Fewest hops" : "Most hops"}
                                     </span>
                                   </div>
                                 )}
@@ -1028,16 +1370,16 @@ export default function TrackerSearchApp() {
         </div>
       )}
 
-      {unlockRequirementsDialog && (
+      {officialInvitesDialog && (
         <div
-          className="fixed inset-0 z-50 h-dvh w-screen bg-black/55 backdrop-blur-sm p-0 md:p-4 flex items-end md:items-center justify-center"
-          onClick={() => setUnlockRequirementsDialog(null)}
+          className="fixed inset-0 z-50 h-dvh w-screen bg-black/55 backdrop-blur-sm p-0 md:p-4 flex items-end md:items-center justify-center animate-in fade-in duration-200"
+          onClick={() => closeOfficialInvitesDialog()}
         >
           <div
             role="dialog"
             aria-modal="true"
-            aria-labelledby="official-invite-forum-dialog-title"
-            className="w-full md:max-w-2xl max-h-[82dvh] md:max-h-[85dvh] rounded-t-2xl md:rounded-xl border border-foreground/15 bg-card shadow-2xl overflow-hidden mt-auto md:mt-0 flex flex-col overscroll-none"
+            aria-labelledby="official-invites-dialog-title"
+            className="w-full md:max-w-2xl max-h-[82dvh] md:max-h-[85dvh] rounded-t-2xl md:rounded-xl border border-foreground/15 bg-card shadow-2xl overflow-hidden mt-auto md:mt-0 flex flex-col overscroll-none animate-in zoom-in-95 slide-in-from-bottom-4 md:slide-in-from-bottom-0 duration-300"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex justify-center pt-2 md:hidden shrink-0">
@@ -1045,17 +1387,16 @@ export default function TrackerSearchApp() {
             </div>
             <div className="flex items-start justify-between gap-4 p-4 border-b border-foreground/10 shrink-0">
               <div>
-                <h2 id="official-invite-forum-dialog-title" className="text-lg font-bold text-foreground">
-                  {unlockRequirementsDialog.sourceName}
+                <h2 id="official-invites-dialog-title" className="text-lg font-bold text-foreground">
+                  {officialInvitesDialog.sourceName}
                 </h2>
                 <p className="text-sm text-foreground/70 mt-1">
-                  Requirements to unlock the official invite forum
+                  Official invite forum and official invites
                 </p>
               </div>
               <button
                 type="button"
-                autoFocus
-                onClick={() => setUnlockRequirementsDialog(null)}
+                onClick={() => closeOfficialInvitesDialog()}
                 className="p-1.5 rounded-md text-foreground/70 transition-colors"
                 aria-label="Close dialog"
               >
@@ -1064,54 +1405,294 @@ export default function TrackerSearchApp() {
             </div>
 
             <div className="p-4 pb-6 overflow-y-auto overscroll-contain space-y-3 custom-scrollbar flex-1 min-h-0">
-              {unlockRequirementsDialog.sections.length > 0 ? (
-                <div className="space-y-2.5">
-                  {unlockRequirementsDialog.sections.map((section, sectionIndex) => (
-                    <div key={section.key}>
-                      {sectionIndex > 0 && (
-                        <div className="flex items-center justify-center my-2">
-                          <span className="text-xs font-semibold text-foreground/40 uppercase">or</span>
-                        </div>
-                      )}
-                      <div className="rounded-lg border border-foreground/10 bg-foreground/5 p-3">
-                        <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
-                          {section.rank ? (
-                            <h3 className="text-sm font-semibold text-foreground">{section.rank}</h3>
-                          ) : (
-                            <h3 className="text-sm font-semibold text-foreground">Requirements</h3>
-                          )}
+              <div className="space-y-2.5">
+                <div className="rounded-lg border border-foreground/10 bg-foreground/5 p-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsUnlockAccordionOpen(current => !current)}
+                    className="w-full flex items-center justify-between gap-2 text-left text-sm font-semibold text-foreground cursor-pointer"
+                    aria-expanded={isUnlockAccordionOpen}
+                  >
+                    <span>Official invite forum unlock requirements</span>
+                    <span className={`material-symbols-rounded text-lg text-foreground/60 transition-transform duration-200 ${isUnlockAccordionOpen ? "rotate-180" : ""}`}>
+                      keyboard_arrow_down
+                    </span>
+                  </button>
+                  <div
+                    className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
+                      isUnlockAccordionOpen ? "grid-rows-[1fr] opacity-100 mt-2.5" : "grid-rows-[0fr] opacity-0 mt-0"
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      {officialInvitesDialog.sections.length > 0 ? (
+                        <div className="space-y-2.5">
+                          {officialInvitesDialog.sections.map((section, sectionIndex) => (
+                            <div key={section.key}>
+                              {sectionIndex > 0 && (
+                                <div className="flex items-center justify-center my-2">
+                                  <span className="text-xs font-semibold text-foreground/40 uppercase">or</span>
+                                </div>
+                              )}
+                              <div className="rounded-lg border border-foreground/10 bg-card p-3">
+                                <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
+                                  {section.rank ? (
+                                    <h4 className="text-sm font-semibold text-foreground">{section.rank}</h4>
+                                  ) : (
+                                    <h4 className="text-sm font-semibold text-foreground">Requirements</h4>
+                                  )}
 
-                          {section.ageText && (
-                            <div className="inline-flex items-center gap-1 text-[11px] font-semibold text-foreground/75 bg-foreground/10 rounded-md px-1.5 py-1 shrink-0 max-w-full">
-                              <span className="material-symbols-rounded text-[13px] shrink-0">schedule</span>
-                              <span className="wrap-break-words text-left leading-tight">
-                                Unlock after {section.ageText.trim()}
+                                  {section.ageText && (
+                                    <div className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-foreground/75 bg-foreground/10 rounded-md px-1.5 py-1 shrink-0 max-w-full">
+                                      <span className="material-symbols-rounded text-[13px] shrink-0">schedule</span>
+                                      <span className="wrap-break-words text-left leading-tight">
+                                        After {section.ageText.trim()}
+                                      </span>
+                                      <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+                                        You can join the official invite forum from {officialInvitesDialog.sourceName} after {section.ageText.trim()}.
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {section.requirements.length > 0 ? (
+                                  <ul className="space-y-1.5">
+                                    {section.requirements.map((requirement, requirementIndex) => (
+                                      <li key={`${section.key}-${requirementIndex}`} className="text-sm text-foreground/80 leading-snug flex items-start gap-2">
+                                        <span className="mt-[7px] h-1 w-1 rounded-full bg-foreground/45 shrink-0" />
+                                        <span className="wrap-break-words">{requirement}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                ) : (
+                                  <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
+                                    {section.requirementText || "No additional requirements."}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-foreground/70">No specific requirements were provided.</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-foreground/10 bg-foreground/5 p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setOfficialInvitesTab("canInviteTo")}
+                        className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition-colors ${
+                          officialInvitesTab === "canInviteTo"
+                            ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+                            : "bg-foreground/8 text-foreground/70 border border-foreground/10 hover:bg-foreground/12"
+                        }`}
+                      >
+                        <span className="material-symbols-rounded text-sm">outbound</span>
+                        <span>Can Invite To ({officialInvitesDialog.canInviteTo.length})</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setOfficialInvitesTab("invitedFrom")}
+                        className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition-colors ${
+                          officialInvitesTab === "invitedFrom"
+                            ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+                            : "bg-foreground/8 text-foreground/70 border border-foreground/10 hover:bg-foreground/12"
+                        }`}
+                      >
+                        <span className="material-symbols-rounded text-sm">south_west</span>
+                        <span>Invited From ({officialInvitesDialog.invitedFrom.length})</span>
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2 ml-auto">
+                      <span className="text-xs font-semibold text-foreground/60">Sort by</span>
+                      <div className="relative">
+                        <select
+                          value={officialInvitesSortBy}
+                          onChange={(event) => {
+                            const nextSortBy = event.target.value as DialogSortByOption;
+                            setOfficialInvitesSortBy(nextSortBy);
+                            setOfficialInvitesSortDirection(nextSortBy === "officialInvites" ? "desc" : "asc");
+                          }}
+                          className="h-8 min-w-[156px] appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-2.5 pr-7 text-xs font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
+                          aria-label="Sort dialog invite trackers"
+                        >
+                          <option value="officialInvites">Official Invites</option>
+                          <option value="unlockAfter">Days</option>
+                        </select>
+                        <span className="pointer-events-none material-symbols-rounded absolute right-1.5 top-1/2 -translate-y-1/2 text-sm text-foreground/50">
+                          expand_more
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setOfficialInvitesSortDirection((current) => current === "asc" ? "desc" : "asc")}
+                        className="relative group h-8 w-8 inline-flex items-center justify-center rounded-md border border-foreground/10 bg-foreground/5 text-foreground/70 outline-none transition-colors hover:border-foreground/20 focus-visible:border-foreground/30"
+                        aria-label={`Sort ${officialInvitesSortDirection === "asc" ? "ascending" : "descending"}`}
+                      >
+                        <span className="material-symbols-rounded text-sm">
+                          {officialInvitesSortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
+                        </span>
+                        <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+                          Sort: {officialInvitesSortDirection === "asc" ? "Ascending" : "Descending"}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                  {sortedDialogInvites.length > 0 ? (
+                    <div className="space-y-2.5">
+                      {sortedDialogInvites.map((invite) => {
+                        const joinRequirementSections = parseRequirementSections(
+                          invite.details.reqs || "",
+                          `${officialInvitesDialog.sourceName}-${invite.tracker}-${officialInvitesTab}`
+                        );
+                        const inviteCardKey = `${officialInvitesDialog.sourceName}:${officialInvitesTab}:${invite.tracker}`;
+                        const isInviteCardOpen = expandedOfficialInviteCards[inviteCardKey] ?? true;
+                        const unlockAfterParts = Array.from(new Set(
+                          joinRequirementSections
+                            .map((section) => section.ageText?.trim())
+                            .filter((value): value is string => Boolean(value))
+                        ));
+                        const unlockAfterValue = unlockAfterParts.join(" / ");
+                        const unlockAfterText = unlockAfterParts.length > 0 ? `After ${unlockAfterValue}` : null;
+                        const joinTargetTracker = officialInvitesTab === "canInviteTo" ? invite.tracker : officialInvitesDialog.sourceName;
+                        const joinSourceTracker = officialInvitesTab === "canInviteTo" ? officialInvitesDialog.sourceName : invite.tracker;
+                        const unlockAfterTooltip = unlockAfterParts.length > 0
+                          ? `You can join ${joinTargetTracker} from ${joinSourceTracker} after ${unlockAfterValue}.`
+                          : null;
+
+                        return (
+                        <div key={invite.tracker} className="rounded-lg border border-foreground/10 bg-card p-3">
+                          <div
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => setExpandedOfficialInviteCards((current) => ({
+                              ...current,
+                              [inviteCardKey]: !(current[inviteCardKey] ?? true),
+                            }))}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter" || event.key === " ") {
+                                event.preventDefault();
+                                setExpandedOfficialInviteCards((current) => ({
+                                  ...current,
+                                  [inviteCardKey]: !(current[inviteCardKey] ?? true),
+                                }));
+                              }
+                            }}
+                            className="flex flex-wrap items-center justify-between gap-2 cursor-pointer rounded-md -mx-1 px-1 py-0.5"
+                            aria-expanded={isInviteCardOpen}
+                            aria-label={`${isInviteCardOpen ? "Collapse" : "Expand"} ${invite.tracker} details`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                              <h4 className="text-sm font-semibold text-foreground">{invite.tracker}</h4>
+                              <span className={badgeClass}>
+                                {getAbbr(invite.tracker)}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  openOfficialInvitesDialog(
+                                    invite.tracker,
+                                    trackerCanInviteTo[invite.tracker] || [],
+                                    trackerInvitedFrom[invite.tracker] || []
+                                  );
+                                }}
+                                className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-900/40 transition-colors cursor-pointer"
+                                aria-label={`Open official invites for ${invite.tracker}`}
+                              >
+                                <span className="material-symbols-rounded text-sm">outbound</span>
+                                <span>{invite.officialInvites}</span>
+                                <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+                                  Official Invites: {invite.officialInvites}
+                                </span>
+                              </button>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {unlockAfterText && (
+                                <div className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-foreground/75 bg-foreground/10 rounded-md px-1.5 py-1 shrink-0 max-w-full">
+                                  <span className="material-symbols-rounded text-[13px] shrink-0">schedule</span>
+                                  <span className="wrap-break-words text-left leading-tight">{unlockAfterText}</span>
+                                  {unlockAfterTooltip && (
+                                    <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+                                      {unlockAfterTooltip}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                              <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${getStatusColor(invite.details.active)}`}>
+                                {getStatusLabel(invite.details.active)}
+                              </span>
+                              <span className={`material-symbols-rounded text-lg text-foreground/60 transition-transform duration-200 ${isInviteCardOpen ? "rotate-180" : ""}`}>
+                                keyboard_arrow_down
                               </span>
                             </div>
-                          )}
+                          </div>
+                          <div
+                            className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
+                              isInviteCardOpen ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0"
+                            }`}
+                          >
+                            <div className="overflow-hidden border-t border-foreground/10 pt-2.5">
+                              {joinRequirementSections.length > 0 ? (
+                                <div className="space-y-2">
+                                  {joinRequirementSections.map((section, sectionIndex) => (
+                                    <div key={section.key}>
+                                      {sectionIndex > 0 && (
+                                        <div className="flex items-center gap-2 py-1">
+                                          <span className="h-px flex-1 bg-foreground/10" />
+                                          <span className="text-[10px] font-semibold text-foreground/40 uppercase">or</span>
+                                          <span className="h-px flex-1 bg-foreground/10" />
+                                        </div>
+                                      )}
+                                      {section.rank && (
+                                        <div className="mb-2">
+                                          <h5 className="text-sm font-semibold text-foreground">{section.rank}</h5>
+                                        </div>
+                                      )}
+                                      {section.requirements.length > 0 ? (
+                                        <ul className="space-y-1.5">
+                                          {section.requirements.map((requirement, requirementIndex) => (
+                                            <li key={`${section.key}-join-${requirementIndex}`} className="text-sm text-foreground/80 leading-snug flex items-start gap-2">
+                                              <span className="mt-[7px] h-1 w-1 rounded-full bg-foreground/45 shrink-0" />
+                                              <span className="wrap-break-words">{renderReqs(requirement)}</span>
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      ) : (
+                                        <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
+                                          {renderReqs(section.requirementText || "No specific requirements.")}
+                                        </p>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
+                                  No specific requirements.
+                                </p>
+                              )}
+                              <div className="text-xs text-foreground/50 mt-2">
+                                Checked: {invite.details.updated}
+                              </div>
+                            </div>
+                          </div>
                         </div>
-
-                        {section.requirements.length > 0 ? (
-                          <ul className="space-y-1.5">
-                            {section.requirements.map((requirement, requirementIndex) => (
-                              <li key={`${section.key}-${requirementIndex}`} className="text-sm text-foreground/80 leading-snug flex items-start gap-2">
-                                <span className="mt-[7px] h-1 w-1 rounded-full bg-foreground/45 shrink-0" />
-                                <span className="wrap-break-words">{requirement}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
-                            {section.requirementText || "No additional requirements."}
-                          </p>
-                        )}
-                      </div>
+                        );
+                      })}
                     </div>
-                  ))}
+                  ) : (
+                    <p className="text-sm text-foreground/70">
+                      {officialInvitesTab === "canInviteTo"
+                        ? "No active official invites were found for this tracker."
+                        : "No active invite routes into this tracker were found."}
+                    </p>
+                  )}
                 </div>
-              ) : (
-                <p className="text-sm text-foreground/70">No specific requirements were provided.</p>
-              )}
+              </div>
             </div>
           </div>
         </div>

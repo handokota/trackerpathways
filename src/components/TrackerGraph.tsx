@@ -2,8 +2,9 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState, useRef, useMemo } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useTheme } from "next-themes";
-import { DataStructure } from "@/types";
+import { DataStructure, RouteDetail } from "@/types";
 import { findShortestPath } from "@/lib/graphUtils";
 
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
@@ -27,12 +28,46 @@ interface CollectionPathOption {
   stepDays: Array<number | null>;
 }
 
+interface UnlockRequirementSection {
+  key: string;
+  rank: string;
+  requirements: string[];
+  requirementText: string;
+  ageText: string | null;
+}
+
+interface OfficialInviteEntry {
+  tracker: string;
+  details: RouteDetail;
+  officialInvites: number;
+}
+
+type OfficialInvitesTab = "canInviteTo" | "invitedFrom";
+type DialogSortByOption = "officialInvites" | "unlockAfter";
+type SortDirection = "asc" | "desc";
+
+interface OfficialInvitesPanelData {
+  sourceName: string;
+  unlockDays: number | null;
+  sections: UnlockRequirementSection[];
+  canInviteTo: OfficialInviteEntry[];
+  invitedFrom: OfficialInviteEntry[];
+}
+
 export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   const { resolvedTheme } = useTheme();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const [fontFace, setFontFace] = useState("sans-serif");
 
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [officialInvitesTab, setOfficialInvitesTab] = useState<OfficialInvitesTab>("canInviteTo");
+  const [officialInvitesSortBy, setOfficialInvitesSortBy] = useState<DialogSortByOption>("officialInvites");
+  const [officialInvitesSortDirection, setOfficialInvitesSortDirection] = useState<SortDirection>("desc");
+  const [isUnlockAccordionOpen, setIsUnlockAccordionOpen] = useState(true);
+  const [expandedOfficialInviteCards, setExpandedOfficialInviteCards] = useState<Record<string, boolean>>({});
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   const [pathStart, setPathStart] = useState<string>("");
@@ -275,23 +310,313 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     }
   }, [collectionActiveIndex]);
 
-  const selectedNodeDetails = useMemo(() => {
-    if (!selectedNodeId) return null;
-    const outgoing = rawData.routeInfo[selectedNodeId] || {};
-    const incoming: Record<string, any> = {};
-    Object.entries(rawData.routeInfo).forEach(([source, targets]) => {
-      if (targets[selectedNodeId]) {
-        incoming[source] = targets[selectedNodeId];
-      }
+  const activeInviteCountBySource = useMemo(() => {
+    const counts: { [key: string]: number } = {};
+    Object.keys(rawData.routeInfo).forEach(sourceName => {
+      counts[sourceName] = Object.values(rawData.routeInfo[sourceName] || {})
+        .filter(route => route.active.toLowerCase() === "yes")
+        .length;
     });
-    return { outgoing, incoming };
-  }, [selectedNodeId, rawData]);
+    return counts;
+  }, [rawData]);
+
+  const parseRequirementSections = (text: string, keyPrefix: string): UnlockRequirementSection[] => {
+    if (!text.trim()) {
+      return [];
+    }
+
+    return text
+      .replace(
+        /(\d+(?:\.\d+)?\s*(?:years?|yrs?|y|months?|mos?|weeks?|w|days?|d)\b)\s+or\s+([A-Za-z_+\- ]+),\s*(\d+(?:\.\d+)?\s*(?:years?|yrs?|y|months?|mos?|weeks?|w|days?|d)\b)/gi,
+        "$1; $2: $3"
+      )
+      .replace(/,?\s*or\s+([A-Za-z0-9_+\- ]+):/gi, "; $1:")
+      .split(";")
+      .map(part => part.trim())
+      .filter(part => part.length > 0)
+      .map((part, index) => {
+        const rankMatch = part.match(/^([A-Za-z0-9_+\- ]{1,40}):\s+(.+)$/);
+        const potentialRank = rankMatch?.[1].trim() || "";
+        const isRankPrefix = Boolean(
+          rankMatch
+          && potentialRank.split(/\s+/).length <= 4
+          && !/requirements?/i.test(potentialRank)
+        );
+        const rank = isRankPrefix ? potentialRank : "";
+        const requirementText = isRankPrefix && rankMatch ? rankMatch[2].trim() : part;
+
+        const rawRequirements = requirementText
+          .split(",")
+          .map(item => item.trim())
+          .filter(item => item.length > 0);
+
+        let ageText = null;
+        let updatedRequirementText = requirementText;
+
+        const ageIndex = rawRequirements.findIndex(req =>
+          /(?:year|month|week|day)s?|\b\d+d\b/i.test(req) &&
+          !/(seedtime|seed size|seedsize|upload|ratio|adoptions|bp|torrents|seeds|bonus)/i.test(req)
+        );
+
+        const requirements = [...rawRequirements];
+        if (ageIndex !== -1) {
+          ageText = requirements[ageIndex];
+          requirements.splice(ageIndex, 1);
+          updatedRequirementText = requirements.join(", ");
+        }
+
+        return {
+          key: `${keyPrefix}-${index}`,
+          rank,
+          requirements,
+          requirementText: updatedRequirementText,
+          ageText,
+        };
+      });
+  };
+
+  const parseAgeTextToDays = (ageText: string): number | null => {
+    const normalizedAgeText = ageText.toLowerCase();
+    let totalDays = 0;
+    let matched = false;
+
+    const durationMatches = normalizedAgeText.matchAll(/(\d+(?:\.\d+)?)\s*(years?|yrs?|y|months?|mos?|weeks?|w|days?|d)\b/g);
+    for (const match of durationMatches) {
+      const value = Number.parseFloat(match[1]);
+      if (Number.isNaN(value)) {
+        continue;
+      }
+
+      const unit = match[2];
+      matched = true;
+      if (unit.startsWith("y")) {
+        totalDays += value * 365;
+      } else if (unit.startsWith("mo") || unit.startsWith("month")) {
+        totalDays += value * 30;
+      } else if (unit.startsWith("w")) {
+        totalDays += value * 7;
+      } else {
+        totalDays += value;
+      }
+    }
+
+    if (!matched) {
+      return null;
+    }
+
+    return Math.round(totalDays);
+  };
+
+  const getInviteUnlockAfterDays = (invite: OfficialInviteEntry, keyPrefix: string): number | null => {
+    const requirementSections = parseRequirementSections(invite.details.reqs || "", keyPrefix);
+    const unlockAfterDays = requirementSections
+      .map((section) => section.ageText ? parseAgeTextToDays(section.ageText) : null)
+      .filter((days): days is number => days !== null);
+
+    if (unlockAfterDays.length === 0) {
+      return null;
+    }
+
+    return Math.min(...unlockAfterDays);
+  };
+
+  const getUnlockRequirementSections = (sourceName: string): UnlockRequirementSection[] => {
+    const unlockInfo = rawData.unlockInviteClass[sourceName];
+    if (!unlockInfo) {
+      return [];
+    }
+
+    return parseRequirementSections(unlockInfo[1], sourceName);
+  };
+
+  const selectedNodeOfficialData: OfficialInvitesPanelData | null = selectedNodeId ? (() => {
+    const unlockInfo = rawData.unlockInviteClass[selectedNodeId];
+    const canInviteTo = Object.entries(rawData.routeInfo[selectedNodeId] || {})
+      .filter(([, route]) => route.active.toLowerCase() === "yes")
+      .map(([target, details]) => ({
+        tracker: target,
+        details,
+        officialInvites: activeInviteCountBySource[target] || 0,
+      }))
+      .sort((a, b) => {
+        if (a.officialInvites !== b.officialInvites) {
+          return b.officialInvites - a.officialInvites;
+        }
+        return a.tracker.localeCompare(b.tracker);
+      });
+
+    const invitedFrom = Object.entries(rawData.routeInfo)
+      .filter(([, routes]) => routes[selectedNodeId]?.active.toLowerCase() === "yes")
+      .map(([tracker, routes]) => ({
+        tracker,
+        details: routes[selectedNodeId] as RouteDetail,
+        officialInvites: activeInviteCountBySource[tracker] || 0,
+      }))
+      .sort((a, b) => {
+        if (a.officialInvites !== b.officialInvites) {
+          return b.officialInvites - a.officialInvites;
+        }
+        return a.tracker.localeCompare(b.tracker);
+      });
+
+    return {
+      sourceName: selectedNodeId,
+      unlockDays: unlockInfo?.[0] ?? null,
+      sections: getUnlockRequirementSections(selectedNodeId),
+      canInviteTo,
+      invitedFrom,
+    };
+  })() : null;
+
+  const sortedPanelInvites = useMemo(() => {
+    if (!selectedNodeOfficialData) {
+      return [];
+    }
+
+    const currentInvites = officialInvitesTab === "canInviteTo"
+      ? selectedNodeOfficialData.canInviteTo
+      : selectedNodeOfficialData.invitedFrom;
+    const unlockAfterCache: { [key: string]: number | null } = {};
+    const getCachedUnlockAfterDays = (invite: OfficialInviteEntry) => {
+      if (invite.tracker in unlockAfterCache) {
+        return unlockAfterCache[invite.tracker];
+      }
+
+      const unlockAfterDays = getInviteUnlockAfterDays(
+        invite,
+        `${selectedNodeOfficialData.sourceName}-${invite.tracker}-${officialInvitesTab}-sort`
+      );
+      unlockAfterCache[invite.tracker] = unlockAfterDays;
+      return unlockAfterDays;
+    };
+
+    return [...currentInvites].sort((a, b) => {
+      if (officialInvitesSortBy === "unlockAfter") {
+        const aUnlockAfterDays = getCachedUnlockAfterDays(a);
+        const bUnlockAfterDays = getCachedUnlockAfterDays(b);
+
+        if (aUnlockAfterDays === null && bUnlockAfterDays !== null) {
+          return 1;
+        }
+        if (aUnlockAfterDays !== null && bUnlockAfterDays === null) {
+          return -1;
+        }
+        if (
+          aUnlockAfterDays !== null
+          && bUnlockAfterDays !== null
+          && aUnlockAfterDays !== bUnlockAfterDays
+        ) {
+          return aUnlockAfterDays - bUnlockAfterDays;
+        }
+      }
+
+      if (a.officialInvites !== b.officialInvites) {
+        return b.officialInvites - a.officialInvites;
+      }
+
+      return a.tracker.localeCompare(b.tracker);
+    });
+  }, [officialInvitesSortBy, officialInvitesTab, selectedNodeOfficialData]);
+
+  const setDialogTrackerInUrl = (trackerName: string | null, method: "push" | "replace" = "push") => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (trackerName) {
+      params.set("tracker", trackerName);
+    } else {
+      params.delete("tracker");
+    }
+
+    const nextQuery = params.toString();
+    const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+    if (method === "replace") {
+      router.replace(nextUrl, { scroll: false });
+      return;
+    }
+
+    router.push(nextUrl, { scroll: false });
+  };
+
+  useEffect(() => {
+    if (activePath) {
+      return;
+    }
+
+    const trackerParam = searchParams.get("tracker");
+    if (!trackerParam) {
+      if (selectedNodeId !== null) {
+        setSelectedNodeId(null);
+      }
+      return;
+    }
+
+    const targetNode = data.nodes.find((node) => node.id === trackerParam);
+    if (!targetNode) {
+      if (selectedNodeId !== null) {
+        setSelectedNodeId(null);
+      }
+      setDialogTrackerInUrl(null, "replace");
+      return;
+    }
+
+    if (selectedNodeId === trackerParam) {
+      return;
+    }
+
+    setOfficialInvitesTab("canInviteTo");
+    setOfficialInvitesSortBy("officialInvites");
+    setIsUnlockAccordionOpen(true);
+    setExpandedOfficialInviteCards({});
+    setSelectedNodeId(trackerParam);
+    if (
+      typeof targetNode.x === "number"
+      && typeof targetNode.y === "number"
+      && fgRef.current
+    ) {
+      fgRef.current.centerAt(targetNode.x, targetNode.y, 1000);
+      fgRef.current.zoom(2.5, 2000);
+    }
+  }, [activePath, data.nodes, searchParams]);
 
   const getAbbr = (name: string) => {
     if (rawData.abbrList && rawData.abbrList[name]) return rawData.abbrList[name];
     const capitals = name.match(/[A-Z]/g);
     if (capitals && capitals.length >= 2) return capitals.join("");
     return name.substring(0, 3).toUpperCase();
+  };
+
+  const getStatusColor = (status: string) => {
+    const s = status.toLowerCase();
+    if (s === "yes" || s === "open") return "text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30";
+    if (s === "no" || s === "closed") return "text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/30";
+    return "text-orange-700 dark:text-orange-300 bg-orange-100 dark:bg-orange-900/30";
+  };
+
+  const getStatusLabel = (status: string) => {
+    const s = status.toLowerCase();
+    if (s === "yes") return "Recruiting";
+    if (s === "no") return "Closed";
+    return status;
+  };
+
+  const renderReqs = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    return parts.map((part, i) => {
+      if (part.match(urlRegex)) {
+        return (
+          <a
+            key={i}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:underline wrap-break-words"
+          >
+            {part}
+          </a>
+        );
+      }
+      return part;
+    });
   };
 
   const getSuggestions = (query: string) => {
@@ -827,12 +1152,20 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
 
           onNodeClick={(node: any) => {
             if (activePath) return;
+            setOfficialInvitesTab("canInviteTo");
+            setOfficialInvitesSortBy("officialInvites");
+            setIsUnlockAccordionOpen(true);
+            setExpandedOfficialInviteCards({});
             setSelectedNodeId(node.id);
+            setDialogTrackerInUrl(node.id);
             fgRef.current.centerAt(node.x, node.y, 1000);
             fgRef.current.zoom(2.5, 2000);
           }}
 
-          onBackgroundClick={() => setSelectedNodeId(null)}
+          onBackgroundClick={() => {
+            setSelectedNodeId(null);
+            setDialogTrackerInUrl(null);
+          }}
 
           nodeCanvasObject={(node: any, ctx, globalScale) => {
             const label = node.id;
@@ -882,12 +1215,18 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
         />
       </div>
 
-      {!activePath && selectedNodeId && selectedNodeDetails && (
-        <aside className="absolute top-4 bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-80 flex flex-col rounded-xl bg-card/90 backdrop-blur border border-foreground/10 z-10 overflow-hidden animate-in slide-in-from-right-10 fade-in duration-300">
+      {!activePath && selectedNodeOfficialData && (
+        <aside className="absolute top-4 bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-[44rem] flex flex-col rounded-xl bg-card/90 backdrop-blur border border-foreground/10 z-10 overflow-hidden animate-in slide-in-from-right-10 fade-in duration-300">
           <div className="flex items-center justify-between p-5 border-b border-foreground/10 shrink-0">
-            <h2 className="text-xl font-bold tracking-tight truncate pr-2">{selectedNodeId}</h2>
+            <div className="min-w-0">
+              <h2 className="text-xl font-bold tracking-tight truncate pr-2">{selectedNodeOfficialData.sourceName}</h2>
+              <p className="text-xs text-foreground/60 mt-0.5">Official invite forum and official invites</p>
+            </div>
             <button
-              onClick={() => setSelectedNodeId(null)}
+              onClick={() => {
+                setSelectedNodeId(null);
+                setDialogTrackerInUrl(null);
+              }}
               className="p-1.5 rounded-full transition-opacity opacity-70 hover:opacity-100"
             >
               <span className="material-symbols-rounded text-lg">close</span>
@@ -895,47 +1234,313 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
           </div>
 
           <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
-            {Object.keys(selectedNodeDetails.outgoing).length > 0 && (
-              <div>
-                <h3 className="text-sm font-bold text-muted-foreground mb-3 flex items-center gap-2">
-                  <span className="material-symbols-rounded text-base">arrow_outward</span>
-                  Can invite to ({Object.keys(selectedNodeDetails.outgoing).length})
-                </h3>
-                <div className="space-y-3">
-                  {Object.entries(selectedNodeDetails.outgoing).map(([target, info]: [string, any]) => (
-                    <div key={target} className="p-4 rounded-xl bg-foreground/5 border border-foreground/10">
-                      <div className="font-bold text-base mb-1">{target}</div>
-                      <div className="text-sm text-muted-foreground leading-relaxed">
-                        {info.reqs || "No specific requirements."}
-                      </div>
+            <div className="rounded-lg border border-foreground/10 bg-foreground/5 p-3">
+              <button
+                type="button"
+                onClick={() => setIsUnlockAccordionOpen(current => !current)}
+                className="w-full flex items-center justify-between gap-2 text-left text-sm font-semibold text-foreground cursor-pointer"
+                aria-expanded={isUnlockAccordionOpen}
+              >
+                <span>Official invite forum unlock requirements</span>
+                <span className={`material-symbols-rounded text-lg text-foreground/60 transition-transform duration-200 ${isUnlockAccordionOpen ? "rotate-180" : ""}`}>
+                  keyboard_arrow_down
+                </span>
+              </button>
+              <div
+                className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
+                  isUnlockAccordionOpen ? "grid-rows-[1fr] opacity-100 mt-2.5" : "grid-rows-[0fr] opacity-0 mt-0"
+                }`}
+              >
+                <div className="overflow-hidden space-y-2.5">
+                  {selectedNodeOfficialData.unlockDays !== null && (
+                    <div className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-foreground/75 bg-foreground/10 rounded-md px-1.5 py-1">
+                      <span className="material-symbols-rounded text-[13px] shrink-0">schedule</span>
+                      After {selectedNodeOfficialData.unlockDays} days
+                      <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+                        You can join the official invite forum from {selectedNodeOfficialData.sourceName} after {selectedNodeOfficialData.unlockDays} days.
+                      </span>
                     </div>
-                  ))}
+                  )}
+
+                  {selectedNodeOfficialData.sections.length > 0 ? (
+                    <div className="space-y-2.5">
+                      {selectedNodeOfficialData.sections.map((section, sectionIndex) => (
+                        <div key={section.key}>
+                          {sectionIndex > 0 && (
+                            <div className="flex items-center justify-center my-2">
+                              <span className="text-xs font-semibold text-foreground/40 uppercase">or</span>
+                            </div>
+                          )}
+                          <div className="rounded-lg border border-foreground/10 bg-card p-3">
+                            <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
+                              {section.rank ? (
+                                <h4 className="text-sm font-semibold text-foreground">{section.rank}</h4>
+                              ) : (
+                                <h4 className="text-sm font-semibold text-foreground">Requirements</h4>
+                              )}
+
+                              {section.ageText && (
+                                <div className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-foreground/75 bg-foreground/10 rounded-md px-1.5 py-1 shrink-0 max-w-full">
+                                  <span className="material-symbols-rounded text-[13px] shrink-0">schedule</span>
+                                  <span className="wrap-break-words text-left leading-tight">
+                                    After {section.ageText.trim()}
+                                  </span>
+                                  <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+                                    You can join the official invite forum from {selectedNodeOfficialData.sourceName} after {section.ageText.trim()}.
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            {section.requirements.length > 0 ? (
+                              <ul className="space-y-1.5">
+                                {section.requirements.map((requirement, requirementIndex) => (
+                                  <li key={`${section.key}-${requirementIndex}`} className="text-sm text-foreground/80 leading-snug flex items-start gap-2">
+                                    <span className="mt-[7px] h-1 w-1 rounded-full bg-foreground/45 shrink-0" />
+                                    <span className="wrap-break-words">{requirement}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
+                                {section.requirementText || "No additional requirements."}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-foreground/70">No specific requirements were provided.</p>
+                  )}
                 </div>
               </div>
-            )}
+            </div>
 
-            {Object.keys(selectedNodeDetails.incoming).length > 0 && (
-              <div>
-                <h3 className="text-sm font-bold text-muted-foreground mb-3 flex items-center gap-2">
-                  <span className="material-symbols-rounded text-base rotate-180">arrow_outward</span>
-                  Recruited from ({Object.keys(selectedNodeDetails.incoming).length})
-                </h3>
-                <div className="space-y-3">
-                  {Object.entries(selectedNodeDetails.incoming).map(([source, info]: [string, any]) => (
-                    <div key={source} className="p-4 rounded-xl bg-foreground/5 border border-foreground/10">
-                      <div className="font-bold text-base mb-1">{source}</div>
-                      <div className="text-sm text-muted-foreground leading-relaxed">
-                        {info.reqs || "No specific requirements."}
-                      </div>
-                    </div>
-                  ))}
+            <div className="rounded-lg border border-foreground/10 bg-foreground/5 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setOfficialInvitesTab("canInviteTo")}
+                    className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition-colors ${
+                      officialInvitesTab === "canInviteTo"
+                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+                        : "bg-foreground/8 text-foreground/70 border border-foreground/10 hover:bg-foreground/12"
+                    }`}
+                  >
+                    <span className="material-symbols-rounded text-sm">outbound</span>
+                    <span>Can Invite To ({selectedNodeOfficialData.canInviteTo.length})</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setOfficialInvitesTab("invitedFrom")}
+                    className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-semibold transition-colors ${
+                      officialInvitesTab === "invitedFrom"
+                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+                        : "bg-foreground/8 text-foreground/70 border border-foreground/10 hover:bg-foreground/12"
+                    }`}
+                  >
+                    <span className="material-symbols-rounded text-sm">south_west</span>
+                    <span>Invited From ({selectedNodeOfficialData.invitedFrom.length})</span>
+                  </button>
+                </div>
+                <div className="flex items-center gap-2 ml-auto">
+                  <span className="text-xs font-semibold text-foreground/60">Sort by</span>
+                  <div className="relative">
+                    <select
+                      value={officialInvitesSortBy}
+                      onChange={(event) => {
+                        const nextSortBy = event.target.value as DialogSortByOption;
+                        setOfficialInvitesSortBy(nextSortBy);
+                        setOfficialInvitesSortDirection(nextSortBy === "officialInvites" ? "desc" : "asc");
+                      }}
+                      className="h-8 min-w-[156px] appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-2.5 pr-7 text-xs font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
+                      aria-label="Sort dialog invite trackers"
+                    >
+                      <option value="officialInvites">Official Invites</option>
+                      <option value="unlockAfter">Days</option>
+                    </select>
+                    <span className="pointer-events-none material-symbols-rounded absolute right-1.5 top-1/2 -translate-y-1/2 text-sm text-foreground/50">
+                      expand_more
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setOfficialInvitesSortDirection((current) => current === "asc" ? "desc" : "asc")}
+                    className="relative group h-8 w-8 inline-flex items-center justify-center rounded-md border border-foreground/10 bg-foreground/5 text-foreground/70 outline-none transition-colors hover:border-foreground/20 focus-visible:border-foreground/30"
+                    aria-label={`Sort ${officialInvitesSortDirection === "asc" ? "ascending" : "descending"}`}
+                  >
+                    <span className="material-symbols-rounded text-sm">
+                      {officialInvitesSortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
+                    </span>
+                    <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+                      Sort: {officialInvitesSortDirection === "asc" ? "Ascending" : "Descending"}
+                    </span>
+                  </button>
                 </div>
               </div>
-            )}
+              {sortedPanelInvites.length > 0 ? (
+                <div className="space-y-2.5">
+                  {sortedPanelInvites.map((invite) => {
+                    const joinRequirementSections = parseRequirementSections(
+                      invite.details.reqs || "",
+                      `${selectedNodeOfficialData.sourceName}-${invite.tracker}-${officialInvitesTab}`
+                    );
+                    const inviteCardKey = `${selectedNodeOfficialData.sourceName}:${officialInvitesTab}:${invite.tracker}`;
+                    const isInviteCardOpen = expandedOfficialInviteCards[inviteCardKey] ?? true;
+                    const unlockAfterParts = Array.from(new Set(
+                      joinRequirementSections
+                        .map((section) => section.ageText?.trim())
+                        .filter((value): value is string => Boolean(value))
+                    ));
+                    const unlockAfterValue = unlockAfterParts.join(" / ");
+                    const unlockAfterText = unlockAfterParts.length > 0 ? `After ${unlockAfterValue}` : null;
+                    const joinTargetTracker = officialInvitesTab === "canInviteTo" ? invite.tracker : selectedNodeOfficialData.sourceName;
+                    const joinSourceTracker = officialInvitesTab === "canInviteTo" ? selectedNodeOfficialData.sourceName : invite.tracker;
+                    const unlockAfterTooltip = unlockAfterParts.length > 0
+                      ? `You can join ${joinTargetTracker} from ${joinSourceTracker} after ${unlockAfterValue}.`
+                      : null;
 
-            {Object.keys(selectedNodeDetails.outgoing).length === 0 && Object.keys(selectedNodeDetails.incoming).length === 0 && (
-              <p className="text-sm text-muted-foreground italic">No route data available.</p>
-            )}
+                    return (
+                    <div key={invite.tracker} className="rounded-lg border border-foreground/10 bg-card p-3">
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => setExpandedOfficialInviteCards((current) => ({
+                          ...current,
+                          [inviteCardKey]: !(current[inviteCardKey] ?? true),
+                        }))}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            setExpandedOfficialInviteCards((current) => ({
+                              ...current,
+                              [inviteCardKey]: !(current[inviteCardKey] ?? true),
+                            }));
+                          }
+                        }}
+                        className="flex flex-wrap items-center justify-between gap-2 cursor-pointer rounded-md -mx-1 px-1 py-0.5"
+                        aria-expanded={isInviteCardOpen}
+                        aria-label={`${isInviteCardOpen ? "Collapse" : "Expand"} ${invite.tracker} details`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                          <h4 className="text-sm font-semibold text-foreground">{invite.tracker}</h4>
+                          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground/80 bg-foreground/10 px-2 py-0.5 rounded-md shrink-0 whitespace-nowrap">
+                            {getAbbr(invite.tracker)}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              const targetNode = data.nodes.find((graphNode) => graphNode.id === invite.tracker);
+                              setOfficialInvitesTab("canInviteTo");
+                              setOfficialInvitesSortBy("officialInvites");
+                              setIsUnlockAccordionOpen(true);
+                              setExpandedOfficialInviteCards({});
+                              setSelectedNodeId(invite.tracker);
+                              setDialogTrackerInUrl(invite.tracker);
+                              if (
+                                targetNode
+                                && typeof targetNode.x === "number"
+                                && typeof targetNode.y === "number"
+                                && fgRef.current
+                              ) {
+                                fgRef.current.centerAt(targetNode.x, targetNode.y, 1000);
+                                fgRef.current.zoom(2.5, 2000);
+                              }
+                            }}
+                            className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-900/40 transition-colors cursor-pointer"
+                            aria-label={`Open official invites for ${invite.tracker}`}
+                          >
+                            <span className="material-symbols-rounded text-sm">outbound</span>
+                            {invite.officialInvites}
+                            <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+                              Official Invites: {invite.officialInvites}
+                            </span>
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {unlockAfterText && (
+                            <div className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-foreground/75 bg-foreground/10 rounded-md px-1.5 py-1 shrink-0 max-w-full">
+                              <span className="material-symbols-rounded text-[13px] shrink-0">schedule</span>
+                              <span className="wrap-break-words text-left leading-tight">{unlockAfterText}</span>
+                              {unlockAfterTooltip && (
+                                <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+                                  {unlockAfterTooltip}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${getStatusColor(invite.details.active)}`}>
+                            {getStatusLabel(invite.details.active)}
+                          </span>
+                          <span className={`material-symbols-rounded text-lg text-foreground/60 transition-transform duration-200 ${isInviteCardOpen ? "rotate-180" : ""}`}>
+                            keyboard_arrow_down
+                          </span>
+                        </div>
+                      </div>
+                      <div
+                        className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
+                          isInviteCardOpen ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0"
+                        }`}
+                      >
+                        <div className="overflow-hidden border-t border-foreground/10 pt-2.5">
+                          {joinRequirementSections.length > 0 ? (
+                            <div className="space-y-2">
+                              {joinRequirementSections.map((section, sectionIndex) => (
+                                <div key={section.key}>
+                                  {sectionIndex > 0 && (
+                                    <div className="flex items-center gap-2 py-1">
+                                      <span className="h-px flex-1 bg-foreground/10" />
+                                      <span className="text-[10px] font-semibold text-foreground/40 uppercase">or</span>
+                                      <span className="h-px flex-1 bg-foreground/10" />
+                                    </div>
+                                  )}
+                                  {section.rank && (
+                                    <div className="mb-2">
+                                      <h5 className="text-sm font-semibold text-foreground">{section.rank}</h5>
+                                    </div>
+                                  )}
+                                  {section.requirements.length > 0 ? (
+                                    <ul className="space-y-1.5">
+                                      {section.requirements.map((requirement, requirementIndex) => (
+                                        <li key={`${section.key}-join-${requirementIndex}`} className="text-sm text-foreground/80 leading-snug flex items-start gap-2">
+                                          <span className="mt-[7px] h-1 w-1 rounded-full bg-foreground/45 shrink-0" />
+                                          <span className="wrap-break-words">{renderReqs(requirement)}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  ) : (
+                                    <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
+                                      {renderReqs(section.requirementText || "No specific requirements.")}
+                                    </p>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
+                              No specific requirements.
+                            </p>
+                          )}
+                          <div className="text-xs text-foreground/50 mt-2">
+                            Checked: {invite.details.updated}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-sm text-foreground/70">
+                  {officialInvitesTab === "canInviteTo"
+                    ? "No active official invites were found for this tracker."
+                    : "No active invite routes into this tracker were found."}
+                </p>
+              )}
+            </div>
           </div>
         </aside>
       )}

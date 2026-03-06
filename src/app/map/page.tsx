@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import rawData from "@/data/trackers.json";
 import { DataStructure } from "@/types";
 import { transformDataToGraph } from "@/lib/graphUtils";
@@ -16,7 +17,9 @@ export default function MapPage() {
 
   return (
     <main className="fixed inset-0 top-16 w-full overflow-hidden bg-background">
-      <TrackerGraph data={graphData} rawData={data} />
+      <Suspense fallback={<div className="w-full h-full" />}>
+        <TrackerGraph data={graphData} rawData={data} />
+      </Suspense>
     </main>
   );
 }
