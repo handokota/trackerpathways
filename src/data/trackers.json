@@ -619,8 +619,9 @@
       "Upload.cx": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" }
     },
     "Luminarr": {
-      "RetroFlix": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
-      "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" }
+      "RetroFlix": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
+      "seedpool": { "days": 0, "reqs": "1TiB seedsize", "active": "Yes", "updated": "Mar 2026" },
+      "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" }
     },
     "M-Team": {
       "Dajiao PT": { "days": 0, "reqs": "Elite+ or VIP", "active": "Yes", "updated": "Aug 2025" },
