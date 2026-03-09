@@ -40,7 +40,6 @@ export default function TrackerSearchApp() {
 
   const [sourceSearch, setSourceSearch] = useState(searchParams.get("source") || "");
   const [targetSearch, setTargetSearch] = useState(searchParams.get("target") || "");
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>((searchParams.get("view") as 'grid' | 'list') || 'grid');
     
   const [maxJumps, setMaxJumps] = useState<number>(
     searchParams.get("jumps") ? Number.parseInt(searchParams.get("jumps")!, 10) : 5
@@ -96,6 +95,7 @@ export default function TrackerSearchApp() {
   const [officialInvitesSortDirection, setOfficialInvitesSortDirection] = useState<SortDirection>("desc");
   const [isUnlockAccordionOpen, setIsUnlockAccordionOpen] = useState(true);
   const [expandedOfficialInviteCards, setExpandedOfficialInviteCards] = useState<Record<string, boolean>>({});
+  const [expandedSources, setExpandedSources] = useState<Record<string, boolean>>({});
   
   const [myTrackers, setMyTrackers] = useState<string[]>([]);
   const [collectionInput, setCollectionInput] = useState("");
@@ -129,7 +129,6 @@ export default function TrackerSearchApp() {
     if (deferredTarget) params.set("target", deferredTarget);
     
     if (deferredSource || deferredTarget) {
-      if (viewMode !== 'grid') params.set("view", viewMode);
       if (maxJumps !== 5) params.set("jumps", maxJumps.toString());
       if (maxDays !== null) params.set("days", maxDays.toString());
       if (sortBy !== 'jumps') params.set("sort", sortBy);
@@ -143,7 +142,7 @@ export default function TrackerSearchApp() {
 
     const nextQuery = params.toString();
     router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
-  }, [deferredSource, deferredTarget, viewMode, maxJumps, maxDays, sortBy, sortDirection, mounted, pathname, router, searchParams]);
+  }, [deferredSource, deferredTarget, maxJumps, maxDays, sortBy, sortDirection, mounted, pathname, router, searchParams]);
 
   useEffect(() => {
     const fetchPaths = async () => {
@@ -413,6 +412,13 @@ export default function TrackerSearchApp() {
     setSourceActiveIndex(-1);
   };
 
+  const toggleSourceAccordion = (source: string) => {
+    setExpandedSources(prev => ({
+      ...prev,
+      [source]: !prev[source]
+    }));
+  };
+
   const getPathId = (path: PathResult) => `${path.source}>${path.nodes.join(">")}`;
 
   const getStepDays = (path: PathResult, routeIndex: number) => {
@@ -528,6 +534,26 @@ export default function TrackerSearchApp() {
     return groups;
   }, [sortedPaths]);
 
+  const sortedSourceNames = useMemo(() => {
+    return Object.keys(groupedResults);
+  }, [groupedResults]);
+
+  const foundCountBySource = useMemo(() => {
+    const counts: { [key: string]: number } = {};
+    sortedPaths.forEach(path => {
+      counts[path.source] = (counts[path.source] || 0) + 1;
+    });
+    return counts;
+  }, [sortedPaths]);
+
+  useEffect(() => {
+    if (sortedSourceNames.length > 0) {
+      setExpandedSources({ [sortedSourceNames[0]]: true });
+    } else {
+      setExpandedSources({});
+    }
+  }, [deferredSource, deferredTarget, sortedSourceNames]);
+
   const parseRequirementSections = (text: string, keyPrefix: string): UnlockRequirementSection[] => {
     if (!text.trim()) {
       return [];
@@ -640,18 +666,6 @@ export default function TrackerSearchApp() {
       return a.tracker.localeCompare(b.tracker) * (officialInvitesSortBy === "alphabetical" ? directionMultiplier : 1);
     });
   }, [officialInvitesDialog, officialInvitesSortBy, officialInvitesSortDirection, officialInvitesTab]);
-
-  const sortedSourceNames = useMemo(() => {
-    return Object.keys(groupedResults);
-  }, [groupedResults]);
-
-  const foundCountBySource = useMemo(() => {
-    const counts: { [key: string]: number } = {};
-    sortedPaths.forEach(path => {
-      counts[path.source] = (counts[path.source] || 0) + 1;
-    });
-    return counts;
-  }, [sortedPaths]);
 
   const setDialogTrackerInUrl = (trackerName: string | null, method: "push" | "replace" = "push") => {
     const params = new URLSearchParams(searchParams.toString());
@@ -886,29 +900,6 @@ export default function TrackerSearchApp() {
                 </button>
               </div>
 
-              <div className="hidden md:flex items-center bg-foreground/5 rounded-md p-0.5">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-1.5 rounded-sm flex items-center justify-center transition-all ${
-                    viewMode === 'grid' 
-                      ? 'bg-foreground/10 text-foreground' 
-                      : 'text-foreground/60 hover:text-foreground'
-                  }`}
-                >
-                  <span className="material-symbols-rounded text-lg">grid_view</span>
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-1.5 rounded-sm flex items-center justify-center transition-all ${
-                    viewMode === 'list' 
-                      ? 'bg-foreground/10 text-foreground' 
-                      : 'text-foreground/60 hover:text-foreground'
-                  }`}
-                >
-                  <span className="material-symbols-rounded text-lg">view_list</span>
-                </button>
-              </div>
-
             </div>
 
           </div>
@@ -1037,226 +1028,251 @@ export default function TrackerSearchApp() {
 
       {(sourceSearch || targetSearch) && (
         <div className="mt-12 animate-in fade-in slide-in-from-bottom-8 duration-500">
-          <div className="flex flex-col gap-10 pb-10">
+          
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-foreground/3 border border-foreground/10 rounded-xl p-4 mb-6">
+            <div className="flex flex-col gap-1 min-w-0">
+              <h2 className="text-base md:text-lg font-bold text-foreground tracking-tight">Search Results</h2>
+              {isLoading || isStale ? (
+                <div className="flex items-center gap-1.5 text-sm text-foreground/50">
+                  <span className="material-symbols-rounded text-[15px] animate-spin">progress_activity</span>
+                  <span>Updating search results...</span>
+                </div>
+              ) : (
+                <p className="text-sm font-medium text-foreground/60 truncate">
+                  Found <span className="text-foreground/80 font-semibold">{sortedSourceNames.length}</span> source{sortedSourceNames.length === 1 ? '' : 's'} and <span className="text-foreground/80 font-semibold">{foundPaths.length}</span> route{foundPaths.length === 1 ? '' : 's'}
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto pt-3 md:pt-0 border-t border-foreground/5 md:border-0 shrink-0">
+              <div className="flex items-center gap-2 flex-1 md:flex-none">
+                <span className="text-xs md:text-sm font-medium text-foreground/60 shrink-0 hidden sm:block">Sort by</span>
+                <div className="relative flex-1 md:w-44">
+                  <select
+                    value={sortBy}
+                    onChange={(event) => {
+                      const nextSortBy = event.target.value as SortByOption;
+                      setSortBy(nextSortBy);
+                      setSortDirection(nextSortBy === "officialInvites" ? "desc" : "asc");
+                      setVisiblePathsBySource({});
+                    }}
+                    className="w-full h-9 appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-3 pr-8 text-sm font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
+                    aria-label="Sort search results"
+                  >
+                    <option value="jumps">Jumps</option>
+                    <option value="days">Days</option>
+                    <option value="officialInvites">Official Invites</option>
+                  </select>
+                  <span className="pointer-events-none material-symbols-rounded absolute right-2 top-1/2 -translate-y-1/2 text-base text-foreground/50">
+                    expand_more
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSortDirection((current) => current === "asc" ? "desc" : "asc")}
+                  className="relative group shrink-0 h-9 w-9 inline-flex items-center justify-center rounded-md border border-foreground/10 bg-foreground/5 text-foreground/70 outline-none transition-colors hover:border-foreground/20 focus-visible:border-foreground/30"
+                  aria-label={`Sort ${sortDirection === "asc" ? "ascending" : "descending"}`}
+                >
+                  <span className="material-symbols-rounded text-base">
+                    {sortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4 pb-10">
             {sortedSourceNames.map((sourceName) => {
               const paths = groupedResults[sourceName];
               const sourceAbbr = getAbbr(sourceName);
               const officialInvites = trackerCanInviteTo[sourceName] || [];
-              const invitedFrom = trackerInvitedFrom[sourceName] || [];
               const sourceFoundCount = foundCountBySource[sourceName] || 0;
               const visibleSourcePathsCount = visiblePathsBySource[sourceName] ?? PATHS_PAGE_SIZE;
               const displayedSourcePaths = paths.slice(0, visibleSourcePathsCount);
+              
+              const bestHops = paths.length > 0 ? Math.min(...paths.map(p => p.routes.length)) : 0;
+              const validDays = paths.filter(p => p.totalDays !== null).map(p => p.totalDays as number);
+              const bestDays = validDays.length > 0 ? Math.min(...validDays) : null;
+              const isExpanded = expandedSources[sourceName] ?? false;
 
               return (
-                <div key={sourceName} className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div key={sourceName} className="flex flex-col bg-card border border-foreground/10 rounded-xl overflow-hidden transition-colors hover:border-foreground/20 animate-in fade-in duration-500">
                   
-                  <div className="flex flex-col gap-2 px-1 pb-2 mb-1">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-3">
-                      <div className="flex flex-col gap-1.5 min-w-0 w-full md:w-auto">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-lg font-bold text-foreground tracking-tight mr-1">{sourceName}</h3>
-                          
-                          {sourceAbbr && (
-                            <span className={badgeClass}>
-                              {sourceAbbr}
-                            </span>
-                          )}
-
-                          <button
-                            type="button"
-                            onClick={() => openOfficialInvitesDialog(sourceName)}
-                            className="relative group inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 transition-colors hover:bg-blue-200 dark:hover:bg-blue-900/40 cursor-pointer"
-                            aria-label={`Official invites for ${sourceName}: ${officialInvites.length}`}
-                          >
-                            <span className="material-symbols-rounded text-sm">outbound</span>
-                            <span className="hidden sm:inline">Official Invites</span>
-                            <span>{officialInvites.length}</span>
-                            <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 hidden md:block">
-                              Official Invites: {officialInvites.length}
-                            </span>
-                          </button>
-                        </div>
-                        {isLoading || isStale ? (
-                          <div className="flex items-center gap-2 text-sm text-foreground/50">
-                            <span className="material-symbols-rounded text-sm animate-spin">progress_activity</span>
-                            <span>Updating search results</span>
-                          </div>
-                        ) : (
-                          <p className="text-sm font-medium text-foreground/50">
-                            Search results {sourceFoundCount} found
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center justify-between md:justify-end gap-2 w-full md:w-auto pt-3 md:pt-0 border-t border-foreground/5 md:border-0">
-                        <span className="text-sm font-medium text-foreground/60 shrink-0">Sort by</span>
-                        <div className="relative flex-1 md:flex-none">
-                          <select
-                            value={sortBy}
-                            onChange={(event) => {
-                              const nextSortBy = event.target.value as SortByOption;
-                              setSortBy(nextSortBy);
-                              setSortDirection(nextSortBy === "officialInvites" ? "desc" : "asc");
-                              setVisiblePathsBySource({});
-                            }}
-                            className="w-full md:min-w-44 h-9 appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-3 pr-8 text-sm font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
-                            aria-label="Sort search results"
-                          >
-                            <option value="jumps">Jumps</option>
-                            <option value="days">Days</option>
-                            <option value="officialInvites">Official Invites</option>
-                          </select>
-                          <span className="pointer-events-none material-symbols-rounded absolute right-2 top-1/2 -translate-y-1/2 text-base text-foreground/50">
-                            expand_more
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setSortDirection((current) => current === "asc" ? "desc" : "asc")}
-                          className="relative group shrink-0 h-9 w-9 inline-flex items-center justify-center rounded-md border border-foreground/10 bg-foreground/5 text-foreground/70 outline-none transition-colors hover:border-foreground/20 focus-visible:border-foreground/30"
-                          aria-label={`Sort ${sortDirection === "asc" ? "ascending" : "descending"}`}
-                        >
-                          <span className="material-symbols-rounded text-base">
-                            {sortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
-                          </span>
-                          <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 hidden md:block">
-                            Sort: {sortDirection === "asc" ? "Ascending" : "Descending"}
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={
-                    viewMode === 'grid' 
-                      ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-                      : "grid grid-cols-1 gap-3"
-                  }>
-                    {displayedSourcePaths.map((path) => {
-                      const targetAbbr = getAbbr(path.target);
-                      const targetOfficialInvites = trackerCanInviteTo[path.target] || [];
-                      const isDirect = path.routes.length === 1;
-                      const pathId = getPathId(path);
-                      const isBestPath = pathId === bestPathId;
-
-                      return (
-                        <div
-                          key={pathId}
-                          className={`flex flex-col p-5 rounded-xl border transition-colors duration-200 h-full ${
-                            isBestPath
-                              ? "border-green-500/40 bg-green-500/5"
-                              : "bg-card border-foreground/10"
-                          }`}
-                        >
-                          
-                          <div className="flex justify-between items-start mb-3 gap-4"> 
-                            <div className="min-w-0">
-                              
-                              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
-                                <div className="font-bold text-foreground text-lg wrap-break-word">{path.target}</div>
-                                
-                                <div className="flex items-center gap-2 shrink-0">
-                                  <span className={badgeClass}>
-                                    {targetAbbr}
-                                  </span>
-                                  {!isDirect && <span className={badgeClass}>{path.routes.length} hop</span>}
-                                  <button
-                                    type="button"
-                                    onClick={() => openOfficialInvitesDialog(path.target)}
-                                    className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 transition-colors hover:bg-blue-200 dark:hover:bg-blue-900/40 cursor-pointer"
-                                    aria-label={`Official invites for ${path.target}: ${targetOfficialInvites.length}`}
-                                  >
-                                    <span className="material-symbols-rounded text-sm">outbound</span>
-                                    <span>{targetOfficialInvites.length}</span>
-                                    <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 hidden md:block">
-                                      Official Invites: {targetOfficialInvites.length}
-                                    </span>
-                                  </button>
-                                </div>
-                              </div>
-                              
-                              <div className="flex flex-col gap-1.5 items-start">
-                                <div className="text-sm font-medium text-foreground/50 tracking-wide flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
-                                  <span>From</span>
-                                  <span className="text-foreground/80 font-medium">{sourceName}</span>
-                                  <span className={badgeClass}>
-                                    {sourceAbbr}
-                                  </span>
-                                </div>
-
-                                {isBestPath && (
-                                  <div className="mt-1.5">
-                                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded-md">
-                                      <span className="material-symbols-rounded text-sm">workspace_premium</span>
-                                      {sortBy === 'days'
-                                        ? sortDirection === "asc" ? "Fastest route" : "Slowest route"
-                                        : sortBy === "officialInvites"
-                                          ? sortDirection === "asc" ? "Fewest official invites" : "Most official invites"
-                                          : sortDirection === "asc" ? "Fewest hops" : "Most hops"}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                              
-                            </div>
-                            
-                            <span className={`text-sm font-medium bg-transparent border border-foreground/10 px-2 py-1 rounded-md whitespace-nowrap shrink-0 ${path.totalDays === null ? 'text-foreground/40' : 'text-foreground/70'}`}>
-                              {path.totalDays === null ? 'Unknown' : `${path.totalDays} days`}
-                            </span>
-                          </div>
-                          
-                          <div className="space-y-3 mt-auto flex-1">
-                            {path.routes.map((req, rIdx) => {
-                              const fromNode = path.nodes[rIdx];
-                              const toNode = path.nodes[rIdx + 1];
-                              const stepDays = getStepDays(path, rIdx);
-                              
-                              return (
-                                <div key={rIdx} className="text-sm pl-3 relative border-l-2 border-foreground/10">
-                                  {!isDirect && (
-                                    <div className="text-sm font-bold text-foreground/70 mb-1 flex items-center gap-1">
-                                      <span>{fromNode}</span><span className="material-symbols-rounded text-base">arrow_right_alt</span><span>{toNode}</span>
-                                    </div>
-                                  )}
-                                  <div className={`text-xs font-medium mb-1 ${stepDays === null ? "text-foreground/40" : "text-foreground/70"}`}>
-                                    Step time: {stepDays === null ? "Unknown" : `${stepDays} days`}
-                                  </div>
-                                  <p className="text-foreground/70 leading-relaxed font-normal text-sm">{renderReqs(req.reqs)}</p>
-                                  
-                                  <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-foreground/5 border-dashed">
-                                    <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
-                                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${getStatusColor(req.active)}`}>
-                                        {getStatusLabel(req.active)}
-                                      </span>
-                                      <div className="flex items-center gap-1 text-foreground/30">
-                                        <span className="text-xs font-medium">Checked: {req.updated}</span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              )
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {!isStale && !isLoading && paths.length > visibleSourcePathsCount && (
-                    <div className="flex items-center justify-center mt-4">
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => toggleSourceAccordion(sourceName)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleSourceAccordion(sourceName);
+                      }
+                    }}
+                    className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 p-4 md:px-5 md:py-4 cursor-pointer bg-foreground/3 hover:bg-foreground/5 transition-colors select-none"
+                    aria-expanded={isExpanded}
+                  >
+                    <div className="flex flex-wrap items-center gap-3 min-w-0">
+                      <h3 className="text-lg font-bold text-foreground tracking-tight truncate">{sourceName}</h3>
+                      <span className={badgeClass}>
+                        {sourceAbbr}
+                      </span>
                       <button
                         type="button"
-                        onClick={() =>
-                          setVisiblePathsBySource((current) => ({
-                            ...current,
-                            [sourceName]: (current[sourceName] ?? PATHS_PAGE_SIZE) + PATHS_PAGE_SIZE,
-                          }))
-                        }
-                        className="px-4 py-2 text-sm font-medium rounded-md bg-foreground/10 text-foreground/80 hover:bg-foreground/15 transition-colors"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          openOfficialInvitesDialog(sourceName);
+                        }}
+                        className="relative group inline-flex items-center gap-1.5 text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 transition-colors hover:bg-blue-200 dark:hover:bg-blue-900/40 cursor-pointer shrink-0"
+                        aria-label={`Official invites for ${sourceName}: ${officialInvites.length}`}
                       >
-                        Load more ({Math.min(PATHS_PAGE_SIZE, paths.length - visibleSourcePathsCount)} more)
+                        <span className="material-symbols-rounded text-sm">outbound</span>
+                        <span className="hidden sm:inline">Official Invites</span>
+                        <span>{officialInvites.length}</span>
                       </button>
                     </div>
-                  )}
+
+                    <div className="flex flex-wrap items-center gap-2 md:gap-3 shrink-0">
+                      <div className="flex items-center gap-1.5 px-2 py-1 bg-foreground/5 rounded-md border border-foreground/5 text-xs md:text-sm font-medium text-foreground/70">
+                        <span className="material-symbols-rounded text-[14px] opacity-70">route</span>
+                        <span>{sourceFoundCount} route{sourceFoundCount !== 1 && 's'}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 px-2 py-1 bg-foreground/5 rounded-md border border-foreground/5 text-xs md:text-sm font-medium text-foreground/70">
+                        <span className="material-symbols-rounded text-[14px] opacity-70">linear_scale</span>
+                        <span>Best: {bestHops} hop{bestHops !== 1 && 's'}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 px-2 py-1 bg-foreground/5 rounded-md border border-foreground/5 text-xs md:text-sm font-medium text-foreground/70">
+                        <span className="material-symbols-rounded text-[14px] opacity-70">schedule</span>
+                        <span>{bestDays !== null ? `${bestDays}d` : 'Unk'}</span>
+                      </div>
+                      <div className="flex items-center justify-center w-7 h-7 rounded-full transition-colors ml-1">
+                        <span className={`material-symbols-rounded text-xl text-foreground/60 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}>
+                          keyboard_arrow_down
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+                    <div className="overflow-hidden">
+                      <div className="p-4 md:p-5 border-t border-foreground/10 bg-background/50">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                          {displayedSourcePaths.map((path) => {
+                            const targetAbbr = getAbbr(path.target);
+                            const targetOfficialInvites = trackerCanInviteTo[path.target] || [];
+                            const isDirect = path.routes.length === 1;
+                            const pathId = getPathId(path);
+                            const isBestPath = pathId === bestPathId;
+
+                            return (
+                              <div
+                                key={pathId}
+                                className={`flex flex-col p-5 rounded-xl border transition-colors duration-200 h-full ${
+                                  isBestPath
+                                    ? "border-green-500/40 bg-green-500/5"
+                                    : "bg-card border-foreground/10"
+                                }`}
+                              >
+                                <div className="flex justify-between items-start mb-3 gap-4"> 
+                                  <div className="min-w-0">
+                                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
+                                      <div className="font-bold text-foreground text-lg wrap-break-word">{path.target}</div>
+                                      
+                                      <div className="flex items-center gap-2 shrink-0">
+                                        <span className={badgeClass}>
+                                          {targetAbbr}
+                                        </span>
+                                        {!isDirect && <span className={badgeClass}>{path.routes.length} hop</span>}
+                                        <button
+                                          type="button"
+                                          onClick={() => openOfficialInvitesDialog(path.target)}
+                                          className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 transition-colors hover:bg-blue-200 dark:hover:bg-blue-900/40 cursor-pointer"
+                                          aria-label={`Official invites for ${path.target}: ${targetOfficialInvites.length}`}
+                                        >
+                                          <span className="material-symbols-rounded text-sm">outbound</span>
+                                          <span>{targetOfficialInvites.length}</span>
+                                        </button>
+                                      </div>
+                                    </div>
+                                    
+                                    {isBestPath && (
+                                      <div className="mt-1.5 mb-1">
+                                        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded-md">
+                                          <span className="material-symbols-rounded text-sm">workspace_premium</span>
+                                          {sortBy === 'days'
+                                            ? sortDirection === "asc" ? "Fastest route overall" : "Slowest route overall"
+                                            : sortBy === "officialInvites"
+                                              ? sortDirection === "asc" ? "Fewest official invites" : "Most official invites"
+                                              : sortDirection === "asc" ? "Fewest hops overall" : "Most hops overall"}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  
+                                  <span className={`text-sm font-medium bg-transparent border border-foreground/10 px-2 py-1 rounded-md whitespace-nowrap shrink-0 ${path.totalDays === null ? 'text-foreground/40' : 'text-foreground/70'}`}>
+                                    {path.totalDays === null ? 'Unknown' : `${path.totalDays} days`}
+                                  </span>
+                                </div>
+                                
+                                <div className="space-y-3 mt-auto flex-1">
+                                  {path.routes.map((req, rIdx) => {
+                                    const fromNode = path.nodes[rIdx];
+                                    const toNode = path.nodes[rIdx + 1];
+                                    const stepDays = getStepDays(path, rIdx);
+                                    
+                                    return (
+                                      <div key={rIdx} className="text-sm pl-3 relative border-l-2 border-foreground/10">
+                                        {!isDirect && (
+                                          <div className="text-sm font-bold text-foreground/70 mb-1 flex items-center gap-1">
+                                            <span>{fromNode}</span><span className="material-symbols-rounded text-base">arrow_right_alt</span><span>{toNode}</span>
+                                          </div>
+                                        )}
+                                        <div className={`text-xs font-medium mb-1 ${stepDays === null ? "text-foreground/40" : "text-foreground/70"}`}>
+                                          Step time: {stepDays === null ? "Unknown" : `${stepDays} days`}
+                                        </div>
+                                        <p className="text-foreground/70 leading-relaxed font-normal text-sm">{renderReqs(req.reqs)}</p>
+                                        
+                                        <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-foreground/5 border-dashed">
+                                          <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+                                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${getStatusColor(req.active)}`}>
+                                              {getStatusLabel(req.active)}
+                                            </span>
+                                            <div className="flex items-center gap-1 text-foreground/30">
+                                              <span className="text-xs font-medium">Checked: {req.updated}</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {!isStale && !isLoading && paths.length > visibleSourcePathsCount && (
+                          <div className="flex flex-col items-center justify-center mt-6 pt-4 gap-3 border-t border-foreground/10">
+                            <span className="text-xs font-semibold text-foreground/40">
+                              Showing {displayedSourcePaths.length} of {paths.length} routes
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setVisiblePathsBySource((current) => ({
+                                  ...current,
+                                  [sourceName]: (current[sourceName] ?? PATHS_PAGE_SIZE) + PATHS_PAGE_SIZE,
+                                }))
+                              }
+                              className="px-5 py-2 text-sm font-semibold rounded-lg bg-foreground/5 text-foreground/80 hover:bg-foreground/10 border border-foreground/10 transition-all active:scale-95 flex items-center gap-2"
+                            >
+                              <span className="material-symbols-rounded text-[18px]">expand_more</span>
+                              Load more routes
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
 
                 </div>
               );
@@ -1283,7 +1299,7 @@ export default function TrackerSearchApp() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="official-invites-dialog-title"
-            className="w-full md:max-w-2xl max-h-[85dvh] rounded-t-2xl md:rounded-xl border border-foreground/15 bg-card shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 md:slide-in-from-bottom-0 duration-300 pointer-events-auto touch-auto"
+            className="w-full md:max-w-2xl max-h-[85dvh] rounded-t-2xl md:rounded-xl border border-foreground/15 bg-card flex flex-col overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 md:slide-in-from-bottom-0 duration-300 pointer-events-auto touch-auto"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex justify-center pt-3 pb-1 md:hidden shrink-0">

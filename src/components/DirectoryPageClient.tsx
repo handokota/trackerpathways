@@ -401,7 +401,7 @@ export default function DirectoryPageClient() {
             <span className="material-symbols-rounded text-base">
               {sortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
             </span>
-            <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 hidden md:block">
+            <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 hidden md:block">
               Sort: {sortDirection === "asc" ? "Ascending" : "Descending"}
             </span>
           </button>
@@ -428,7 +428,7 @@ export default function DirectoryPageClient() {
                   >
                     <span className="material-symbols-rounded text-sm">outbound</span>
                     <span>{t.officialInvites}</span>
-                    <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 shadow-sm transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+                    <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
                       Official Invites: {t.officialInvites}
                     </span>
                   </button>
@@ -467,7 +467,7 @@ export default function DirectoryPageClient() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="official-invites-dialog-title"
-            className="w-full md:max-w-2xl max-h-[85dvh] rounded-t-2xl md:rounded-xl border border-foreground/15 bg-card shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 md:slide-in-from-bottom-0 duration-300 pointer-events-auto touch-auto"
+            className="w-full md:max-w-2xl max-h-[85dvh] rounded-t-2xl md:rounded-xl border border-foreground/15 bg-card flex flex-col overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 md:slide-in-from-bottom-0 duration-300 pointer-events-auto touch-auto"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex justify-center pt-3 pb-1 md:hidden shrink-0">
