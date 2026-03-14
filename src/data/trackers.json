@@ -376,11 +376,15 @@
       "LST": { "days": 0, "reqs": "No requirement", "active": "YES", "updated": "Nov 2025" },
       "Luminarr": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Feb 2026" },
       "OldToonsWorld": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2025" },
+      "PixelCove": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
       "ReelFliX": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2025" },
-      "Unwalled": { "days": 0, "reqs": "5 uploads", "active": "Yes", "updated": "Aug 2025" }
+      "RetroFlix": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
+      "Unwalled": { "days": 0, "reqs": "5 uploads", "active": "Yes", "updated": "Aug 2025" },
+      "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" }
     },
     "BroadcasTheNet": {
       "Aither": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2024" },
+      "AlphaRatio": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
       "AnimeBytes": { "days": 90, "reqs": "PU+, 3 months", "active": "Yes", "updated": "Nov 2025" },
       "Anthelion": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2024" },
       "AsianCinema": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Nov 2024" },
@@ -389,6 +393,8 @@
       "BeyondHD": { "days": 0, "reqs": "Guru", "active": "Yes", "updated": "Nov 2024" },
       "Canal Street": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Nov 2024" },
       "Concertos": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2024" },
+      "D3Si": { "days": 540, "reqs": "Elite, 18 months", "active": "Yes", "updated": "Mar 2026" },
+      "F1Carreras": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
       "FunFile": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2024" },
       "GazelleGames": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Nov 2024" },
       "HD-Forever": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Nov 2024" },
@@ -397,7 +403,8 @@
       "Lat-Team": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2024" },
       "LzTr": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Nov 2024" },
       "MyAnonamouse": { "days": 0, "reqs": "No Requirement", "active": "Yes", "updated": "Nov 2024" },
-      "Orpheus": { "days": 0, "reqs": "No requirement", "active": "No", "updated": "Nov 2024" },
+      "OldToonsWorld": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
+      "Orpheus": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
       "PassThePopcorn": { "days": 730, "reqs": "Master, 2 years", "active": "Yes", "updated": "Nov 2024" },
       "PixelCove": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2024" },
       "PixelHD": { "days": 180, "reqs": "Elite or high-level PU, 3x 6 months old profile links (including BTN)", "active": "Yes", "updated": "Nov 2024" },
@@ -406,7 +413,7 @@
     },
     "BroadCity": {
       "PTerClub": { "days": 120, "reqs": "Gold User+, 4 months, 2 proofs from another tracker", "active": "No", "updated": "May 2024" },
-      "TeamHD": { "days": 0, "reqs": "No requirement", "active": "Unknown", "updated": "Jan 2024" }
+      "TeamHD": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2024" }
     },
     "CapybaraBR": {
       "DarkPeers": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
@@ -652,7 +659,6 @@
     },
     "MyAnonamouse": {
       "ABTorrents": { "days": 0, "reqs": "Some profile links and ratio proofs", "active": "Yes", "updated": "Oct 2025" },
-      "Aither": { "days": 360, "reqs": "12 months", "active": "Yes", "updated": "Jan 2026" },
       "Anthelion": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Dec 2025" },
       "Aura4K": { "days": 180, "reqs": "PU+, 6 months, 1TB upload", "active": "Yes", "updated": "Feb 2026" },
       "BakaBT": { "days": 180, "reqs": "PU+, 6 months", "active": "Yes", "updated": "Nov 2025" },
