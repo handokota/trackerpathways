@@ -615,7 +615,7 @@
       "Luminarr": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Feb 2026" }
     },
     "LST": {
-      "Aither": { "days": 180, "reqs": "Whale, 6 months", "active": "Yes", "updated": "Nov 2025" },
+      "Aither": { "days": 360, "reqs": "Leviathan or Ship, 12 months", "active": "Yes", "updated": "Mar 2026" },
       "DarkPeers": { "days": 0, "reqs": "Whale", "active": "Yes", "updated": "Nov 2025" },
       "DigitalCore.Club": { "days": 0, "reqs": "Whale", "active": "Yes", "updated": "Nov 2025" },
       "ExtremeBits": { "days": 365, "reqs": "Whale, 1 year", "active": "Yes", "updated": "Nov 2025" },
@@ -659,6 +659,7 @@
     },
     "MyAnonamouse": {
       "ABTorrents": { "days": 0, "reqs": "Some profile links and ratio proofs", "active": "Yes", "updated": "Oct 2025" },
+      "Aither": { "days": 360, "reqs": "12 months", "active": "Yes", "updated": "Jan 2026" },
       "Anthelion": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Dec 2025" },
       "Aura4K": { "days": 180, "reqs": "PU+, 6 months, 1TB upload", "active": "Yes", "updated": "Feb 2026" },
       "BakaBT": { "days": 180, "reqs": "PU+, 6 months", "active": "Yes", "updated": "Nov 2025" },
