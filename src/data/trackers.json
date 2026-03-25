@@ -61,6 +61,7 @@
     "HD-Only": "HD-O",
     "HD-Space": "HD-S",
     "HD-Torrents": "HDT",
+    "HD-UNiT3D": "HDU",
     "HDBits": "HDB",
     "HDCity": "HDC",
     "HDFans": "HDF",
@@ -451,12 +452,12 @@
       "PrivateHD": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Nov 2025" }
     },
     "DarkPeers": {
-      "BitPorn": { "days": 30, "reqs": "5 TiB of uploaded, avg seedtime >= 1 month", "active": "Yes", "updated": "Jan 2026" },
-      "DigitalCore.Club": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jan 2026" },
-      "FearNoPeer": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jan 2026" },
-      "HomieHelpDesk": { "days": 120, "reqs": "Account age  >=4 months minimum, 5TB upload, 2 additional proofs", "active": "Yes", "updated": "Jan 2026" },
-      "seedpool": { "days": 0, "reqs": "1 TiB seeding size", "active": "Yes", "updated": "Jan 2026" },
-      "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jan 2026" }
+      "BitPorn": { "days": 30, "reqs": "5 TiB of uploaded, avg seedtime >= 1 month", "active": "Yes", "updated": "Mar 2026" },
+      "DigitalCore.Club": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
+      "FearNoPeer": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
+      "HomieHelpDesk": { "days": 120, "reqs": "Account age  >=4 months minimum, 5TB upload, 2 additional proofs", "active": "Yes", "updated": "Mar 2026" },
+      "seedpool": { "days": 0, "reqs": "1 TiB seeding size", "active": "Yes", "updated": "Mar 2026" },
+      "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" }
     },
     "Empornium": {
       "Aither": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Jan 2026" },
@@ -586,11 +587,12 @@
       "ToTheGlory": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2024" }
     },
     "HomieHelpDesk": {
-      "DarkPeers": { "days": 0, "reqs": "Specialist", "active": "Yes", "updated": "Jan 2026" },
-      "DigitalCore.Club": { "days": 0, "reqs": "Specialist", "active": "Yes", "updated": "Jan 2026" },
-      "RocketHD": { "days": 0, "reqs": "Specialist", "active": "Yes", "updated": "Jan 2026" },
-      "seedpool": { "days": 0, "reqs": "Specialist", "active": "Yes", "updated": "Jan 2026" },
-      "YuScene": { "days": 0, "reqs": "Specialist", "active": "Yes", "updated": "Jan 2026" }
+      "DarkPeers": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
+      "DigitalCore.Club": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
+      "Luminarr": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Mar 2026" },
+      "RocketHD": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
+      "seedpool": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
+      "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" }
     },
     "JPopsuki": {
       "SugoiMusic": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
@@ -627,6 +629,7 @@
       "Upload.cx": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" }
     },
     "Luminarr": {
+      "HomieHelpDesk": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Mar 2026" },
       "RetroFlix": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
       "seedpool": { "days": 0, "reqs": "1TiB seedsize", "active": "Yes", "updated": "Mar 2026" },
       "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" }
@@ -913,24 +916,22 @@
       "PTerClub": { "days": 180, "reqs": "Crazy User+, 6 months", "active": "Yes", "updated": "Feb 2026" }
     },
     "Upload.cx": {
-      "DigitalCore.Club": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Dec 2025" },
-      "FearNoPeer": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Dec 2025" },
-      "HDCity": { "days": 0, "reqs": "PU+, 10TB \"upload size\", (optional) additional tracker profile screenshots", "active": "Yes", "updated": "Aug 2025" },
-      "LST": { "days": 90, "reqs": "PU+, 3 months", "active": "Yes", "updated": "Dec 2025" },
-      "ReelFliX": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Dec 2025" },
-      "seedpool": { "days": 0, "reqs": "PU+, 1TiB seedsize", "active": "Yes", "updated": "Dec 2025" },
-      "YuScene": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Dec 2025" }
+      "DigitalCore.Club": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Mar 2026" },
+      "FearNoPeer": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Mar 2026" },
+      "LST": { "days": 90, "reqs": "PU+, 3 months", "active": "Yes", "updated": "Mar 2026" },
+      "ReelFliX": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Mar 2026" },
+      "seedpool": { "days": 0, "reqs": "PU+, 1TiB seedsize", "active": "Yes", "updated": "Mar 2026" },
+      "YuScene": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Mar 2026" }
     },
     "YuScene": {
-      "Aura4K": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Feb 2026" },
-      "CapybaraBR": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Jan 2026" },
-      "DarkPeers": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Jan 2026" },
-      "DigitalCore.Club": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Jan 2026" },
-      "FearNoPeer": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Jan 2026" },
-      "HomieHelpDesk": { "days": 120, "reqs": "4 months account age, 3 TB upload, 2 more ratio proofs", "active": "Yes", "updated": "Jan 2026" },
-      "Luminarr": { "days": 90, "reqs": "3 months account age", "active": "Yes", "updated": "Feb 2026" },
-      "seedpool": { "days": 0, "reqs": "1 TiB seeding size", "active": "Yes", "updated": "Jan 2026" },
-      "Upload.cx": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Jan 2026" }
+      "Aura4K": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Mar 2026" },
+      "CapybaraBR": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Mar 2026" },
+      "DarkPeers": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Mar 2026" },
+      "DigitalCore.Club": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Mar 2026" },
+      "FearNoPeer": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Mar 2026" },
+      "Luminarr": { "days": 90, "reqs": "3 months account age", "active": "Yes", "updated": "Mar 2026" },
+      "seedpool": { "days": 0, "reqs": "1 TiB seeding size", "active": "Yes", "updated": "Mar 2026" },
+      "Upload.cx": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Mar 2026" }
     }
   }
 }
