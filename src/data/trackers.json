@@ -138,7 +138,6 @@
     "Speed.cd": "SPD",
     "SpeedApp": "SA",
     "SportsCult": "SPC",
-    "SugoiMusic": "SM",
     "Superbits": "SB",
     "TeamHD": "THD",
     "TheEmpire": "TE",
@@ -280,7 +279,6 @@
       "PassThePopcorn": { "days": 730, "reqs": "Legend, 2 years", "active": "Yes", "updated": "Jan 2026" },
       "PixelHD": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jan 2026" },
       "ReelFliX": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jan 2026" },
-      "SugoiMusic": { "days": 0, "reqs": "No requirement", "active": "No", "updated": "Jan 2026" },
       "TeamHD": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jan 2026" },
       "TheEmpire": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jan 2026" },
       "TheGeeks": { "days": 0, "reqs": "2-3x full tracker profile screenshots (including AB)", "active": "Yes", "updated": "Jan 2026" },
@@ -343,7 +341,6 @@
       "PixelHD": { "days": 0, "reqs": "Pro+, 3 profile links", "active": "Yes", "updated": "Dec 2025" },
       "ReelFliX": { "days": 0, "reqs": "Pro+", "active": "Yes", "updated": "Dec 2025" },
       "seedpool": { "days": 0, "reqs": "Pro+", "active": "Yes", "updated": "Dec 2025" },
-      "SugoiMusic": { "days": 0, "reqs": "Pro+", "active": "Yes", "updated": "Dec 2025" },
       "Unwalled": { "days": 0, "reqs": "Pro+", "active": "Yes", "updated": "Dec 2025" }
     },
     "Bibliotik": {
@@ -410,7 +407,6 @@
       "PassThePopcorn": { "days": 730, "reqs": "Master, 2 years", "active": "Yes", "updated": "Nov 2024" },
       "PixelCove": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2024" },
       "PixelHD": { "days": 180, "reqs": "Elite or high-level PU, 3x 6 months old profile links (including BTN)", "active": "Yes", "updated": "Nov 2024" },
-      "SugoiMusic": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2024" },
       "TheGeeks": { "days": 0, "reqs": "2-3x full tracker profile screenshots (including BTN)", "active": "Yes", "updated": "Nov 2024" }
     },
     "BroadCity": {
@@ -469,7 +465,6 @@
       "Orpheus": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2025" },
       "PixelCove": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2025" },
       "ReelFliX": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2025" },
-      "SugoiMusic": { "days": 0, "reqs": "Great Perv+", "active": "Yes", "updated": "Mar 2025" },
       "Unwalled": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2025" }
     },
     "ExoticaZ": {
@@ -596,7 +591,6 @@
       "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" }
     },
     "JPopsuki": {
-      "SugoiMusic": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
       "U2.dmhy": { "days": 90, "reqs": "2 unlimited invite posts, one suspended, another active (requiring 3 months, ACG collection proofs)", "active": "Yes", "updated": "Mar 2023" }
     },
     "KaraGarga": {
@@ -630,6 +624,7 @@
       "Upload.cx": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" }
     },
     "Luminarr": {
+      "BrokenStones": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
       "HomieHelpDesk": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Mar 2026" },
       "RetroFlix": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
       "seedpool": { "days": 0, "reqs": "1TiB seedsize", "active": "Yes", "updated": "Mar 2026" },
@@ -732,7 +727,6 @@
       "ReelFliX": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
       "RetroFlix": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
       "seedpool": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
-      "SugoiMusic": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
       "Unwalled": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" }
     },
     "PassThePopcorn": {
@@ -813,7 +807,6 @@
       "SceneHD": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Feb 2026" },
       "Secret Cinema": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Feb 2026" },
       "seedpool": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
-      "SugoiMusic": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
       "TheGeeks": { "days": 180, "reqs": "2-3 full tracker profile screenshots (including RED) that meet the following criteria: 180 days, 60GB real upload, real ratio>=1.05", "active": "Yes", "updated": "Feb 2026" },
       "TLFBits": { "days": 90, "reqs": "3 months (13 weeks)", "active": "Yes", "updated": "Feb 2026" },
       "Unwalled": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
