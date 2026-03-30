@@ -633,6 +633,7 @@
       "HomieHelpDesk": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Mar 2026" },
       "RetroFlix": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
       "seedpool": { "days": 0, "reqs": "1TiB seedsize", "active": "Yes", "updated": "Mar 2026" },
+      "Upload.cx": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" },
       "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2026" }
     },
     "M-Team": {
