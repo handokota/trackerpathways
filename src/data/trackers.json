@@ -4,7 +4,6 @@
     "Aither": "ATH",
     "AlphaRatio": "AR",
     "AnimeBytes": "AB",
-    "AnimeTorrents": "AT",
     "AnimeWorld": "AW",
     "Anthelion": "ANT",
     "ArabicSource": "AST",
@@ -287,6 +286,12 @@
     "AnimeWorld": {
       "RocketHD": { "days": 60, "reqs": "2 months", "active": "Yes", "updated": "Oct 2025" }
     },
+    "AnimeZ": {
+      "AvistaZ": { "days": 120, "reqs": "10k bp, Member Rank, 120 days, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
+      "CinemaZ": { "days": 120, "reqs": "10k bp, Member Rank, 120 days, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
+      "ExoticaZ": { "days": 120, "reqs": "10k bp, Member Rank, 120 days, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
+      "PrivateHD": { "days": 120, "reqs": "10k bp, Member Rank, 120 days, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" }
+    },
     "Anthelion": {
       "Aither": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Feb 2026" },
       "Aura4K": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
@@ -314,9 +319,10 @@
       "YuScene": { "days": 0, "reqs": "No Requirement", "active": "Yes", "updated": "Feb 2026" }
     },
     "AvistaZ": {
-      "CinemaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Nov 2025" },
-      "ExoticaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Nov 2025" },
-      "PrivateHD": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Nov 2025" }
+      "AnimeZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
+      "CinemaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
+      "ExoticaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
+      "PrivateHD": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" }
     },
     "Bemaniso": {
       "Orpheus": { "days": 0, "reqs": "PU", "active": "Yes", "updated": "Oct 2024" },
@@ -444,9 +450,10 @@
       "Unwalled": { "days": 0, "reqs": "Superfan+, 5 seeded uploads", "active": "Yes", "updated": "Mar 2025" }
     },
     "CinemaZ": {
-      "AvistaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Nov 2025" },
-      "ExoticaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Nov 2025" },
-      "PrivateHD": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Nov 2025" }
+      "AnimeZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
+      "AvistaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
+      "ExoticaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
+      "PrivateHD": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" }
     },
     "DarkPeers": {
       "BitPorn": { "days": 30, "reqs": "5 TiB of uploaded, avg seedtime >= 1 month", "active": "Yes", "updated": "Apr 2026" },
@@ -469,9 +476,10 @@
       "Unwalled": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Mar 2025" }
     },
     "ExoticaZ": {
-      "AvistaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Nov 2025" },
-      "CinemaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Nov 2025" },
-      "PrivateHD": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Nov 2025" }
+      "AnimeZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
+      "AvistaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
+      "CinemaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
+      "PrivateHD": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" }
     },
     "FearNoPeer": {
       "BrokenStones": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Apr 2026" },
@@ -628,6 +636,7 @@
     "Luminarr": {
       "BrokenStones": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Apr 2026" },
       "DarkPeers": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Apr 2026" },
+      "FearNoPeer": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Apr 2026" },
       "HomieHelpDesk": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Apr 2026" },
       "RetroFlix": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Apr 2026" },
       "seedpool": { "days": 0, "reqs": "1TiB seedsize", "active": "Yes", "updated": "Apr 2026" },
@@ -767,9 +776,10 @@
       "TLFBits": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Nov 2024" }
     },
     "PrivateHD": {
-      "AvistaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2024" },
-      "CinemaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2024" },
-      "ExoticaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2024" }
+      "AnimeZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
+      "AvistaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
+      "CinemaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
+      "ExoticaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" }
     },
     "Redacted": {
       "Aither": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Feb 2026" },
