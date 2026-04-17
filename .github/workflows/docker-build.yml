@@ -44,8 +44,8 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
             ${{ secrets.DOCKER_USERNAME }}/trackerpathways
           tags: |
-            type=raw,value=latest
-            type=sha,prefix=,format=long
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,format=long
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
