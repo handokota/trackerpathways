@@ -3,56 +3,97 @@ import rawData from "@/data/trackers.json";
 import { DataStructure, PathResult } from "@/types";
 
 const data = rawData as unknown as DataStructure;
+const MAX_API_JUMPS = 8;
+const MAX_API_DAYS = 3650;
+const MAX_PATHS_LIMIT = 2000;
+const allTrackerKeys = Object.keys(data.routeInfo);
+const allTrackers = Array.from(new Set([
+  ...allTrackerKeys,
+  ...allTrackerKeys.flatMap((key) => Object.keys(data.routeInfo[key] || {})),
+]));
 
 interface RouteSearchResult extends PathResult {
   stepDays: Array<number | null>;
 }
 
+const getAbbr = (name: string) => {
+  if (data.abbrList[name]) return data.abbrList[name];
+  const capitals = name.match(/[A-Z]/g);
+  if (capitals && capitals.length >= 2) return capitals.join("");
+  return name.substring(0, 3).toUpperCase();
+};
+
+const strictTrackerIdentifiers = new Set(
+  allTrackers.flatMap((trackerName) => [trackerName.toLowerCase(), getAbbr(trackerName).toLowerCase()])
+);
+
+const parseAndValidatePositiveInt = (
+  rawValue: string | null,
+  fallback: number,
+  min: number,
+  max: number
+): number | null => {
+  if (!rawValue) {
+    return fallback;
+  }
+
+  const parsed = Number.parseInt(rawValue, 10);
+  if (!Number.isFinite(parsed) || parsed < min || parsed > max) {
+    return null;
+  }
+
+  return parsed;
+};
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const sourceRaw = searchParams.get("source") || "";
   const targetRaw = searchParams.get("target") || "";
-  const maxJumps = Number.parseInt(searchParams.get("jumps") || "1", 10);
+  const maxJumpsRaw = searchParams.get("jumps");
+  const maxJumps = parseAndValidatePositiveInt(maxJumpsRaw, 1, 1, MAX_API_JUMPS);
   const maxDaysStr = searchParams.get("days");
-  const maxDays = maxDaysStr ? Number.parseInt(maxDaysStr, 10) : null;
+  const maxDays = maxDaysStr
+    ? parseAndValidatePositiveInt(maxDaysStr, 1, 1, MAX_API_DAYS)
+    : null;
+
+  if (maxJumps === null) {
+    return NextResponse.json(
+      { error: `Invalid jumps value. Use an integer between 1 and ${MAX_API_JUMPS}.` },
+      { status: 400 }
+    );
+  }
+
+  if (maxDaysStr && maxDays === null) {
+    return NextResponse.json(
+      { error: `Invalid days value. Use an integer between 1 and ${MAX_API_DAYS}.` },
+      { status: 400 }
+    );
+  }
 
   const sQueryRaw = sourceRaw.toLowerCase().trim();
-  const sourceInputs = sQueryRaw ? sQueryRaw.split(',').map(s => s.trim()).filter(s => s) : [];
+  const sourceInputs = sQueryRaw
+    ? Array.from(new Set(sQueryRaw.split(",").map((source) => source.trim()).filter(Boolean)))
+    : [];
   const tQuery = targetRaw.toLowerCase().trim();
 
   if (!sQueryRaw && !tQuery) {
     return NextResponse.json([]);
   }
 
-  const getAbbr = (name: string) => {
-    if (data.abbrList[name]) return data.abbrList[name];
-    const capitals = name.match(/[A-Z]/g);
-    if (capitals && capitals.length >= 2) return capitals.join("");
-    return name.substring(0, 3).toUpperCase();
-  };
-
-  const allTrackerKeys = Object.keys(data.routeInfo);
-  const allTrackers = Array.from(new Set([
-    ...allTrackerKeys,
-    ...allTrackerKeys.flatMap(k => Object.keys(data.routeInfo[k] || {}))
-  ]));
-
-  const isStrictTarget = allTrackers.some(t => 
-    t.toLowerCase() === tQuery || getAbbr(t).toLowerCase() === tQuery
-  );
+  const isStrictTarget = strictTrackerIdentifiers.has(tQuery);
 
   let startNodes: string[] = [];
 
   if (sourceInputs.length > 0) {
-    startNodes = allTrackerKeys.filter(t => {
-      const tLower = t.toLowerCase();
-      const tAbbr = getAbbr(t).toLowerCase();
-      return sourceInputs.some(input => {
-        const isStrictInput = allTrackers.some(validT => validT.toLowerCase() === input || getAbbr(validT).toLowerCase() === input);
+    startNodes = allTrackerKeys.filter((trackerName) => {
+      const trackerLower = trackerName.toLowerCase();
+      const trackerAbbr = getAbbr(trackerName).toLowerCase();
+      return sourceInputs.some((input) => {
+        const isStrictInput = strictTrackerIdentifiers.has(input);
         if (isStrictInput) {
-          return tLower === input || tAbbr === input;
+          return trackerLower === input || trackerAbbr === input;
         }
-        return tLower.includes(input) || tAbbr === input;
+        return trackerLower.includes(input) || trackerAbbr === input;
       });
     });
   } else if (tQuery) {
@@ -61,27 +102,19 @@ export async function GET(request: Request) {
 
   const startNodeSet = new Set(startNodes);
   const results: RouteSearchResult[] = [];
-  const queue: RouteSearchResult[] = [];
-
-  startNodes.forEach(start => {
-    queue.push({
+  const queue: RouteSearchResult[] = startNodes.map((start) => ({
       source: start,
       target: start,
       nodes: [start],
       totalDays: 0,
       stepDays: [],
       routes: []
-    });
-  });
+    }));
 
-  const MAX_PATHS_LIMIT = 2000; 
   let pathsFound = 0;
 
-  while (queue.length > 0) {
-    if (pathsFound >= MAX_PATHS_LIMIT) break;
-
-    const currentPath = queue.shift();
-    if (!currentPath) continue;
+  for (let queueIndex = 0; queueIndex < queue.length && pathsFound < MAX_PATHS_LIMIT; queueIndex += 1) {
+    const currentPath = queue[queueIndex];
 
     const currentNode = currentPath.nodes[currentPath.nodes.length - 1];
     if (!currentNode) continue;
@@ -142,5 +175,17 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.json(results);
+  results.sort((a, b) => {
+    if (a.routes.length !== b.routes.length) return a.routes.length - b.routes.length;
+    const aDays = a.totalDays ?? Number.POSITIVE_INFINITY;
+    const bDays = b.totalDays ?? Number.POSITIVE_INFINITY;
+    if (aDays !== bDays) return aDays - bDays;
+    return a.target.localeCompare(b.target);
+  });
+
+  return NextResponse.json(results, {
+    headers: {
+      "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+    },
+  });
 }

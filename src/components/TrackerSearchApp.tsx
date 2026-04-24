@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useDeferredValue, useRef } from "react";
+import { useState, useMemo, useEffect, useDeferredValue, useRef, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import rawData from "@/data/trackers.json"; 
 import { DataStructure, PathResult, RouteDetail } from "@/types"; 
@@ -89,6 +89,7 @@ export default function TrackerSearchApp() {
 
   const [foundPaths, setFoundPaths] = useState<PathResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [officialInvitesDialog, setOfficialInvitesDialog] = useState<OfficialInvitesDialogState | null>(null);
   const [officialInvitesTab, setOfficialInvitesTab] = useState<OfficialInvitesTab>("canInviteTo");
   const [officialInvitesSortBy, setOfficialInvitesSortBy] = useState<DialogSortByOption>("officialInvites");
@@ -102,6 +103,7 @@ export default function TrackerSearchApp() {
 
   const isUsingCollection = myTrackers.length > 0 && sourceSearch === myTrackers.join(", ");
   const [visiblePathsBySource, setVisiblePathsBySource] = useState<Record<string, number>>({});
+  const latestRequestIdRef = useRef(0);
 
   useEffect(() => {
     setMounted(true);
@@ -145,38 +147,63 @@ export default function TrackerSearchApp() {
   }, [deferredSource, deferredTarget, maxJumps, maxDays, sortBy, sortDirection, mounted, pathname, router, searchParams]);
 
   useEffect(() => {
-    const fetchPaths = async () => {
-      if (!deferredSource && !deferredTarget) {
-        setFoundPaths([]);
-        return;
-      }
+    if (!deferredSource && !deferredTarget) {
+      setFoundPaths([]);
+      setSearchError(null);
+      return;
+    }
 
+    const requestId = latestRequestIdRef.current + 1;
+    latestRequestIdRef.current = requestId;
+    const controller = new AbortController();
+
+    const timeoutId = setTimeout(async () => {
       setIsLoading(true);
+      setSearchError(null);
+
       try {
         const params = new URLSearchParams();
         if (deferredSource) params.append("source", deferredSource);
         if (deferredTarget) params.append("target", deferredTarget);
         params.append("jumps", maxJumps.toString());
-        if (maxDays) params.append("days", maxDays.toString());
+        if (maxDays !== null) params.append("days", maxDays.toString());
 
-        const res = await fetch(`/api/routes?${params.toString()}`);
-        if (res.ok) {
-          const data = await res.json();
-          setFoundPaths(data);
+        const res = await fetch(`/api/routes?${params.toString()}`, { signal: controller.signal });
+        const payload: unknown = await res.json();
+
+        if (!res.ok) {
+          const message = typeof payload === "object" && payload && "error" in payload && typeof payload.error === "string"
+            ? payload.error
+            : "Search request failed. Please try again.";
+          throw new Error(message);
+        }
+
+        if (!Array.isArray(payload)) {
+          throw new Error("Unexpected response format from the server.");
+        }
+
+        if (requestId === latestRequestIdRef.current) {
+          setFoundPaths(payload as PathResult[]);
         }
       } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
         console.error("Failed to fetch routes", error);
+        setFoundPaths([]);
+        setSearchError(error instanceof Error ? error.message : "Failed to fetch routes.");
       } finally {
-        setIsLoading(false);
+        if (requestId === latestRequestIdRef.current) {
+          setIsLoading(false);
+        }
       }
+    }, 300);
+
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
     };
-
-    const timeoutId = setTimeout(() => {
-        fetchPaths();
-    }, 300); 
-
-    return () => clearTimeout(timeoutId);
-
   }, [deferredSource, deferredTarget, maxJumps, maxDays]);
 
   useEffect(() => {
@@ -184,6 +211,7 @@ export default function TrackerSearchApp() {
         setSourceSearch("");
         setTargetSearch("");
         setFoundPaths([]);
+        setSearchError(null);
         setVisiblePathsBySource({});
       }
   }, [searchParams]);
@@ -297,7 +325,7 @@ export default function TrackerSearchApp() {
     return Array.from(set).sort();
   }, []);
 
-  const getSuggestions = (query: string) => {
+  const getSuggestions = useCallback((query: string) => {
     if (!query) return [];
     const terms = query.split(",");
     const lastTerm = terms[terms.length - 1].trim().toLowerCase();
@@ -307,7 +335,11 @@ export default function TrackerSearchApp() {
       const abbr = getAbbr(t).toLowerCase();
       return t.toLowerCase().includes(lastTerm) || abbr.includes(lastTerm);
     }).slice(0, 8);
-  };
+  }, [allTrackers]);
+
+  const sourceSuggestions = useMemo(() => getSuggestions(sourceSearch), [sourceSearch, getSuggestions]);
+  const targetSuggestions = useMemo(() => getSuggestions(targetSearch), [targetSearch, getSuggestions]);
+  const collectionSuggestions = useMemo(() => getSuggestions(collectionInput), [collectionInput, getSuggestions]);
 
   const handleSourceSelect = (selectedItem: string) => {
     const terms = sourceSearch.split(",");
@@ -345,7 +377,7 @@ export default function TrackerSearchApp() {
 
   const handleSourceKeyDown = (e: React.KeyboardEvent) => {
     if (!showSourceSug) return;
-    const suggestions = getSuggestions(sourceSearch);
+    const suggestions = sourceSuggestions;
     if (suggestions.length === 0) return;
 
     if (e.key === "ArrowDown") {
@@ -364,7 +396,7 @@ export default function TrackerSearchApp() {
 
   const handleTargetKeyDown = (e: React.KeyboardEvent) => {
     if (!showTargetSug) return;
-    const suggestions = getSuggestions(targetSearch);
+    const suggestions = targetSuggestions;
     if (suggestions.length === 0) return;
 
     if (e.key === "ArrowDown") {
@@ -383,7 +415,7 @@ export default function TrackerSearchApp() {
 
   const handleCollectionKeyDown = (e: React.KeyboardEvent) => {
     if (!showCollectionSug) return;
-    const suggestions = getSuggestions(collectionInput);
+    const suggestions = collectionSuggestions;
     if (suggestions.length === 0) return;
 
     if (e.key === "ArrowDown") {
@@ -802,10 +834,10 @@ export default function TrackerSearchApp() {
                     </button>
                   </div>
                 </div>
-                {!isUsingCollection && showSourceSug && getSuggestions(sourceSearch).length > 0 && (
+                {!isUsingCollection && showSourceSug && sourceSuggestions.length > 0 && (
                   <div className="absolute top-full -left-8 w-[calc(100%+2rem)] mt-2 bg-card rounded-xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-100 border border-foreground/10">
                     <div className="max-h-60 overflow-y-auto p-1" ref={sourceListRef}>
-                      {getSuggestions(sourceSearch).map((item, i) => (
+                      {sourceSuggestions.map((item, i) => (
                         <div 
                           key={i}
                           className={`px-3 py-2.5 rounded-md text-sm cursor-pointer transition-colors text-foreground/90 font-medium flex items-center justify-between ${
@@ -842,10 +874,10 @@ export default function TrackerSearchApp() {
                   }}
                   onKeyDown={handleTargetKeyDown}
                 />
-                {showTargetSug && getSuggestions(targetSearch).length > 0 && (
+                {showTargetSug && targetSuggestions.length > 0 && (
                   <div className="absolute top-full -left-8 w-[calc(100%+2rem)] mt-2 bg-card rounded-xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-100 border border-foreground/10">
                     <div className="max-h-60 overflow-y-auto p-1" ref={targetListRef}>
-                      {getSuggestions(targetSearch).map((item, i) => (
+                      {targetSuggestions.map((item, i) => (
                         <div 
                           key={i}
                           className={`px-3 py-2.5 rounded-md text-sm cursor-pointer transition-colors text-foreground/90 font-medium flex items-center justify-between ${
@@ -981,10 +1013,10 @@ export default function TrackerSearchApp() {
                   }}
                   onKeyDown={handleCollectionKeyDown}
                 />
-                {showCollectionSug && getSuggestions(collectionInput).length > 0 && (
+                {showCollectionSug && collectionSuggestions.length > 0 && (
                   <div className="absolute top-full left-0 w-full mt-2 bg-card rounded-xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-100 border border-foreground/10">
                     <div className="max-h-60 overflow-y-auto p-1" ref={collectionListRef}>
-                      {getSuggestions(collectionInput).map((item, i) => (
+                      {collectionSuggestions.map((item, i) => (
                         <div 
                           key={i}
                           className={`px-3 py-2.5 rounded-md text-sm cursor-pointer transition-colors text-foreground/90 font-medium flex items-center justify-between ${
@@ -1278,12 +1310,19 @@ export default function TrackerSearchApp() {
               );
             })}
             
-            {!isStale && !isLoading && foundPaths.length === 0 && (sourceSearch || targetSearch) && (
+            {!searchError && !isStale && !isLoading && foundPaths.length === 0 && (sourceSearch || targetSearch) && (
               <div className="flex flex-col items-center justify-center py-20 opacity-50 border-2 border-dashed border-foreground/10 rounded-lg">
                 <span className="material-symbols-rounded text-6xl mb-4 text-foreground/20">search_off</span>
                 <p className="text-foreground/50 font-medium">
                   No routes found matching your criteria
                 </p>
+              </div>
+            )}
+
+            {searchError && (
+              <div className="flex items-start gap-3 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-300">
+                <span className="material-symbols-rounded text-base">error</span>
+                <span>{searchError}</span>
               </div>
             )}
           </div>
