@@ -27,11 +27,11 @@ export default function DirectoryPageClient() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const activeTrackerParam = searchParams.get("tracker");
 
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<DirectorySortByOption>("alphabetical");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-  const [officialInvitesDialog, setOfficialInvitesDialog] = useState<OfficialInvitesData | null>(null);
   const [visibleTrackersCount, setVisibleTrackersCount] = useState(TRACKERS_PAGE_SIZE);
   const directoryLoadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -65,46 +65,39 @@ export default function DirectoryPageClient() {
   }, [pathname, router, searchParams]);
 
   const openOfficialInvitesDialog = useCallback((sourceName: string, updateUrl = true) => {
-    setOfficialInvitesDialog({
-      sourceName,
-      sections: getUnlockRequirementSections(sourceName),
-      canInviteTo: getOfficialInvitesForSource(data.routeInfo, sourceName, activeInviteCountBySource),
-      invitedFrom: getInvitedFromForSource(data.routeInfo, sourceName, activeInviteCountBySource),
-    });
-
     if (updateUrl) {
       setDialogTrackerInUrl(sourceName);
     }
-  }, [activeInviteCountBySource, getUnlockRequirementSections, setDialogTrackerInUrl]);
+  }, [setDialogTrackerInUrl]);
 
   const closeOfficialInvitesDialog = useCallback((updateUrl = true) => {
-    setOfficialInvitesDialog(null);
     if (updateUrl) {
       setDialogTrackerInUrl(null);
     }
   }, [setDialogTrackerInUrl]);
 
   useEffect(() => {
-    const trackerParam = searchParams.get("tracker");
-    if (!trackerParam) {
-      if (officialInvitesDialog) {
-        closeOfficialInvitesDialog(false);
-      }
+    if (!activeTrackerParam) {
       return;
     }
 
-    if (!data.abbrList[trackerParam]) {
-      closeOfficialInvitesDialog(false);
+    if (!data.abbrList[activeTrackerParam]) {
       setDialogTrackerInUrl(null, "replace");
-      return;
+    }
+  }, [activeTrackerParam, setDialogTrackerInUrl]);
+
+  const officialInvitesDialog = useMemo<OfficialInvitesData | null>(() => {
+    if (!activeTrackerParam || !data.abbrList[activeTrackerParam]) {
+      return null;
     }
 
-    if (officialInvitesDialog?.sourceName === trackerParam) {
-      return;
-    }
-
-    openOfficialInvitesDialog(trackerParam, false);
-  }, [closeOfficialInvitesDialog, officialInvitesDialog, openOfficialInvitesDialog, searchParams, setDialogTrackerInUrl]);
+    return {
+      sourceName: activeTrackerParam,
+      sections: getUnlockRequirementSections(activeTrackerParam),
+      canInviteTo: getOfficialInvitesForSource(data.routeInfo, activeTrackerParam, activeInviteCountBySource),
+      invitedFrom: getInvitedFromForSource(data.routeInfo, activeTrackerParam, activeInviteCountBySource),
+    };
+  }, [activeInviteCountBySource, activeTrackerParam, getUnlockRequirementSections]);
 
   const getAbbr = (name: string) => getTrackerAbbr(name, data.abbrList);
 

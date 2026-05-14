@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useTheme } from "next-themes";
+import type { ForceGraphMethods } from "react-force-graph-2d";
 import { DataStructure } from "@/types";
 import { findShortestPath } from "@/lib/graphUtils";
 import {
@@ -15,20 +16,32 @@ import {
   parseRequirementSections,
 } from "@/lib/officialInvites";
 import OfficialInvitesContent from "@/components/shared/OfficialInvitesContent";
-import UiState from "@/components/shared/UiState";
 import useFocusTrap from "@/hooks/useFocusTrap";
 
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
   ssr: false,
-  loading: () => <UiState kind="loading" title="Loading graph" className="h-full rounded-none border-0 bg-transparent" />,
+  loading: () => <div className="flex items-center justify-center h-full text-muted-foreground">Loading Graph...</div>,
 });
 
 interface TrackerGraphProps {
   data: {
-    nodes: any[];
-    links: any[];
+    nodes: GraphNode[];
+    links: GraphLink[];
   };
   rawData: DataStructure;
+}
+
+interface GraphNode {
+  id: string;
+  group?: number;
+  val?: number;
+  x?: number;
+  y?: number;
+}
+
+interface GraphLink {
+  source?: string | number | GraphNode;
+  target?: string | number | GraphNode;
 }
 
 interface CollectionPathOption {
@@ -39,20 +52,38 @@ interface CollectionPathOption {
   stepDays: Array<number | null>;
 }
 
+type GraphNodeRef = string | number | { id?: string | number } | null | undefined;
+
+const getGraphNodeId = (nodeRef: GraphNodeRef): string | null => {
+  if (nodeRef === null || nodeRef === undefined) {
+    return null;
+  }
+  if (typeof nodeRef === "object") {
+    if (nodeRef.id === null || nodeRef.id === undefined) {
+      return null;
+    }
+    return String(nodeRef.id);
+  }
+  return String(nodeRef);
+};
+
 export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   const { resolvedTheme } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
-  const [fontFace, setFontFace] = useState("sans-serif");
+  const [dimensions, setDimensions] = useState(() => ({
+    width: typeof window !== "undefined" ? window.innerWidth : 800,
+    height: typeof window !== "undefined" ? window.innerHeight : 600,
+  }));
+  const [fontFace] = useState(() =>
+    typeof window !== "undefined" ? window.getComputedStyle(document.body).fontFamily : "sans-serif"
+  );
 
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   const [pathStart, setPathStart] = useState<string>("");
   const [pathEnd, setPathEnd] = useState<string>("");
-  const [activePath, setActivePath] = useState<string[] | null>(null);
   const [pathSortBy, setPathSortBy] = useState<"jumps" | "days">("jumps");
   const [useCollectionAsSource, setUseCollectionAsSource] = useState(false);
   const [selectedCollectionPathId, setSelectedCollectionPathId] = useState<string | null>(null);
@@ -68,13 +99,20 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   const pathEndListRef = useRef<HTMLDivElement>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const fgRef = useRef<any>(null);
+  const fgRef = useRef<ForceGraphMethods | undefined>(undefined);
 
   const allTrackerNames = useMemo(() => {
-    return data.nodes.map(n => n.id).sort((a: string, b: string) => a.localeCompare(b));
+    return data.nodes
+      .map((node) => node.id)
+      .sort((a, b) => a.localeCompare(b));
   }, [data]);
 
-  const [collection, setCollection] = useState<string>("");
+  const [collection, setCollection] = useState<string>(() => {
+    if (typeof window === "undefined") {
+      return "";
+    }
+    return localStorage.getItem("tracker-collection") || "";
+  });
   const [isCollectionPanelOpen, setIsCollectionPanelOpen] = useState(false);
   const [collectionInput, setCollectionInput] = useState("");
   const [showCollectionSug, setShowCollectionSug] = useState(false);
@@ -84,13 +122,6 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   const selectedNodePanelRef = useRef<HTMLElement>(null);
   const selectedNodeCloseButtonRef = useRef<HTMLButtonElement>(null);
   const selectedNodeReturnFocusRef = useRef<HTMLElement | null>(null);
-
-  useEffect(() => {
-    const savedCollection = localStorage.getItem("tracker-collection");
-    if (savedCollection) {
-      setCollection(savedCollection);
-    }
-  }, []);
 
   const collectionNodes = useMemo(() => {
     return collection.split(",").map(s => s.trim()).filter(s => s && allTrackerNames.includes(s));
@@ -105,12 +136,14 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
       if (outgoing) Object.keys(outgoing).forEach(target => neighbors.add(target));
     });
 
-    data.links.forEach((link: any) => {
-      const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-      const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+    data.links.forEach((link) => {
+      const sourceId = getGraphNodeId(link.source);
+      const targetId = getGraphNodeId(link.target);
 
-      if (collectionNodes.includes(sourceId)) neighbors.add(targetId);
-      if (collectionNodes.includes(targetId)) neighbors.add(sourceId);
+      if (sourceId && targetId) {
+        if (collectionNodes.includes(sourceId)) neighbors.add(targetId);
+        if (collectionNodes.includes(targetId)) neighbors.add(sourceId);
+      }
     });
 
     collectionNodes.forEach(nodeId => neighbors.delete(nodeId));
@@ -197,65 +230,49 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
       }
     };
 
-    setFontFace(window.getComputedStyle(document.body).fontFamily);
+    const frameId = window.requestAnimationFrame(updateDimensions);
     window.addEventListener("resize", updateDimensions);
-    updateDimensions();
-    return () => window.removeEventListener("resize", updateDimensions);
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("resize", updateDimensions);
+    };
   }, []);
 
-  useEffect(() => {
-    if (useCollectionAsSource) {
-      setPathStart("");
-      setPathStartInput("");
-      setShowPathStartSug(false);
-      setPathStartActiveIndex(-1);
+  const activeCollectionPathId = useMemo(() => {
+    if (!useCollectionAsSource || collectionPathOptions.length === 0) {
+      return null;
     }
-  }, [useCollectionAsSource]);
-
-  useEffect(() => {
-    if (!useCollectionAsSource) {
-      return;
+    if (selectedCollectionPathId && collectionPathOptions.some((path) => path.id === selectedCollectionPathId)) {
+      return selectedCollectionPathId;
     }
-
-    if (collectionPathOptions.length === 0) {
-      setSelectedCollectionPathId(null);
-      return;
-    }
-
-    if (
-      selectedCollectionPathId
-      && collectionPathOptions.some((path) => path.id === selectedCollectionPathId)
-    ) {
-      return;
-    }
-
-    setSelectedCollectionPathId(collectionPathOptions[0].id);
+    return collectionPathOptions[0].id;
   }, [collectionPathOptions, selectedCollectionPathId, useCollectionAsSource]);
 
-  useEffect(() => {
+  const activePath = useMemo(() => {
     if (useCollectionAsSource) {
-      const selectedCollectionPath = collectionPathOptions.find((path) => path.id === selectedCollectionPathId);
-      setActivePath(selectedCollectionPath?.nodes || null);
-      setSelectedNodeId(null);
-      return;
+      const selectedCollectionPath = collectionPathOptions.find((path) => path.id === activeCollectionPathId);
+      return selectedCollectionPath?.nodes || null;
     }
 
     if (pathStart && pathEnd) {
-      const path = findShortestPath(rawData, pathStart, pathEnd);
-      setActivePath(path);
-      setSelectedNodeId(null);
-      return;
+      return findShortestPath(rawData, pathStart, pathEnd);
     }
 
-    setActivePath(null);
-  }, [
-    collectionPathOptions,
-    pathEnd,
-    pathStart,
-    rawData,
-    selectedCollectionPathId,
-    useCollectionAsSource,
-  ]);
+    return null;
+  }, [activeCollectionPathId, collectionPathOptions, pathEnd, pathStart, rawData, useCollectionAsSource]);
+
+  const toggleCollectionSourceMode = useCallback(() => {
+    setUseCollectionAsSource((current) => {
+      const next = !current;
+      if (next) {
+        setPathStart("");
+        setPathStartInput("");
+        setShowPathStartSug(false);
+        setPathStartActiveIndex(-1);
+      }
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     if (pathStartActiveIndex >= 0 && pathStartListRef.current) {
@@ -307,6 +324,12 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     return parseRequirementSections(unlockInfo[1], sourceName);
   };
 
+  const trackerParam = searchParams.get("tracker");
+  const validNodeIds = useMemo(() => new Set(data.nodes.map((node) => node.id)), [data.nodes]);
+  const selectedNodeId = !activePath && trackerParam && validNodeIds.has(trackerParam)
+    ? trackerParam
+    : null;
+
   const selectedNodeOfficialData: OfficialInvitesData | null = selectedNodeId ? (() => {
     const canInviteTo = getOfficialInvitesForSource(
       rawData.routeInfo,
@@ -346,7 +369,6 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   }, [pathname, router, searchParams]);
 
   const closeSelectedNodePanel = useCallback(() => {
-    setSelectedNodeId(null);
     setDialogTrackerInUrl(null);
   }, [setDialogTrackerInUrl]);
 
@@ -360,44 +382,36 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   });
 
   useEffect(() => {
-    if (activePath) {
+    if (activePath || !trackerParam) {
       return;
     }
-
-    const trackerParam = searchParams.get("tracker");
-    if (!trackerParam) {
-      if (selectedNodeId !== null) {
-        setSelectedNodeId(null);
-      }
-      return;
-    }
-
-    const targetNode = data.nodes.find((node) => node.id === trackerParam);
-    if (!targetNode) {
-      if (selectedNodeId !== null) {
-        setSelectedNodeId(null);
-      }
+    if (!validNodeIds.has(trackerParam)) {
       setDialogTrackerInUrl(null, "replace");
+    }
+  }, [activePath, setDialogTrackerInUrl, trackerParam, validNodeIds]);
+
+  const lastCenteredTrackerRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!selectedNodeId) {
+      lastCenteredTrackerRef.current = null;
+      return;
+    }
+    if (lastCenteredTrackerRef.current === selectedNodeId) {
       return;
     }
 
-    if (selectedNodeId === trackerParam) {
-      return;
-    }
-
-    if (document.activeElement instanceof HTMLElement) {
-      selectedNodeReturnFocusRef.current = document.activeElement;
-    }
-    setSelectedNodeId(trackerParam);
+    const targetNode = data.nodes.find((node) => node.id === selectedNodeId);
     if (
-      typeof targetNode.x === "number"
+      targetNode
+      && typeof targetNode.x === "number"
       && typeof targetNode.y === "number"
       && fgRef.current
     ) {
       fgRef.current.centerAt(targetNode.x, targetNode.y, 1000);
       fgRef.current.zoom(2.5, 2000);
     }
-  }, [activePath, data.nodes, searchParams, selectedNodeId, setDialogTrackerInUrl]);
+    lastCenteredTrackerRef.current = selectedNodeId;
+  }, [data.nodes, selectedNodeId]);
 
   const getAbbr = (name: string) => getTrackerAbbr(name, rawData.abbrList);
 
@@ -529,8 +543,8 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   const formatStepDays = (days: number | null) => (days === null ? "?" : `${days}d`);
 
   const selectedCollectionPath = useMemo(
-    () => collectionPathOptions.find((path) => path.id === selectedCollectionPathId) || null,
-    [collectionPathOptions, selectedCollectionPathId]
+    () => collectionPathOptions.find((path) => path.id === activeCollectionPathId) || null,
+    [activeCollectionPathId, collectionPathOptions]
   );
 
   const isDark = resolvedTheme === "dark";
@@ -570,7 +584,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             <div className="p-4 flex flex-col gap-4 min-w-[250px]">
               <div className="flex items-center justify-between gap-2">
                 <button
-                  onClick={() => setUseCollectionAsSource((current) => !current)}
+                  onClick={toggleCollectionSourceMode}
                   disabled={collectionNodes.length === 0}
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-colors border ${
                     collectionNodes.length === 0
@@ -713,7 +727,9 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
               </div>
 
               {useCollectionAsSource && pathEnd && collectionPathOptions.length === 0 && (
-                <UiState kind="error" title="No path found from My Trackers" layout="inline" className="justify-center py-1" />
+                <div className="text-sm text-red-500 font-medium text-center py-1">
+                  No path found from My Trackers
+                </div>
               )}
               {useCollectionAsSource && pathEnd && selectedCollectionPath && (
                 <div className="text-sm text-green-500 font-medium text-center py-1 flex items-center justify-center gap-1.5">
@@ -722,7 +738,9 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 </div>
               )}
               {!useCollectionAsSource && pathStart && pathEnd && !activePath && (
-                <UiState kind="error" title="No path found" layout="inline" className="justify-center py-1" />
+                <div className="text-sm text-red-500 font-medium text-center py-1">
+                  No path found
+                </div>
               )}
               {!useCollectionAsSource && pathStart && pathEnd && activePath && (
                 <div className="text-sm text-green-500 font-medium text-center py-1 flex items-center justify-center gap-1.5">
@@ -734,7 +752,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
               {useCollectionAsSource && pathEnd && collectionPathOptions.length > 0 && (
                 <div className="flex flex-col gap-2 max-h-52 overflow-y-auto pr-1 custom-scrollbar">
                   {collectionPathOptions.map((pathOption, index) => {
-                    const isSelected = selectedCollectionPathId === pathOption.id;
+                    const isSelected = activeCollectionPathId === pathOption.id;
 
                     return (
                       <button
@@ -888,33 +906,39 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
           graphData={data}
           backgroundColor={bgColor}
 
-          nodeColor={(node: any) => {
+          nodeColor={(node) => {
+            const nodeId = node.id === undefined ? "" : String(node.id);
             if (activePath) {
-              return activePath.includes(node.id) ? pathColor : dimColor;
+              return activePath.includes(nodeId) ? pathColor : dimColor;
             }
             if (selectedNodeId) {
-              return node.id === selectedNodeId || rawData.routeInfo[selectedNodeId]?.[node.id] || rawData.routeInfo[node.id]?.[selectedNodeId]
+              return nodeId === selectedNodeId
+                || rawData.routeInfo[selectedNodeId]?.[nodeId]
+                || rawData.routeInfo[nodeId]?.[selectedNodeId]
                 ? defaultNodeColor
                 : dimColor;
             }
 
             if (isRingMode) {
-              if (collectionNodes.includes(node.id)) return collectionColor;
-              if (collectionNeighbors.has(node.id)) return defaultNodeColor;
+              if (collectionNodes.includes(nodeId)) return collectionColor;
+              if (collectionNeighbors.has(nodeId)) return defaultNodeColor;
               return distantNodeColor;
             }
 
-            if (collectionNodes.includes(node.id)) return collectionColor;
+            if (collectionNodes.includes(nodeId)) return collectionColor;
             return defaultNodeColor;
           }}
 
           nodeLabel="id"
           nodeRelSize={6}
 
-          linkColor={(link: any) => {
+          linkColor={(link) => {
             if (activePath) {
-              const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-              const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+              const sourceId = getGraphNodeId(link.source);
+              const targetId = getGraphNodeId(link.target);
+              if (!sourceId || !targetId) {
+                return dimColor;
+              }
               const sourceIndex = activePath.indexOf(sourceId);
               if (sourceIndex !== -1 && activePath[sourceIndex + 1] === targetId) return pathColor;
               return dimColor;
@@ -922,8 +946,11 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             if (selectedNodeId) return dimColor;
 
             if (isRingMode) {
-              const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-              const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+              const sourceId = getGraphNodeId(link.source);
+              const targetId = getGraphNodeId(link.target);
+              if (!sourceId || !targetId) {
+                return isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
+              }
               const isSourceRel = collectionNodes.includes(sourceId) || collectionNeighbors.has(sourceId);
               const isTargetRel = collectionNodes.includes(targetId) || collectionNeighbors.has(targetId);
 
@@ -934,10 +961,13 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             return isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)";
           }}
 
-          linkWidth={(link: any) => {
+          linkWidth={(link) => {
             if (activePath) {
-              const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-              const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+              const sourceId = getGraphNodeId(link.source);
+              const targetId = getGraphNodeId(link.target);
+              if (!sourceId || !targetId) {
+                return 1;
+              }
               const sourceIndex = activePath.indexOf(sourceId);
               if (sourceIndex !== -1 && activePath[sourceIndex + 1] === targetId) return 3;
             }
@@ -948,15 +978,24 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
           linkDirectionalArrowRelPos={1}
           linkCurvature={0.1}
 
-          onNodeClick={(node: any) => {
+          onNodeClick={(node) => {
             if (activePath) return;
+            const nodeId = node.id === undefined ? null : String(node.id);
+            if (!nodeId) {
+              return;
+            }
             if (document.activeElement instanceof HTMLElement) {
               selectedNodeReturnFocusRef.current = document.activeElement;
             }
-            setSelectedNodeId(node.id);
-            setDialogTrackerInUrl(node.id);
-            fgRef.current.centerAt(node.x, node.y, 1000);
-            fgRef.current.zoom(2.5, 2000);
+            setDialogTrackerInUrl(nodeId);
+            if (
+              typeof node.x === "number"
+              && typeof node.y === "number"
+              && fgRef.current
+            ) {
+              fgRef.current.centerAt(node.x, node.y, 1000);
+              fgRef.current.zoom(2.5, 2000);
+            }
           }}
 
           onBackgroundClick={() => {
@@ -965,19 +1004,22 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             }
           }}
 
-          nodeCanvasObject={(node: any, ctx, globalScale) => {
-            const label = node.id;
+          nodeCanvasObject={(node, ctx, globalScale) => {
+            const nodeId = node.id === undefined ? "" : String(node.id);
+            const label = nodeId;
             const fontSize = 12 / globalScale;
 
-            const isDimmed = activePath && !activePath.includes(node.id);
-            const isPathNode = activePath && activePath.includes(node.id);
-            const isCollectionNode = !activePath && collectionNodes.includes(node.id);
-            const isRingNeighbor = isRingMode && collectionNeighbors.has(node.id);
+            const isDimmed = activePath && !activePath.includes(nodeId);
+            const isPathNode = activePath && activePath.includes(nodeId);
+            const isCollectionNode = !activePath && collectionNodes.includes(nodeId);
+            const isRingNeighbor = isRingMode && collectionNeighbors.has(nodeId);
             const isRingDistant = isRingMode && !isCollectionNode && !isRingNeighbor;
+            const nodeX = typeof node.x === "number" ? node.x : 0;
+            const nodeY = typeof node.y === "number" ? node.y : 0;
 
             ctx.globalAlpha = isDimmed ? 0.1 : 1;
             ctx.beginPath();
-            ctx.arc(node.x, node.y, 5, 0, 2 * Math.PI, false);
+            ctx.arc(nodeX, nodeY, 5, 0, 2 * Math.PI, false);
 
             if (isPathNode) ctx.fillStyle = pathColor;
             else if (isCollectionNode) ctx.fillStyle = collectionColor;
@@ -1007,7 +1049,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 ctx.fillStyle = textColor;
                 ctx.font = `500 ${fontSize}px ${fontFace}`;
               }
-              ctx.fillText(label, node.x, node.y + 8);
+              ctx.fillText(label, nodeX, nodeY + 8);
             }
           }}
         />
@@ -1046,7 +1088,6 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
               renderReqs={renderReqs}
               onOpenTracker={(tracker) => {
                 const targetNode = data.nodes.find((graphNode) => graphNode.id === tracker);
-                setSelectedNodeId(tracker);
                 setDialogTrackerInUrl(tracker);
                 if (
                   targetNode
