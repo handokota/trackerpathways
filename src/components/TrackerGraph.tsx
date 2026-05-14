@@ -1,11 +1,20 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useTheme } from "next-themes";
-import { DataStructure, RouteDetail } from "@/types";
+import { DataStructure } from "@/types";
 import { findShortestPath } from "@/lib/graphUtils";
+import {
+  OfficialInvitesData,
+  getActiveInviteCountBySource,
+  getInvitedFromForSource,
+  getOfficialInvitesForSource,
+  getTrackerAbbr,
+  parseRequirementSections,
+} from "@/lib/officialInvites";
+import OfficialInvitesContent from "@/components/shared/OfficialInvitesContent";
 
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
   ssr: false,
@@ -28,30 +37,6 @@ interface CollectionPathOption {
   stepDays: Array<number | null>;
 }
 
-interface UnlockRequirementSection {
-  key: string;
-  rank: string;
-  requirements: string[];
-  requirementText: string;
-}
-
-interface OfficialInviteEntry {
-  tracker: string;
-  details: RouteDetail;
-  officialInvites: number;
-}
-
-type OfficialInvitesTab = "canInviteTo" | "invitedFrom";
-type DialogSortByOption = "officialInvites" | "alphabetical";
-type SortDirection = "asc" | "desc";
-
-interface OfficialInvitesPanelData {
-  sourceName: string;
-  sections: UnlockRequirementSection[];
-  canInviteTo: OfficialInviteEntry[];
-  invitedFrom: OfficialInviteEntry[];
-}
-
 export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   const { resolvedTheme } = useTheme();
   const router = useRouter();
@@ -61,11 +46,6 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   const [fontFace, setFontFace] = useState("sans-serif");
 
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [officialInvitesTab, setOfficialInvitesTab] = useState<OfficialInvitesTab>("canInviteTo");
-  const [officialInvitesSortBy, setOfficialInvitesSortBy] = useState<DialogSortByOption>("officialInvites");
-  const [officialInvitesSortDirection, setOfficialInvitesSortDirection] = useState<SortDirection>("desc");
-  const [isUnlockAccordionOpen, setIsUnlockAccordionOpen] = useState(true);
-  const [expandedOfficialInviteCards, setExpandedOfficialInviteCards] = useState<Record<string, boolean>>({});
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   const [pathStart, setPathStart] = useState<string>("");
@@ -308,56 +288,12 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     }
   }, [collectionActiveIndex]);
 
-  const activeInviteCountBySource = useMemo(() => {
-    const counts: { [key: string]: number } = {};
-    Object.keys(rawData.routeInfo).forEach(sourceName => {
-      counts[sourceName] = Object.values(rawData.routeInfo[sourceName] || {})
-        .filter(route => route.active.toLowerCase() === "yes")
-        .length;
-    });
-    return counts;
-  }, [rawData]);
+  const activeInviteCountBySource = useMemo(
+    () => getActiveInviteCountBySource(rawData.routeInfo),
+    [rawData]
+  );
 
-  const parseRequirementSections = (text: string, keyPrefix: string): UnlockRequirementSection[] => {
-    if (!text.trim()) {
-      return [];
-    }
-
-    return text
-      .replace(
-        /(\d+(?:\.\d+)?\s*(?:years?|yrs?|y|months?|mos?|weeks?|w|days?|d)\b)\s+or\s+([A-Za-z_+\- ]+),\s*(\d+(?:\.\d+)?\s*(?:years?|yrs?|y|months?|mos?|weeks?|w|days?|d)\b)/gi,
-        "$1; $2: $3"
-      )
-      .replace(/,?\s*or\s+([A-Za-z0-9_+\- ]+):/gi, "; $1:")
-      .split(";")
-      .map(part => part.trim())
-      .filter(part => part.length > 0)
-      .map((part, index) => {
-        const rankMatch = part.match(/^([A-Za-z0-9_+\- ]{1,40}):\s+(.+)$/);
-        const potentialRank = rankMatch?.[1].trim() || "";
-        const isRankPrefix = Boolean(
-          rankMatch
-          && potentialRank.split(/\s+/).length <= 4
-          && !/requirements?/i.test(potentialRank)
-        );
-        const rank = isRankPrefix ? potentialRank : "";
-        const requirementText = isRankPrefix && rankMatch ? rankMatch[2].trim() : part;
-
-        const rawRequirements = requirementText
-          .split(",")
-          .map(item => item.trim())
-          .filter(item => item.length > 0);
-
-        return {
-          key: `${keyPrefix}-${index}`,
-          rank,
-          requirements: rawRequirements,
-          requirementText: requirementText,
-        };
-      });
-  };
-
-  const getUnlockRequirementSections = (sourceName: string): UnlockRequirementSection[] => {
+  const getUnlockRequirementSections = (sourceName: string) => {
     const unlockInfo = rawData.unlockInviteClass[sourceName];
     if (!unlockInfo) {
       return [];
@@ -366,34 +302,17 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     return parseRequirementSections(unlockInfo[1], sourceName);
   };
 
-  const selectedNodeOfficialData: OfficialInvitesPanelData | null = selectedNodeId ? (() => {
-    const canInviteTo = Object.entries(rawData.routeInfo[selectedNodeId] || {})
-      .filter(([, route]) => route.active.toLowerCase() === "yes")
-      .map(([target, details]) => ({
-        tracker: target,
-        details,
-        officialInvites: activeInviteCountBySource[target] || 0,
-      }))
-      .sort((a, b) => {
-        if (a.officialInvites !== b.officialInvites) {
-          return b.officialInvites - a.officialInvites;
-        }
-        return a.tracker.localeCompare(b.tracker);
-      });
-
-    const invitedFrom = Object.entries(rawData.routeInfo)
-      .filter(([, routes]) => routes[selectedNodeId]?.active.toLowerCase() === "yes")
-      .map(([tracker, routes]) => ({
-        tracker,
-        details: routes[selectedNodeId] as RouteDetail,
-        officialInvites: activeInviteCountBySource[tracker] || 0,
-      }))
-      .sort((a, b) => {
-        if (a.officialInvites !== b.officialInvites) {
-          return b.officialInvites - a.officialInvites;
-        }
-        return a.tracker.localeCompare(b.tracker);
-      });
+  const selectedNodeOfficialData: OfficialInvitesData | null = selectedNodeId ? (() => {
+    const canInviteTo = getOfficialInvitesForSource(
+      rawData.routeInfo,
+      selectedNodeId,
+      activeInviteCountBySource
+    );
+    const invitedFrom = getInvitedFromForSource(
+      rawData.routeInfo,
+      selectedNodeId,
+      activeInviteCountBySource
+    );
 
     return {
       sourceName: selectedNodeId,
@@ -403,27 +322,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     };
   })() : null;
 
-  const sortedPanelInvites = useMemo(() => {
-    if (!selectedNodeOfficialData) {
-      return [];
-    }
-
-    const directionMultiplier = officialInvitesSortDirection === "asc" ? 1 : -1;
-    const currentInvites = officialInvitesTab === "canInviteTo"
-      ? selectedNodeOfficialData.canInviteTo
-      : selectedNodeOfficialData.invitedFrom;
-
-    return [...currentInvites].sort((a, b) => {
-      if (officialInvitesSortBy === "officialInvites") {
-        if (a.officialInvites !== b.officialInvites) {
-          return (a.officialInvites - b.officialInvites) * directionMultiplier;
-        }
-      }
-      return a.tracker.localeCompare(b.tracker) * (officialInvitesSortBy === "alphabetical" ? directionMultiplier : 1);
-    });
-  }, [officialInvitesSortBy, officialInvitesSortDirection, officialInvitesTab, selectedNodeOfficialData]);
-
-  const setDialogTrackerInUrl = (trackerName: string | null, method: "push" | "replace" = "push") => {
+  const setDialogTrackerInUrl = useCallback((trackerName: string | null, method: "push" | "replace" = "push") => {
     const params = new URLSearchParams(searchParams.toString());
     if (trackerName) {
       params.set("tracker", trackerName);
@@ -439,7 +338,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     }
 
     router.push(nextUrl, { scroll: false });
-  };
+  }, [pathname, router, searchParams]);
 
   useEffect(() => {
     if (activePath) {
@@ -467,10 +366,6 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
       return;
     }
 
-    setOfficialInvitesTab("canInviteTo");
-    setOfficialInvitesSortBy("officialInvites");
-    setIsUnlockAccordionOpen(true);
-    setExpandedOfficialInviteCards({});
     setSelectedNodeId(trackerParam);
     if (
       typeof targetNode.x === "number"
@@ -480,28 +375,9 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
       fgRef.current.centerAt(targetNode.x, targetNode.y, 1000);
       fgRef.current.zoom(2.5, 2000);
     }
-  }, [activePath, data.nodes, searchParams]);
+  }, [activePath, data.nodes, searchParams, selectedNodeId, setDialogTrackerInUrl]);
 
-  const getAbbr = (name: string) => {
-    if (rawData.abbrList && rawData.abbrList[name]) return rawData.abbrList[name];
-    const capitals = name.match(/[A-Z]/g);
-    if (capitals && capitals.length >= 2) return capitals.join("");
-    return name.substring(0, 3).toUpperCase();
-  };
-
-  const getStatusColor = (status: string) => {
-    const s = status.toLowerCase();
-    if (s === "yes" || s === "open") return "text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30";
-    if (s === "no" || s === "closed") return "text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/30";
-    return "text-orange-700 dark:text-orange-300 bg-orange-100 dark:bg-orange-900/30";
-  };
-
-  const getStatusLabel = (status: string) => {
-    const s = status.toLowerCase();
-    if (s === "yes") return "Recruiting";
-    if (s === "no") return "Closed";
-    return status;
-  };
+  const getAbbr = (name: string) => getTrackerAbbr(name, rawData.abbrList);
 
   const renderReqs = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -646,8 +522,6 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   const distantTextColor = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)";
 
   const isRingMode = collectionNodes.length > 0 && !activePath && !selectedNodeId;
-  const badgeClass = "flex items-center gap-1.5 text-xs font-semibold text-foreground/80 bg-foreground/10 px-2 py-0.5 rounded-md shrink-0 whitespace-nowrap";
-
   return (
     <div ref={containerRef} className="relative w-full h-full overflow-hidden bg-background">
 
@@ -1058,10 +932,6 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
 
           onNodeClick={(node: any) => {
             if (activePath) return;
-            setOfficialInvitesTab("canInviteTo");
-            setOfficialInvitesSortBy("officialInvites");
-            setIsUnlockAccordionOpen(true);
-            setExpandedOfficialInviteCards({});
             setSelectedNodeId(node.id);
             setDialogTrackerInUrl(node.id);
             fgRef.current.centerAt(node.x, node.y, 1000);
@@ -1140,270 +1010,27 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 md:p-5 space-y-4 md:space-y-6 custom-scrollbar">
-            <div className="rounded-lg border border-foreground/10 bg-foreground/5 p-3">
-              <button
-                type="button"
-                onClick={() => setIsUnlockAccordionOpen(current => !current)}
-                className="w-full flex items-center justify-between gap-2 text-left text-sm font-semibold text-foreground cursor-pointer"
-                aria-expanded={isUnlockAccordionOpen}
-              >
-                <span>Official invite forum unlock requirements</span>
-                <span className={`material-symbols-rounded text-lg text-foreground/60 transition-transform duration-200 ${isUnlockAccordionOpen ? "rotate-180" : ""}`}>
-                  keyboard_arrow_down
-                </span>
-              </button>
-              <div
-                className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
-                  isUnlockAccordionOpen ? "grid-rows-[1fr] opacity-100 mt-2.5" : "grid-rows-[0fr] opacity-0 mt-0"
-                }`}
-              >
-                <div className="overflow-hidden space-y-2.5">
-                  {selectedNodeOfficialData.sections.length > 0 ? (
-                    <div className="space-y-2.5">
-                      {selectedNodeOfficialData.sections.map((section, sectionIndex) => (
-                        <div key={section.key}>
-                          {sectionIndex > 0 && (
-                            <div className="flex items-center justify-center my-2">
-                              <span className="text-xs font-semibold text-foreground/40 uppercase">or</span>
-                            </div>
-                          )}
-                          <div className="rounded-lg border border-foreground/10 bg-card p-3">
-                            <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
-                              {section.rank ? (
-                                <h4 className="text-sm font-semibold text-foreground wrap-break-words">{section.rank}</h4>
-                              ) : (
-                                <h4 className="text-sm font-semibold text-foreground">Requirements</h4>
-                              )}
-                            </div>
-
-                            {section.requirements.length > 0 ? (
-                              <ul className="space-y-1.5 min-w-0">
-                                {section.requirements.map((requirement, requirementIndex) => (
-                                  <li key={`${section.key}-${requirementIndex}`} className="text-sm text-foreground/80 leading-snug flex items-start gap-2">
-                                    <span className="mt-[7px] h-1 w-1 rounded-full bg-foreground/45 shrink-0" />
-                                    <span className="wrap-break-words min-w-0 flex-1">{renderReqs(requirement)}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : (
-                              <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
-                                {section.requirementText ? renderReqs(section.requirementText) : "No additional requirements."}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-foreground/70">No specific requirements were provided.</p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-foreground/10 bg-foreground/5 p-3">
-              <div className="flex flex-col gap-3 mb-3">
-                <div className="grid grid-cols-2 gap-2 w-full">
-                  <button
-                    type="button"
-                    onClick={() => setOfficialInvitesTab("canInviteTo")}
-                    className={`justify-center w-full inline-flex items-center gap-1.5 px-2 py-1.5 rounded-md text-xs font-semibold transition-colors ${
-                      officialInvitesTab === "canInviteTo"
-                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                        : "bg-foreground/8 text-foreground/70 border border-foreground/10 hover:bg-foreground/12"
-                    }`}
-                  >
-                    <span className="material-symbols-rounded text-sm shrink-0">outbound</span>
-                    <span className="truncate">Can Invite To ({selectedNodeOfficialData.canInviteTo.length})</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setOfficialInvitesTab("invitedFrom")}
-                    className={`justify-center w-full inline-flex items-center gap-1.5 px-2 py-1.5 rounded-md text-xs font-semibold transition-colors ${
-                      officialInvitesTab === "invitedFrom"
-                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                        : "bg-foreground/8 text-foreground/70 border border-foreground/10 hover:bg-foreground/12"
-                    }`}
-                  >
-                    <span className="material-symbols-rounded text-sm shrink-0">south_west</span>
-                    <span className="truncate">Invited From ({selectedNodeOfficialData.invitedFrom.length})</span>
-                  </button>
-                </div>
-                <div className="flex items-center justify-between gap-2 w-full pt-3 border-t border-foreground/5">
-                  <span className="text-xs font-semibold text-foreground/60 shrink-0">Sort by</span>
-                  <div className="relative flex-1">
-                    <select
-                      value={officialInvitesSortBy}
-                      onChange={(event) => {
-                        const nextSortBy = event.target.value as DialogSortByOption;
-                        setOfficialInvitesSortBy(nextSortBy);
-                        setOfficialInvitesSortDirection(nextSortBy === "officialInvites" ? "desc" : "asc");
-                      }}
-                      className="w-full h-8 appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-2.5 pr-7 text-xs font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
-                      aria-label="Sort dialog invite trackers"
-                    >
-                      <option value="officialInvites">Official Invites</option>
-                      <option value="alphabetical">Alphabetical</option>
-                    </select>
-                    <span className="pointer-events-none material-symbols-rounded absolute right-1.5 top-1/2 -translate-y-1/2 text-sm text-foreground/50">
-                      expand_more
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setOfficialInvitesSortDirection((current) => current === "asc" ? "desc" : "asc")}
-                    className="relative group shrink-0 h-8 w-8 inline-flex items-center justify-center rounded-md border border-foreground/10 bg-foreground/5 text-foreground/70 outline-none transition-colors hover:border-foreground/20 focus-visible:border-foreground/30"
-                    aria-label={`Sort ${officialInvitesSortDirection === "asc" ? "ascending" : "descending"}`}
-                  >
-                    <span className="material-symbols-rounded text-sm">
-                      {officialInvitesSortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
-                    </span>
-                  </button>
-                </div>
-              </div>
-              {sortedPanelInvites.length > 0 ? (
-                <div className="space-y-2.5">
-                  {sortedPanelInvites.map((invite) => {
-                    const joinRequirementSections = parseRequirementSections(
-                      invite.details.reqs || "",
-                      `${selectedNodeOfficialData.sourceName}-${invite.tracker}-${officialInvitesTab}`
-                    );
-                    const inviteCardKey = `${selectedNodeOfficialData.sourceName}:${officialInvitesTab}:${invite.tracker}`;
-                    const isInviteCardOpen = expandedOfficialInviteCards[inviteCardKey] ?? true;
-
-                    return (
-                    <div key={invite.tracker} className="rounded-lg border border-foreground/10 bg-card p-3">
-                      <div
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => setExpandedOfficialInviteCards((current) => ({
-                          ...current,
-                          [inviteCardKey]: !(current[inviteCardKey] ?? true),
-                        }))}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter" || event.key === " ") {
-                            event.preventDefault();
-                            setExpandedOfficialInviteCards((current) => ({
-                              ...current,
-                              [inviteCardKey]: !(current[inviteCardKey] ?? true),
-                            }));
-                          }
-                        }}
-                        className="flex items-center justify-between gap-3 cursor-pointer rounded-md -mx-1 px-1 py-0.5"
-                        aria-expanded={isInviteCardOpen}
-                        aria-label={`${isInviteCardOpen ? "Collapse" : "Expand"} ${invite.tracker} details`}
-                      >
-                        <div className="flex flex-wrap items-center gap-2 min-w-0 flex-1">
-                          <h4 className="text-sm font-semibold text-foreground truncate max-w-full">{invite.tracker}</h4>
-                          <span className={badgeClass}>
-                            {getAbbr(invite.tracker)}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              const targetNode = data.nodes.find((graphNode) => graphNode.id === invite.tracker);
-                              setOfficialInvitesTab("canInviteTo");
-                              setOfficialInvitesSortBy("officialInvites");
-                              setIsUnlockAccordionOpen(true);
-                              setExpandedOfficialInviteCards({});
-                              setSelectedNodeId(invite.tracker);
-                              setDialogTrackerInUrl(invite.tracker);
-                              if (
-                                targetNode
-                                && typeof targetNode.x === "number"
-                                && typeof targetNode.y === "number"
-                                && fgRef.current
-                              ) {
-                                fgRef.current.centerAt(targetNode.x, targetNode.y, 1000);
-                                fgRef.current.zoom(2.5, 2000);
-                              }
-                            }}
-                            className="relative group inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-900/40 transition-colors cursor-pointer shrink-0"
-                            aria-label={`Open official invites for ${invite.tracker}`}
-                          >
-                            <span className="material-symbols-rounded text-sm">outbound</span>
-                            <span>{invite.officialInvites}</span>
-                          </button>
-                        </div>
-                        
-                        <div className="flex items-center shrink-0 ml-1">
-                          <span className={`material-symbols-rounded text-lg text-foreground/60 transition-transform duration-200 ${isInviteCardOpen ? "rotate-180" : ""}`}>
-                            keyboard_arrow_down
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div
-                        className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
-                          isInviteCardOpen ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0 mt-0"
-                        }`}
-                      >
-                        <div className="overflow-hidden pt-1">
-                          {joinRequirementSections.length > 0 ? (
-                            <div className="space-y-2">
-                              {joinRequirementSections.map((section, sectionIndex) => (
-                                <div key={section.key}>
-                                  {sectionIndex > 0 && (
-                                    <div className="flex items-center gap-2 py-1">
-                                      <span className="h-px flex-1 bg-foreground/10" />
-                                      <span className="text-[10px] font-semibold text-foreground/40 uppercase">or</span>
-                                      <span className="h-px flex-1 bg-foreground/10" />
-                                    </div>
-                                  )}
-                                  {section.rank && (
-                                    <div className="mb-2">
-                                      <h5 className="text-sm font-semibold text-foreground wrap-break-words">{section.rank}</h5>
-                                    </div>
-                                  )}
-                                  {section.requirements.length > 0 ? (
-                                    <ul className="space-y-1.5 min-w-0">
-                                      {section.requirements.map((requirement, requirementIndex) => (
-                                        <li key={`${section.key}-join-${requirementIndex}`} className="text-sm text-foreground/80 leading-snug flex items-start gap-2">
-                                          <span className="mt-[7px] h-1 w-1 rounded-full bg-foreground/45 shrink-0" />
-                                          <span className="wrap-break-words min-w-0 flex-1">{renderReqs(requirement)}</span>
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  ) : (
-                                    <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
-                                      {renderReqs(section.requirementText || "No specific requirements.")}
-                                    </p>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
-                              No specific requirements.
-                            </p>
-                          )}
-                          
-                          <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-foreground/5 border-dashed">
-                            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
-                              <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${getStatusColor(invite.details.active)}`}>
-                                {getStatusLabel(invite.details.active)}
-                              </span>
-                              <div className="flex items-center gap-1 text-foreground/30">
-                                <span className="text-xs font-medium">Checked: {invite.details.updated}</span>
-                              </div>
-                            </div>
-                          </div>
-
-                        </div>
-                      </div>
-                    </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="text-sm text-foreground/70 text-center py-4 border border-dashed border-foreground/10 rounded-lg">
-                  {officialInvitesTab === "canInviteTo"
-                    ? "No active official invites were found for this tracker."
-                    : "No active invite routes into this tracker were found."}
-                </p>
-              )}
-            </div>
+            <OfficialInvitesContent
+              key={selectedNodeOfficialData.sourceName}
+              data={selectedNodeOfficialData}
+              layout="panel"
+              getAbbr={getAbbr}
+              renderReqs={renderReqs}
+              onOpenTracker={(tracker) => {
+                const targetNode = data.nodes.find((graphNode) => graphNode.id === tracker);
+                setSelectedNodeId(tracker);
+                setDialogTrackerInUrl(tracker);
+                if (
+                  targetNode
+                  && typeof targetNode.x === "number"
+                  && typeof targetNode.y === "number"
+                  && fgRef.current
+                ) {
+                  fgRef.current.centerAt(targetNode.x, targetNode.y, 1000);
+                  fgRef.current.zoom(2.5, 2000);
+                }
+              }}
+            />
           </div>
         </aside>
       )}
