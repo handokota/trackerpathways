@@ -6,6 +6,9 @@ const data = rawData as unknown as DataStructure;
 const MAX_API_JUMPS = 8;
 const MAX_API_DAYS = 3650;
 const MAX_PATHS_LIMIT = 999;
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX_REQUESTS = 60;
+const RATE_LIMIT_MAX_BUCKETS = 5000;
 const allTrackerKeys = Object.keys(data.routeInfo);
 const allTrackers = Array.from(new Set([
   ...allTrackerKeys,
@@ -15,6 +18,19 @@ const allTrackers = Array.from(new Set([
 interface RouteSearchResult extends PathResult {
   stepDays: Array<number | null>;
 }
+
+interface RateLimitBucket {
+  count: number;
+  resetAt: number;
+}
+
+interface RateLimitResult {
+  allowed: boolean;
+  remaining: number;
+  resetAt: number;
+}
+
+const rateLimitBuckets = new Map<string, RateLimitBucket>();
 
 const getAbbr = (name: string) => {
   if (data.abbrList[name]) return data.abbrList[name];
@@ -45,7 +61,93 @@ const parseAndValidatePositiveInt = (
   return parsed;
 };
 
+const getClientIdentifier = (request: Request): string => {
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  if (forwardedFor) {
+    const firstIp = forwardedFor.split(",")[0]?.trim();
+    if (firstIp) {
+      return firstIp;
+    }
+  }
+
+  const realIp = request.headers.get("x-real-ip")?.trim();
+  if (realIp) {
+    return realIp;
+  }
+
+  const connectingIp = request.headers.get("cf-connecting-ip")?.trim();
+  if (connectingIp) {
+    return connectingIp;
+  }
+
+  const userAgent = request.headers.get("user-agent")?.trim() || "unknown-agent";
+  return `unknown:${userAgent}`;
+};
+
+const pruneExpiredRateLimitBuckets = (now: number) => {
+  if (rateLimitBuckets.size < RATE_LIMIT_MAX_BUCKETS) {
+    return;
+  }
+
+  for (const [key, bucket] of rateLimitBuckets.entries()) {
+    if (bucket.resetAt <= now) {
+      rateLimitBuckets.delete(key);
+    }
+  }
+};
+
+const consumeRateLimit = (clientKey: string, now: number): RateLimitResult => {
+  pruneExpiredRateLimitBuckets(now);
+
+  const existingBucket = rateLimitBuckets.get(clientKey);
+  if (!existingBucket || existingBucket.resetAt <= now) {
+    const resetAt = now + RATE_LIMIT_WINDOW_MS;
+    rateLimitBuckets.set(clientKey, { count: 1, resetAt });
+    return {
+      allowed: true,
+      remaining: RATE_LIMIT_MAX_REQUESTS - 1,
+      resetAt,
+    };
+  }
+
+  if (existingBucket.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return {
+      allowed: false,
+      remaining: 0,
+      resetAt: existingBucket.resetAt,
+    };
+  }
+
+  existingBucket.count += 1;
+  rateLimitBuckets.set(clientKey, existingBucket);
+  return {
+    allowed: true,
+    remaining: RATE_LIMIT_MAX_REQUESTS - existingBucket.count,
+    resetAt: existingBucket.resetAt,
+  };
+};
+
+const buildRateLimitHeaders = (rateLimit: RateLimitResult) => ({
+  "X-RateLimit-Limit": RATE_LIMIT_MAX_REQUESTS.toString(),
+  "X-RateLimit-Remaining": rateLimit.remaining.toString(),
+  "X-RateLimit-Reset": Math.ceil(rateLimit.resetAt / 1000).toString(),
+});
+
+const buildRateLimitExceededHeaders = (rateLimit: RateLimitResult, now: number) => ({
+  ...buildRateLimitHeaders(rateLimit),
+  "Retry-After": Math.max(1, Math.ceil((rateLimit.resetAt - now) / 1000)).toString(),
+});
+
 export async function GET(request: Request) {
+  const now = Date.now();
+  const rateLimit = consumeRateLimit(getClientIdentifier(request), now);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again in a minute." },
+      { status: 429, headers: buildRateLimitExceededHeaders(rateLimit, now) }
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   const sourceRaw = searchParams.get("source") || "";
   const targetRaw = searchParams.get("target") || "";
@@ -59,14 +161,14 @@ export async function GET(request: Request) {
   if (maxJumps === null) {
     return NextResponse.json(
       { error: `Invalid jumps value. Use an integer between 1 and ${MAX_API_JUMPS}.` },
-      { status: 400 }
+      { status: 400, headers: buildRateLimitHeaders(rateLimit) }
     );
   }
 
   if (maxDaysStr && maxDays === null) {
     return NextResponse.json(
       { error: `Invalid days value. Use an integer between 1 and ${MAX_API_DAYS}.` },
-      { status: 400 }
+      { status: 400, headers: buildRateLimitHeaders(rateLimit) }
     );
   }
 
@@ -77,7 +179,7 @@ export async function GET(request: Request) {
   const tQuery = targetRaw.toLowerCase().trim();
 
   if (!sQueryRaw && !tQuery) {
-    return NextResponse.json([]);
+    return NextResponse.json([], { headers: buildRateLimitHeaders(rateLimit) });
   }
 
   const isStrictTarget = strictTrackerIdentifiers.has(tQuery);
@@ -186,6 +288,7 @@ export async function GET(request: Request) {
   return NextResponse.json(results, {
     headers: {
       "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+      ...buildRateLimitHeaders(rateLimit),
     },
   });
 }
