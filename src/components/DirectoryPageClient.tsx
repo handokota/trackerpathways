@@ -16,6 +16,7 @@ import {
 import OfficialInvitesDialog from "@/components/shared/OfficialInvitesDialog";
 import SortDirectionButton from "@/components/shared/SortDirectionButton";
 import OfficialInvitesBadge from "@/components/shared/OfficialInvitesBadge";
+import UiState from "@/components/shared/UiState";
 
 const data = rawData as unknown as DataStructure;
 const TRACKERS_PAGE_SIZE = 20;
@@ -294,20 +295,17 @@ export default function DirectoryPageClient() {
 
           {hasMoreTrackers && (
             <div ref={directoryLoadMoreRef} className="h-10 flex items-center justify-center">
-              <div className="inline-flex items-center gap-1.5 text-sm text-foreground/50">
-                <span className="material-symbols-rounded text-sm animate-spin">progress_activity</span>
-                <span>Loading more trackers...</span>
-              </div>
+              <UiState kind="loading" title="Loading results" layout="inline" />
             </div>
           )}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-20 opacity-50 border-2 border-dashed border-foreground/10 rounded-xl">
-          <span className="material-symbols-rounded text-6xl mb-4 text-foreground/20">search_off</span>
-          <p className="text-foreground/50 font-medium">
-            No trackers found matching &quot;{search}&quot;
-          </p>
-        </div>
+        <UiState
+          kind="empty"
+          title="No trackers found"
+          description={`No match for "${search}". Try another tracker name or abbreviation.`}
+          className="py-20"
+        />
       )}
 
       {officialInvitesDialog && (

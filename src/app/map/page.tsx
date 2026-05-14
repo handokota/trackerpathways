@@ -5,6 +5,7 @@ import { DataStructure } from "@/types";
 import { transformDataToGraph } from "@/lib/graphUtils";
 import TrackerGraph from "@/components/TrackerGraph";
 import FullScreenShell from "@/components/layout/FullScreenShell";
+import UiState from "@/components/shared/UiState";
 
 export const metadata: Metadata = {
   title: "Tracker Map - Visual Network",
@@ -18,7 +19,7 @@ export default function MapPage() {
 
   return (
     <FullScreenShell>
-      <Suspense fallback={<div className="w-full h-full" />}>
+      <Suspense fallback={<UiState kind="loading" title="Loading page" className="h-full rounded-none border-0 bg-transparent" />}>
         <TrackerGraph data={graphData} rawData={data} />
       </Suspense>
     </FullScreenShell>

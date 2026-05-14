@@ -19,6 +19,7 @@ import {
 import OfficialInvitesDialog from "@/components/shared/OfficialInvitesDialog";
 import SortDirectionButton from "@/components/shared/SortDirectionButton";
 import OfficialInvitesBadge from "@/components/shared/OfficialInvitesBadge";
+import UiState from "@/components/shared/UiState";
 
 const data = rawData as unknown as DataStructure;
 const PATHS_PAGE_SIZE = 12;
@@ -949,10 +950,7 @@ export default function TrackerSearchApp() {
             <div className="flex flex-col gap-1 min-w-0">
               <h2 className="text-base md:text-lg font-bold text-foreground tracking-tight">Search Results</h2>
               {isLoading || isStale ? (
-                <div className="flex items-center gap-1.5 text-sm text-foreground/50">
-                  <span className="material-symbols-rounded text-[15px] animate-spin">progress_activity</span>
-                  <span>Updating search results...</span>
-                </div>
+                <UiState kind="loading" title="Loading results" layout="inline" />
               ) : (
                 <p className="text-sm font-medium text-foreground/60 truncate">
                   Found <span className="text-foreground/80 font-semibold">{sortedSourceNames.length}</span> source{sortedSourceNames.length === 1 ? '' : 's'} and <span className="text-foreground/80 font-semibold">{foundPaths.length}</span> route{foundPaths.length === 1 ? '' : 's'}
@@ -1182,19 +1180,16 @@ export default function TrackerSearchApp() {
             })}
             
             {!searchError && !isStale && !isLoading && foundPaths.length === 0 && (sourceSearch || targetSearch) && (
-              <div className="flex flex-col items-center justify-center py-20 opacity-50 border-2 border-dashed border-foreground/10 rounded-lg">
-                <span className="material-symbols-rounded text-6xl mb-4 text-foreground/20">search_off</span>
-                <p className="text-foreground/50 font-medium">
-                  No routes found matching your criteria
-                </p>
-              </div>
+              <UiState
+                kind="empty"
+                title="No routes found"
+                description="Try a different source, target, or filter."
+                className="py-20"
+              />
             )}
 
             {searchError && (
-              <div className="flex items-start gap-3 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-300">
-                <span className="material-symbols-rounded text-base">error</span>
-                <span>{searchError}</span>
-              </div>
+              <UiState kind="error" title="Could not load routes" description={searchError} />
             )}
           </div>
         </div>

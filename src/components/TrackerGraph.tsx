@@ -15,10 +15,11 @@ import {
   parseRequirementSections,
 } from "@/lib/officialInvites";
 import OfficialInvitesContent from "@/components/shared/OfficialInvitesContent";
+import UiState from "@/components/shared/UiState";
 
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
   ssr: false,
-  loading: () => <div className="flex items-center justify-center h-full text-muted-foreground">Loading Graph...</div>,
+  loading: () => <UiState kind="loading" title="Loading graph" className="h-full rounded-none border-0 bg-transparent" />,
 });
 
 interface TrackerGraphProps {
@@ -691,9 +692,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
               </div>
 
               {useCollectionAsSource && pathEnd && collectionPathOptions.length === 0 && (
-                <div className="text-sm text-red-500 font-medium text-center py-1">
-                  No path found from My Trackers
-                </div>
+                <UiState kind="error" title="No path found from My Trackers" layout="inline" className="justify-center py-1" />
               )}
               {useCollectionAsSource && pathEnd && selectedCollectionPath && (
                 <div className="text-sm text-green-500 font-medium text-center py-1 flex items-center justify-center gap-1.5">
@@ -702,9 +701,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 </div>
               )}
               {!useCollectionAsSource && pathStart && pathEnd && !activePath && (
-                <div className="text-sm text-red-500 font-medium text-center py-1">
-                  No path found
-                </div>
+                <UiState kind="error" title="No path found" layout="inline" className="justify-center py-1" />
               )}
               {!useCollectionAsSource && pathStart && pathEnd && activePath && (
                 <div className="text-sm text-green-500 font-medium text-center py-1 flex items-center justify-center gap-1.5">
