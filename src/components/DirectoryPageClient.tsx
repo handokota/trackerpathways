@@ -35,29 +35,6 @@ export default function DirectoryPageClient() {
   const [visibleTrackersCount, setVisibleTrackersCount] = useState(TRACKERS_PAGE_SIZE);
   const directoryLoadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    if (!officialInvitesDialog) {
-      return;
-    }
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOfficialInvitesDialog(null);
-        const params = new URLSearchParams(searchParams.toString());
-        params.delete("tracker");
-        const nextQuery = params.toString();
-        router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
-      }
-    };
-
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", handleEscape);
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", handleEscape);
-    };
-  }, [officialInvitesDialog, pathname, router, searchParams]);
-
   const activeInviteCountBySource = useMemo(() => getActiveInviteCountBySource(data.routeInfo), []);
 
   const getUnlockRequirementSections = useCallback((sourceName: string) => {

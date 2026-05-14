@@ -16,6 +16,7 @@ import {
 } from "@/lib/officialInvites";
 import OfficialInvitesContent from "@/components/shared/OfficialInvitesContent";
 import UiState from "@/components/shared/UiState";
+import useFocusTrap from "@/hooks/useFocusTrap";
 
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
   ssr: false,
@@ -80,6 +81,9 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
   const [collectionActiveIndex, setCollectionActiveIndex] = useState(-1);
   const collectionWrapperRef = useRef<HTMLDivElement>(null);
   const collectionListRef = useRef<HTMLDivElement>(null);
+  const selectedNodePanelRef = useRef<HTMLElement>(null);
+  const selectedNodeCloseButtonRef = useRef<HTMLButtonElement>(null);
+  const selectedNodeReturnFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const savedCollection = localStorage.getItem("tracker-collection");
@@ -341,6 +345,20 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     router.push(nextUrl, { scroll: false });
   }, [pathname, router, searchParams]);
 
+  const closeSelectedNodePanel = useCallback(() => {
+    setSelectedNodeId(null);
+    setDialogTrackerInUrl(null);
+  }, [setDialogTrackerInUrl]);
+
+  const isOfficialPanelOpen = !activePath && Boolean(selectedNodeOfficialData);
+  useFocusTrap({
+    active: isOfficialPanelOpen,
+    containerRef: selectedNodePanelRef,
+    initialFocusRef: selectedNodeCloseButtonRef,
+    returnFocusRef: selectedNodeReturnFocusRef,
+    onEscape: closeSelectedNodePanel,
+  });
+
   useEffect(() => {
     if (activePath) {
       return;
@@ -367,6 +385,9 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
       return;
     }
 
+    if (document.activeElement instanceof HTMLElement) {
+      selectedNodeReturnFocusRef.current = document.activeElement;
+    }
     setSelectedNodeId(trackerParam);
     if (
       typeof targetNode.x === "number"
@@ -929,6 +950,9 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
 
           onNodeClick={(node: any) => {
             if (activePath) return;
+            if (document.activeElement instanceof HTMLElement) {
+              selectedNodeReturnFocusRef.current = document.activeElement;
+            }
             setSelectedNodeId(node.id);
             setDialogTrackerInUrl(node.id);
             fgRef.current.centerAt(node.x, node.y, 1000);
@@ -936,8 +960,9 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
           }}
 
           onBackgroundClick={() => {
-            setSelectedNodeId(null);
-            setDialogTrackerInUrl(null);
+            if (selectedNodeId !== null) {
+              closeSelectedNodePanel();
+            }
           }}
 
           nodeCanvasObject={(node: any, ctx, globalScale) => {
@@ -989,18 +1014,24 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
       </div>
 
       {!activePath && selectedNodeOfficialData && (
-        <aside className="absolute top-4 bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-md flex flex-col rounded-xl bg-card/90 backdrop-blur border border-foreground/10 z-10 overflow-hidden animate-in slide-in-from-right-10 fade-in duration-300">
+        <aside
+          ref={selectedNodePanelRef}
+          role="dialog"
+          aria-modal="false"
+          aria-labelledby="tracker-official-panel-title"
+          tabIndex={-1}
+          className="absolute top-4 bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-md flex flex-col rounded-xl bg-card/90 backdrop-blur border border-foreground/10 z-10 overflow-hidden animate-in slide-in-from-right-10 fade-in duration-300"
+        >
           <div className="flex items-center justify-between p-5 border-b border-foreground/10 shrink-0">
             <div className="min-w-0">
-              <h2 className="text-xl font-bold tracking-tight truncate pr-2">{selectedNodeOfficialData.sourceName}</h2>
+              <h2 id="tracker-official-panel-title" className="text-xl font-bold tracking-tight truncate pr-2">{selectedNodeOfficialData.sourceName}</h2>
               <p className="text-xs text-foreground/60 mt-0.5">Official invite forum and official invites</p>
             </div>
             <button
-              onClick={() => {
-                setSelectedNodeId(null);
-                setDialogTrackerInUrl(null);
-              }}
+              onClick={closeSelectedNodePanel}
+              ref={selectedNodeCloseButtonRef}
               className="p-1.5 rounded-md text-foreground/70 transition-colors hover:text-foreground"
+              aria-label="Close panel"
             >
               <span className="material-symbols-rounded text-lg">close</span>
             </button>

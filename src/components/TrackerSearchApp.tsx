@@ -276,29 +276,6 @@ export default function TrackerSearchApp() {
     }
   }, [collectionActiveIndex]);
 
-  useEffect(() => {
-    if (!officialInvitesDialog) {
-      return;
-    }
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOfficialInvitesDialog(null);
-        const params = new URLSearchParams(searchParams.toString());
-        params.delete("tracker");
-        const nextQuery = params.toString();
-        router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
-      }
-    };
-
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", handleEscape);
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", handleEscape);
-    };
-  }, [officialInvitesDialog, pathname, router, searchParams]);
-
   const getAbbr = useCallback((name: string) => getTrackerAbbr(name, data.abbrList), []);
 
   const allTrackers = useMemo(() => {

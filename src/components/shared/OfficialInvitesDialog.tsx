@@ -1,6 +1,10 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import type { OfficialInvitesData } from "@/lib/officialInvites";
 import OfficialInvitesContent from "@/components/shared/OfficialInvitesContent";
+import useFocusTrap from "@/hooks/useFocusTrap";
 
 interface OfficialInvitesDialogProps {
   data: OfficialInvitesData;
@@ -17,6 +21,25 @@ export default function OfficialInvitesDialog({
   getAbbr,
   renderReqs,
 }: OfficialInvitesDialogProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useFocusTrap({
+    active: true,
+    containerRef: dialogRef,
+    initialFocusRef: closeButtonRef,
+    onEscape: onClose,
+  });
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center md:items-center bg-black/55 backdrop-blur-sm p-0 md:p-4 animate-in fade-in duration-200 overscroll-none touch-none"
@@ -26,6 +49,8 @@ export default function OfficialInvitesDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="official-invites-dialog-title"
+        tabIndex={-1}
+        ref={dialogRef}
         className="w-full md:max-w-2xl max-h-[85dvh] rounded-t-2xl md:rounded-xl border border-foreground/15 bg-card flex flex-col overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-4 md:slide-in-from-bottom-0 duration-300 pointer-events-auto touch-auto"
         onClick={(event) => event.stopPropagation()}
       >
@@ -44,6 +69,7 @@ export default function OfficialInvitesDialog({
           <button
             type="button"
             onClick={onClose}
+            ref={closeButtonRef}
             className="p-1.5 rounded-md text-foreground/70 transition-colors hover:text-foreground"
             aria-label="Close dialog"
           >
