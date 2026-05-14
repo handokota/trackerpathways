@@ -4,6 +4,7 @@ import rawData from "@/data/trackers.json";
 import { DataStructure } from "@/types";
 import { transformDataToGraph } from "@/lib/graphUtils";
 import TrackerGraph from "@/components/TrackerGraph";
+import FullScreenShell from "@/components/layout/FullScreenShell";
 
 export const metadata: Metadata = {
   title: "Tracker Map - Visual Network",
@@ -16,10 +17,10 @@ export default function MapPage() {
   const graphData = transformDataToGraph(data);
 
   return (
-    <main className="fixed inset-0 top-16 w-full overflow-hidden bg-background">
+    <FullScreenShell>
       <Suspense fallback={<div className="w-full h-full" />}>
         <TrackerGraph data={graphData} rawData={data} />
       </Suspense>
-    </main>
+    </FullScreenShell>
   );
 }

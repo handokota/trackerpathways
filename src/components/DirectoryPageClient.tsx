@@ -346,7 +346,7 @@ export default function DirectoryPageClient() {
   }, [filteredTrackers.length, hasMoreTrackers, visibleTrackersCount]);
 
   return (
-    <main className="w-full px-6 pt-24 md:pt-32 pb-10 min-h-screen">
+    <section className="w-full">
       <div className="mb-8 md:mb-12 flex flex-col md:grid md:grid-cols-[minmax(0,1fr)_minmax(20rem,26rem)_minmax(0,1fr)] items-start md:items-end gap-4 md:gap-6">
         <div className="w-full">
           <h1 className="text-2xl font-bold tracking-tight mb-1 text-foreground">Tracker Directory</h1>
@@ -748,6 +748,6 @@ export default function DirectoryPageClient() {
           </div>
         </div>
       )}
-    </main>
+    </section>
   );
 }

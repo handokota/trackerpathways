@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import TrackerSearchApp from "@/components/TrackerSearchApp";
+import PageShell from "@/components/layout/PageShell";
 
 export const metadata: Metadata = {
   title: "Tracker Pathways - Discover the private tracker network",
@@ -9,10 +10,10 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main className="w-full px-6 pt-24 md:pt-32 pb-10">
+    <PageShell>
       <Suspense fallback={<div className="w-full min-h-[50vh]" />}>
         <TrackerSearchApp />
       </Suspense>
-    </main>
+    </PageShell>
   );
 }
