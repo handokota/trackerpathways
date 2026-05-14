@@ -5,7 +5,7 @@ import { DataStructure, PathResult } from "@/types";
 const data = rawData as unknown as DataStructure;
 const MAX_API_JUMPS = 8;
 const MAX_API_DAYS = 3650;
-const MAX_PATHS_LIMIT = 2000;
+const MAX_PATHS_LIMIT = 999;
 const allTrackerKeys = Object.keys(data.routeInfo);
 const allTrackers = Array.from(new Set([
   ...allTrackerKeys,
