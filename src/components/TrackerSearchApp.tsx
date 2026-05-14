@@ -143,6 +143,11 @@ export default function TrackerSearchApp() {
     if (trackerParam) params.set("tracker", trackerParam);
 
     const nextQuery = params.toString();
+    const currentQuery = searchParams.toString();
+    if (nextQuery === currentQuery) {
+      return;
+    }
+
     router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
   }, [deferredSource, deferredTarget, maxJumps, maxDays, sortBy, sortDirection, mounted, pathname, router, searchParams]);
 
@@ -586,7 +591,7 @@ export default function TrackerSearchApp() {
     }
   }, [deferredSource, deferredTarget, sortedSourceNames]);
 
-  const parseRequirementSections = (text: string, keyPrefix: string): UnlockRequirementSection[] => {
+  const parseRequirementSections = useCallback((text: string, keyPrefix: string): UnlockRequirementSection[] => {
     if (!text.trim()) {
       return [];
     }
@@ -623,16 +628,16 @@ export default function TrackerSearchApp() {
           requirementText: requirementText,
         };
       });
-  };
+  }, []);
 
-  const getUnlockRequirementSections = (sourceName: string): UnlockRequirementSection[] => {
+  const getUnlockRequirementSections = useCallback((sourceName: string): UnlockRequirementSection[] => {
     const unlockInfo = data.unlockInviteClass[sourceName];
     if (!unlockInfo) {
       return [];
     }
 
     return parseRequirementSections(unlockInfo[1], sourceName);
-  };
+  }, [parseRequirementSections]);
 
   const trackerCanInviteTo = useMemo(() => {
     const invitesByTracker: { [key: string]: OfficialInviteEntry[] } = {};
@@ -699,7 +704,7 @@ export default function TrackerSearchApp() {
     });
   }, [officialInvitesDialog, officialInvitesSortBy, officialInvitesSortDirection, officialInvitesTab]);
 
-  const setDialogTrackerInUrl = (trackerName: string | null, method: "push" | "replace" = "push") => {
+  const setDialogTrackerInUrl = useCallback((trackerName: string | null, method: "push" | "replace" = "push") => {
     const params = new URLSearchParams(searchParams.toString());
     if (trackerName) {
       params.set("tracker", trackerName);
@@ -715,9 +720,9 @@ export default function TrackerSearchApp() {
     }
 
     router.push(nextUrl, { scroll: false });
-  };
+  }, [pathname, router, searchParams]);
 
-  const openOfficialInvitesDialog = (sourceName: string, updateUrl = true) => {
+  const openOfficialInvitesDialog = useCallback((sourceName: string, updateUrl = true) => {
     setOfficialInvitesTab("canInviteTo");
     setOfficialInvitesSortBy("officialInvites");
     setOfficialInvitesSortDirection("desc");
@@ -733,14 +738,14 @@ export default function TrackerSearchApp() {
     if (updateUrl) {
       setDialogTrackerInUrl(sourceName);
     }
-  };
+  }, [getUnlockRequirementSections, setDialogTrackerInUrl, trackerCanInviteTo, trackerInvitedFrom]);
 
-  const closeOfficialInvitesDialog = (updateUrl = true) => {
+  const closeOfficialInvitesDialog = useCallback((updateUrl = true) => {
     setOfficialInvitesDialog(null);
     if (updateUrl) {
       setDialogTrackerInUrl(null);
     }
-  };
+  }, [setDialogTrackerInUrl]);
 
   useEffect(() => {
     const trackerParam = searchParams.get("tracker");
@@ -762,7 +767,7 @@ export default function TrackerSearchApp() {
     }
 
     openOfficialInvitesDialog(trackerParam, false);
-  }, [allTrackers, searchParams, trackerCanInviteTo, trackerInvitedFrom]);
+  }, [allTrackers, closeOfficialInvitesDialog, officialInvitesDialog, openOfficialInvitesDialog, searchParams, setDialogTrackerInUrl]);
 
 
   if (!mounted) return <div className="w-full" />;
