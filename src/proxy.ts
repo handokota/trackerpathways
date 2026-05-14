@@ -3,10 +3,18 @@ import type { NextRequest } from "next/server";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 
-function buildCsp() {
+const createNonce = () => {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return btoa(String.fromCharCode(...bytes));
+};
+
+function buildCsp(nonce?: string) {
   const scriptSrc = isDevelopment
     ? `'self' 'unsafe-eval' 'unsafe-inline'`
-    : `'self' 'unsafe-inline'`;
+    : nonce
+      ? `'self' 'nonce-${nonce}'`
+      : `'self'`;
 
   return [
     "default-src 'self'",
@@ -23,13 +31,22 @@ function buildCsp() {
 }
 
 export function proxy(request: NextRequest) {
+  const nonce = isDevelopment ? undefined : createNonce();
+  const csp = buildCsp(nonce);
+  const requestHeaders = new Headers(request.headers);
+
+  if (nonce) {
+    requestHeaders.set("x-nonce", nonce);
+  }
+  requestHeaders.set("Content-Security-Policy", csp);
+
   const response = NextResponse.next({
     request: {
-      headers: request.headers,
+      headers: requestHeaders,
     },
   });
 
-  response.headers.set("Content-Security-Policy", buildCsp());
+  response.headers.set("Content-Security-Policy", csp);
   return response;
 }
 

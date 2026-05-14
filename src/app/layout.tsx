@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { headers } from "next/headers";
 import "./globals.css";
 import { Providers } from "./providers";
 import Navbar from "@/components/Navbar";
@@ -24,15 +25,18 @@ export const metadata: Metadata = {
   description: "Find your way to the trackers worth chasing.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const requestHeaders = await headers();
+  const nonce = requestHeaders.get("x-nonce") ?? undefined;
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${materialSymbols.variable} font-sans antialiased bg-background text-foreground transition-colors duration-300`} suppressHydrationWarning>
-        <Providers>
+        <Providers nonce={nonce}>
           <div className="min-h-screen flex flex-col">
             <Navbar />
 
