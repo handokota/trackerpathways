@@ -25,23 +25,141 @@
   --ring: oklch(98.5% 0 0);
 }
 
-@theme {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+.text-ui-muted { color: color-mix(in oklab, var(--foreground) 60%, transparent); }
+.text-ui-emphasis { color: color-mix(in oklab, var(--foreground) 70%, transparent); }
+.text-ui-dim { color: color-mix(in oklab, var(--foreground) 50%, transparent); }
+.text-ui-strong { color: color-mix(in oklab, var(--foreground) 80%, transparent); }
+.text-ui-soft { color: color-mix(in oklab, var(--foreground) 40%, transparent); }
+.text-ui-faint { color: color-mix(in oklab, var(--foreground) 30%, transparent); }
 
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+.border-ui { border-color: color-mix(in oklab, var(--foreground) 10%, transparent); }
+.border-ui-subtle { border-color: color-mix(in oklab, var(--foreground) 5%, transparent); }
+.border-ui-strong { border-color: color-mix(in oklab, var(--foreground) 20%, transparent); }
+
+.bg-ui-soft { background-color: color-mix(in oklab, var(--foreground) 3%, transparent); }
+.bg-ui-muted { background-color: color-mix(in oklab, var(--foreground) 5%, transparent); }
+.bg-ui-strong { background-color: color-mix(in oklab, var(--foreground) 10%, transparent); }
+
+.ui-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: color-mix(in oklab, var(--foreground) 80%, transparent);
+  background-color: color-mix(in oklab, var(--foreground) 10%, transparent);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
-@variant dark (&:where(.dark, .dark *));
+.ui-surface-card {
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent);
+  background-color: var(--card);
+}
+
+.ui-surface-soft {
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent);
+  background-color: color-mix(in oklab, var(--foreground) 3%, transparent);
+}
+
+.ui-input-control {
+  width: 100%;
+  border-radius: 0.375rem;
+  border: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent);
+  background-color: color-mix(in oklab, var(--foreground) 5%, transparent);
+  padding: 0.625rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+
+.ui-select-control {
+  height: 2.25rem;
+  appearance: none;
+  border-radius: 0.375rem;
+  border: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent);
+  background-color: color-mix(in oklab, var(--foreground) 5%, transparent);
+  padding-left: 0.75rem;
+  padding-right: 2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: color-mix(in oklab, var(--foreground) 80%, transparent);
+  outline: none;
+  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+
+.ui-select-control:hover {
+  border-color: color-mix(in oklab, var(--foreground) 20%, transparent);
+}
+
+.ui-select-control:focus {
+  border-color: color-mix(in oklab, var(--foreground) 30%, transparent);
+}
+
+/* fallback classes for semantic theme colors without Tailwind @theme */
+.bg-background { background-color: var(--background); }
+.text-foreground { color: var(--foreground); }
+.bg-card { background-color: var(--card); }
+.text-card-foreground { color: var(--card-foreground); }
+.border-border { border-color: var(--border); }
+.border-input { border-color: var(--input); }
+.ring-ring { --tw-ring-color: var(--ring); }
+
+.bg-background\/50 { background-color: color-mix(in oklab, var(--background) 50%, transparent); }
+.bg-background\/80 { background-color: color-mix(in oklab, var(--background) 80%, transparent); }
+.bg-card\/90 { background-color: color-mix(in oklab, var(--card) 90%, transparent); }
+
+.text-foreground\/25 { color: color-mix(in oklab, var(--foreground) 25%, transparent); }
+.text-foreground\/30 { color: color-mix(in oklab, var(--foreground) 30%, transparent); }
+.text-foreground\/40 { color: color-mix(in oklab, var(--foreground) 40%, transparent); }
+.text-foreground\/50 { color: color-mix(in oklab, var(--foreground) 50%, transparent); }
+.text-foreground\/60 { color: color-mix(in oklab, var(--foreground) 60%, transparent); }
+.text-foreground\/70 { color: color-mix(in oklab, var(--foreground) 70%, transparent); }
+.text-foreground\/80 { color: color-mix(in oklab, var(--foreground) 80%, transparent); }
+.text-foreground\/90 { color: color-mix(in oklab, var(--foreground) 90%, transparent); }
+
+.bg-foreground\/3 { background-color: color-mix(in oklab, var(--foreground) 3%, transparent); }
+.bg-foreground\/5 { background-color: color-mix(in oklab, var(--foreground) 5%, transparent); }
+.bg-foreground\/8 { background-color: color-mix(in oklab, var(--foreground) 8%, transparent); }
+.bg-foreground\/10 { background-color: color-mix(in oklab, var(--foreground) 10%, transparent); }
+.bg-foreground\/12 { background-color: color-mix(in oklab, var(--foreground) 12%, transparent); }
+.bg-foreground\/20 { background-color: color-mix(in oklab, var(--foreground) 20%, transparent); }
+.bg-foreground\/45 { background-color: color-mix(in oklab, var(--foreground) 45%, transparent); }
+
+.border-foreground\/5 { border-color: color-mix(in oklab, var(--foreground) 5%, transparent); }
+.border-foreground\/10 { border-color: color-mix(in oklab, var(--foreground) 10%, transparent); }
+.border-foreground\/15 { border-color: color-mix(in oklab, var(--foreground) 15%, transparent); }
+.border-foreground\/20 { border-color: color-mix(in oklab, var(--foreground) 20%, transparent); }
+.border-border\/40 { border-color: color-mix(in oklab, var(--border) 40%, transparent); }
+
+.placeholder\:text-foreground\/30::placeholder {
+  color: color-mix(in oklab, var(--foreground) 30%, transparent);
+}
+
+.hover\:bg-foreground\/5:hover { background-color: color-mix(in oklab, var(--foreground) 5%, transparent); }
+.hover\:bg-foreground\/10:hover { background-color: color-mix(in oklab, var(--foreground) 10%, transparent); }
+.hover\:bg-foreground\/12:hover { background-color: color-mix(in oklab, var(--foreground) 12%, transparent); }
+.hover\:border-foreground\/20:hover { border-color: color-mix(in oklab, var(--foreground) 20%, transparent); }
+
+.focus\:border-foreground\/30:focus { border-color: color-mix(in oklab, var(--foreground) 30%, transparent); }
+.focus-visible\:border-foreground\/30:focus-visible { border-color: color-mix(in oklab, var(--foreground) 30%, transparent); }
+
+.focus\:ring-foreground\/10:focus { --tw-ring-color: color-mix(in oklab, var(--foreground) 10%, transparent); }
+.focus-visible\:ring-foreground\/25:focus-visible { --tw-ring-color: color-mix(in oklab, var(--foreground) 25%, transparent); }
+
+.from-foreground\/10 {
+  --tw-gradient-from: color-mix(in oklab, var(--foreground) 10%, transparent) var(--tw-gradient-from-position);
+  --tw-gradient-to: color-mix(in oklab, var(--foreground) 0%, transparent) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.to-foreground\/10 {
+  --tw-gradient-to: color-mix(in oklab, var(--foreground) 10%, transparent) var(--tw-gradient-to-position);
+}
 
 body {
   background-color: var(--background);
