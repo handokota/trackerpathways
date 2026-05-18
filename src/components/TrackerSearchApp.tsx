@@ -30,6 +30,7 @@ export default function TrackerSearchApp() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const activeTrackerParam = searchParams.get("tracker");
 
   const [sourceSearch, setSourceSearch] = useState(searchParams.get("source") || "");
   const [targetSearch, setTargetSearch] = useState(searchParams.get("target") || "");
@@ -83,7 +84,6 @@ export default function TrackerSearchApp() {
   const [foundPaths, setFoundPaths] = useState<PathResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const [officialInvitesDialog, setOfficialInvitesDialog] = useState<OfficialInvitesData | null>(null);
   const [expandedSources, setExpandedSources] = useState<Record<string, boolean>>({});
   
   const [myTrackers, setMyTrackers] = useState<string[]>([]);
@@ -585,46 +585,39 @@ export default function TrackerSearchApp() {
   }, [pathname, router, searchParams]);
 
   const openOfficialInvitesDialog = useCallback((sourceName: string, updateUrl = true) => {
-    setOfficialInvitesDialog({
-      sourceName,
-      sections: getUnlockRequirementSections(sourceName),
-      canInviteTo: trackerCanInviteTo[sourceName] || [],
-      invitedFrom: trackerInvitedFrom[sourceName] || [],
-    });
-
     if (updateUrl) {
       setDialogTrackerInUrl(sourceName);
     }
-  }, [getUnlockRequirementSections, setDialogTrackerInUrl, trackerCanInviteTo, trackerInvitedFrom]);
+  }, [setDialogTrackerInUrl]);
 
   const closeOfficialInvitesDialog = useCallback((updateUrl = true) => {
-    setOfficialInvitesDialog(null);
     if (updateUrl) {
       setDialogTrackerInUrl(null);
     }
   }, [setDialogTrackerInUrl]);
 
   useEffect(() => {
-    const trackerParam = searchParams.get("tracker");
-    if (!trackerParam) {
-      if (officialInvitesDialog) {
-        closeOfficialInvitesDialog(false);
-      }
+    if (!activeTrackerParam) {
       return;
     }
 
-    if (!allTrackers.includes(trackerParam)) {
-      closeOfficialInvitesDialog(false);
+    if (!allTrackers.includes(activeTrackerParam)) {
       setDialogTrackerInUrl(null, "replace");
-      return;
+    }
+  }, [activeTrackerParam, allTrackers, setDialogTrackerInUrl]);
+
+  const officialInvitesDialog = useMemo<OfficialInvitesData | null>(() => {
+    if (!activeTrackerParam || !allTrackers.includes(activeTrackerParam)) {
+      return null;
     }
 
-    if (officialInvitesDialog?.sourceName === trackerParam) {
-      return;
-    }
-
-    openOfficialInvitesDialog(trackerParam, false);
-  }, [allTrackers, closeOfficialInvitesDialog, officialInvitesDialog, openOfficialInvitesDialog, searchParams, setDialogTrackerInUrl]);
+    return {
+      sourceName: activeTrackerParam,
+      sections: getUnlockRequirementSections(activeTrackerParam),
+      canInviteTo: trackerCanInviteTo[activeTrackerParam] || [],
+      invitedFrom: trackerInvitedFrom[activeTrackerParam] || [],
+    };
+  }, [activeTrackerParam, allTrackers, getUnlockRequirementSections, trackerCanInviteTo, trackerInvitedFrom]);
 
 
   if (!mounted) return <div className="w-full" />;
@@ -635,7 +628,7 @@ export default function TrackerSearchApp() {
     <>
       <div className={`w-full relative z-40 transition-all duration-500 ease-out ${sourceSearch || targetSearch ? 'translate-y-0' : 'translate-y-4 md:translate-y-16'}`}>
         {!sourceSearch && !targetSearch && (
-          <div className="text-center mb-10 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-5xl mx-auto">
+          <div className="text-center mb-10 space-y-4 motion-safe:animate-in fade-in slide-in-from-bottom-4 duration-200 max-w-5xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
               Discover the private tracker network.
             </h1>
@@ -645,7 +638,7 @@ export default function TrackerSearchApp() {
           </div>
         )}
 
-        <div className="w-full max-w-2xl mx-auto bg-foreground/3 border border-foreground/10 rounded-xl p-2 animate-in fade-in zoom-in-95 duration-500 relative z-30">
+        <div className="w-full max-w-2xl mx-auto bg-foreground/3 border border-foreground/10 rounded-xl p-2 motion-safe:animate-in fade-in zoom-in-95 duration-200 relative z-30">
           <div className="flex flex-col relative">
               
             <div className="absolute left-4 top-4 bottom-14 flex flex-col items-center gap-1 z-0 pointer-events-none">
@@ -697,7 +690,7 @@ export default function TrackerSearchApp() {
                   </div>
                 </div>
                 {!isUsingCollection && showSourceSug && sourceSuggestions.length > 0 && (
-                  <div className="absolute top-full -left-8 w-[calc(100%+2rem)] mt-2 bg-card rounded-xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-100 border border-foreground/10">
+                  <div className="absolute top-full -left-8 w-[calc(100%+2rem)] mt-2 bg-card rounded-xl overflow-hidden z-50 motion-safe:animate-in fade-in zoom-in-95 duration-200 border border-foreground/10">
                     <div className="max-h-60 overflow-y-auto p-1" ref={sourceListRef}>
                       {sourceSuggestions.map((item, i) => (
                         <div 
@@ -737,7 +730,7 @@ export default function TrackerSearchApp() {
                   onKeyDown={handleTargetKeyDown}
                 />
                 {showTargetSug && targetSuggestions.length > 0 && (
-                  <div className="absolute top-full -left-8 w-[calc(100%+2rem)] mt-2 bg-card rounded-xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-100 border border-foreground/10">
+                  <div className="absolute top-full -left-8 w-[calc(100%+2rem)] mt-2 bg-card rounded-xl overflow-hidden z-50 motion-safe:animate-in fade-in zoom-in-95 duration-200 border border-foreground/10">
                     <div className="max-h-60 overflow-y-auto p-1" ref={targetListRef}>
                       {targetSuggestions.map((item, i) => (
                         <div 
@@ -800,7 +793,7 @@ export default function TrackerSearchApp() {
         </div>
 
         {showFilters && (
-          <div className="max-w-2xl mx-auto mt-2 p-6 bg-foreground/3 border border-foreground/10 rounded-xl animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="max-w-2xl mx-auto mt-2 p-6 bg-foreground/3 border border-foreground/10 rounded-xl motion-safe:animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
               <div>
@@ -858,7 +851,7 @@ export default function TrackerSearchApp() {
         )}
 
         {showCollectionManager && (
-          <div className={`max-w-2xl mx-auto mt-2 p-6 bg-foreground/3 border border-foreground/10 rounded-xl animate-in fade-in slide-in-from-top-2 duration-200 relative z-20 transition-all ${showCollectionSug ? 'mb-40' : ''}`}>
+          <div className={`max-w-2xl mx-auto mt-2 p-6 bg-foreground/3 border border-foreground/10 rounded-xl motion-safe:animate-in fade-in slide-in-from-top-2 duration-200 relative z-20 transition-all ${showCollectionSug ? 'mb-40' : ''}`}>
             <div className="flex flex-col gap-4">
               <div className="relative" ref={collectionWrapperRef}>
                 <label className="text-sm font-medium text-foreground/50 mb-2 block">Add to My Trackers</label>
@@ -876,7 +869,7 @@ export default function TrackerSearchApp() {
                   onKeyDown={handleCollectionKeyDown}
                 />
                 {showCollectionSug && collectionSuggestions.length > 0 && (
-                  <div className="absolute top-full left-0 w-full mt-2 bg-card rounded-xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-100 border border-foreground/10">
+                  <div className="absolute top-full left-0 w-full mt-2 bg-card rounded-xl overflow-hidden z-50 motion-safe:animate-in fade-in zoom-in-95 duration-200 border border-foreground/10">
                     <div className="max-h-60 overflow-y-auto p-1" ref={collectionListRef}>
                       {collectionSuggestions.map((item, i) => (
                         <div 
@@ -921,7 +914,7 @@ export default function TrackerSearchApp() {
       </div>
 
       {(sourceSearch || targetSearch) && (
-        <div className="mt-12 animate-in fade-in slide-in-from-bottom-8 duration-500">
+        <div className="mt-12 motion-safe:animate-in fade-in slide-in-from-bottom-8 duration-200">
           
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-foreground/3 border border-foreground/10 rounded-xl p-4 mb-6">
             <div className="flex flex-col gap-1 min-w-0">
@@ -981,7 +974,7 @@ export default function TrackerSearchApp() {
               const isExpanded = expandedSources[sourceName] ?? false;
 
               return (
-                <div key={sourceName} className="flex flex-col bg-card border border-foreground/10 rounded-xl overflow-hidden transition-colors hover:border-foreground/20 animate-in fade-in duration-500">
+                <div key={sourceName} className="flex flex-col bg-card border border-foreground/10 rounded-xl overflow-hidden transition-colors hover:border-foreground/20 motion-safe:animate-in fade-in duration-200">
                   
                   <div
                     role="button"

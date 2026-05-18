@@ -31,7 +31,7 @@ export default function UiState({
     const inlineColor = kind === "error" ? "text-red-700 dark:text-red-300" : "text-foreground/60";
     return (
       <div className={`inline-flex items-center gap-1.5 text-sm ${inlineColor} ${className}`.trim()}>
-        <span className={`material-symbols-rounded text-[15px] ${kind === "loading" ? "animate-spin" : ""}`}>
+        <span className={`material-symbols-rounded text-[15px] ${kind === "loading" ? "animate-spin motion-reduce:animate-none" : ""}`}>
           {config.icon}
         </span>
         <span>{resolvedTitle}</span>
@@ -48,7 +48,7 @@ export default function UiState({
 
   return (
     <div className={`w-full flex flex-col items-center justify-center gap-3 rounded-xl px-6 py-16 text-center ${cardClass} ${className}`.trim()}>
-      <span className={`material-symbols-rounded text-5xl ${iconClass} ${kind === "loading" ? "animate-spin" : ""}`}>
+      <span className={`material-symbols-rounded text-5xl ${iconClass} ${kind === "loading" ? "animate-spin motion-reduce:animate-none" : ""}`}>
         {config.icon}
       </span>
       <p className="text-base font-semibold text-current">{resolvedTitle}</p>

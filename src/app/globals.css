@@ -10,7 +10,10 @@
   --border: oklch(92% 0 0);            
   --input: oklch(92% 0 0);
   --ring: oklch(14.5% 0 0);
-  --radius: 0.625rem;                  
+  --radius: 0.625rem;
+  --motion-duration-fast: 150ms;
+  --motion-duration-base: 200ms;
+  --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
 }
 
 .dark {
@@ -98,6 +101,36 @@
 
 .ui-select-control:focus {
   border-color: color-mix(in oklab, var(--foreground) 30%, transparent);
+}
+
+.animate-in {
+  animation-duration: var(--motion-duration-base);
+  animation-timing-function: var(--motion-ease-standard);
+}
+
+.transition-all,
+.transition-colors,
+.transition-opacity,
+.transition-transform,
+.transition-\[grid-template-rows\,opacity\,margin\] {
+  transition-duration: var(--motion-duration-base);
+  transition-timing-function: var(--motion-ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-in,
+  .animate-spin {
+    animation: none !important;
+  }
+
+  .transition-all,
+  .transition-colors,
+  .transition-opacity,
+  .transition-transform,
+  .transition-\[grid-template-rows\,opacity\,margin\] {
+    transition-duration: 0ms !important;
+    transition-delay: 0ms !important;
+  }
 }
 
 /* fallback classes for semantic theme colors without Tailwind @theme */

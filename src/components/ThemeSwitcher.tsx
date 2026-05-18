@@ -7,10 +7,8 @@ export default function ThemeSwitcher() {
   const [isOpen, setIsOpen] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
   const menuRef = useRef<HTMLDivElement>(null);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
@@ -20,7 +18,7 @@ export default function ThemeSwitcher() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (!mounted) return <div className="w-9 h-9" />;
+  if (!resolvedTheme) return <div className="w-9 h-9" />;
 
   const currentIcon = resolvedTheme === 'dark' ? 'dark_mode' : 'light_mode';
 
@@ -43,7 +41,7 @@ export default function ThemeSwitcher() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-40 bg-card rounded-xl border border-foreground/10 p-1 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+        <div className="absolute right-0 mt-2 w-40 bg-card rounded-xl border border-foreground/10 p-1 z-50 overflow-hidden motion-safe:animate-in fade-in zoom-in-95 duration-200 origin-top-right">
           {themes.map((t) => (
             <button
               key={t.id}

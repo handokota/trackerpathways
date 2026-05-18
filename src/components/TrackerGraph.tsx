@@ -1062,7 +1062,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
           aria-modal="false"
           aria-labelledby="tracker-official-panel-title"
           tabIndex={-1}
-          className="absolute top-4 bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-md flex flex-col rounded-xl bg-card/90 backdrop-blur border border-foreground/10 z-10 overflow-hidden animate-in slide-in-from-right-10 fade-in duration-300"
+          className="absolute top-4 bottom-4 left-4 right-4 md:left-auto md:right-6 md:w-md flex flex-col rounded-xl bg-card/90 backdrop-blur border border-foreground/10 z-10 overflow-hidden motion-safe:animate-in slide-in-from-right-10 fade-in duration-200"
         >
           <div className="flex items-center justify-between p-5 border-b border-foreground/10 shrink-0">
             <div className="min-w-0">

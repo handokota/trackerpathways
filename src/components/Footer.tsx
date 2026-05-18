@@ -10,7 +10,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className="w-full py-6 px-6 mt-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <footer className="w-full py-6 px-6 mt-auto motion-safe:animate-in fade-in slide-in-from-bottom-4 duration-200">
       <div className="w-full flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-xs font-medium text-foreground/40 text-center">
         <span>
           Data by <a href="https://www.reddit.com/r/TrackersInfo/wiki/official_recruitments/" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors underline decoration-dotted underline-offset-4">TrackersInfo</a>
