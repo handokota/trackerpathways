@@ -12,7 +12,13 @@ export const metadata: Metadata = {
 export default function DirectoryPage() {
   return (
     <PageShell className="min-h-screen">
-      <Suspense fallback={<UiState kind="loading" title="Loading page" className="min-h-[50vh]" />}>
+      <Suspense
+        fallback={(
+          <div className="min-h-[50vh] flex items-center justify-center">
+            <UiState kind="loading" title="Loading page" layout="inline" />
+          </div>
+        )}
+      >
         <DirectoryPageClient />
       </Suspense>
     </PageShell>
