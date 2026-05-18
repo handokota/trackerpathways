@@ -650,7 +650,7 @@ export default function TrackerSearchApp() {
               
             <div className="absolute left-4 top-4 bottom-14 flex flex-col items-center gap-1 z-0 pointer-events-none">
               <div className="w-2.5 h-2.5 rounded-full border-[3px] border-foreground/10 bg-background"></div>
-              <div className="w-px flex-1 bg-linear-to-b from-foreground/10 to-foreground/10"></div>
+              <div className="w-px flex-1 bg-foreground/10"></div>
               <div className="w-2.5 h-2.5 rounded-full bg-foreground/10"></div>
             </div>
 
