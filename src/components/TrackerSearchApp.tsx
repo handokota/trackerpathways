@@ -797,6 +797,7 @@ export default function TrackerSearchApp() {
   if (!mounted) return <div className="w-full" />;
 
   const badgeClass = "flex items-center gap-1.5 text-xs font-semibold text-foreground/80 bg-foreground/10 px-2 py-0.5 rounded-md shrink-0 whitespace-nowrap";
+  const infoBadgeClass = "flex items-center gap-1.5 px-2 py-1 bg-foreground/8 rounded-md text-xs md:text-sm font-medium text-foreground/70";
 
   return (
     <>
@@ -1259,15 +1260,15 @@ export default function TrackerSearchApp() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2 md:gap-3 shrink-0">
-                      <div className="flex items-center gap-1.5 px-2 py-1 bg-foreground/5 rounded-md border border-foreground/5 text-xs md:text-sm font-medium text-foreground/70">
+                      <div className={infoBadgeClass}>
                         <span className="material-symbols-rounded text-[14px] opacity-70">route</span>
                         <span>{sourceFoundCount} route{sourceFoundCount !== 1 && 's'}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 px-2 py-1 bg-foreground/5 rounded-md border border-foreground/5 text-xs md:text-sm font-medium text-foreground/70">
+                      <div className={infoBadgeClass}>
                         <span className="material-symbols-rounded text-[14px] opacity-70">linear_scale</span>
                         <span>Best: {bestHops} hop{bestHops !== 1 && 's'}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 px-2 py-1 bg-foreground/5 rounded-md border border-foreground/5 text-xs md:text-sm font-medium text-foreground/70">
+                      <div className={infoBadgeClass}>
                         <span className="material-symbols-rounded text-[14px] opacity-70">schedule</span>
                         <span>{bestDays !== null ? `${bestDays}d` : 'Unk'}</span>
                       </div>
@@ -1331,7 +1332,7 @@ export default function TrackerSearchApp() {
                                     )}
                                   </div>
                                   
-                                  <span className={`text-sm font-medium bg-transparent border border-foreground/10 px-2 py-1 rounded-md whitespace-nowrap shrink-0 ${path.totalDays === null ? 'text-foreground/40' : 'text-foreground/70'}`}>
+                                  <span className={`text-sm font-medium bg-foreground/8 px-2 py-1 rounded-md whitespace-nowrap shrink-0 ${path.totalDays === null ? 'text-foreground/40' : 'text-foreground/70'}`}>
                                     {path.totalDays === null ? 'Unknown' : `${path.totalDays} days`}
                                   </span>
                                 </div>
