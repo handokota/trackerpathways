@@ -1251,8 +1251,6 @@ export default function TrackerSearchApp() {
                       <OfficialInvitesBadge
                         count={officialInvites.length}
                         ariaLabel={`Official invites for ${sourceName}: ${officialInvites.length}`}
-                        label="Official Invites"
-                        labelClassName="hidden sm:inline"
                         onClick={(event) => {
                           event.stopPropagation();
                           openOfficialInvitesDialog(sourceName);
