@@ -17,20 +17,106 @@ import {
   parseRequirementSections,
 } from "@/lib/officialInvites";
 import OfficialInvitesDialog from "@/components/shared/OfficialInvitesDialog";
-import SortDirectionButton from "@/components/shared/SortDirectionButton";
 import OfficialInvitesBadge from "@/components/shared/OfficialInvitesBadge";
 import UiState from "@/components/shared/UiState";
 
 const data = rawData as unknown as DataStructure;
-const PATHS_PAGE_SIZE = 12;
+const DEFAULT_ROUTES_PER_PAGE = 10;
+const ROUTES_PER_PAGE_OPTIONS = [10, 20, 50] as const;
 
 type SortByOption = "days" | "jumps" | "officialInvites";
+const SORT_OPTIONS: Array<{ value: SortByOption; label: string }> = [
+  { value: "jumps", label: "Jumps" },
+  { value: "days", label: "Days" },
+  { value: "officialInvites", label: "Official" },
+];
+
+const parsePositiveIntParam = (value: string | null, fallback: number) => {
+  if (!value) return fallback;
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed < 1) {
+    return fallback;
+  }
+  return parsed;
+};
+
+const parseRoutesPerPageParam = (value: string | null) => {
+  if (!value) return DEFAULT_ROUTES_PER_PAGE;
+  const parsed = Number.parseInt(value, 10);
+  return ROUTES_PER_PAGE_OPTIONS.includes(parsed as (typeof ROUTES_PER_PAGE_OPTIONS)[number])
+    ? parsed
+    : DEFAULT_ROUTES_PER_PAGE;
+};
+
+const parseSourcePagesParam = (value: string | null) => {
+  if (!value) return {} as Record<string, number>;
+
+  const sourcePages: Record<string, number> = {};
+  for (const entry of value.split("|")) {
+    const separatorIndex = entry.lastIndexOf(":");
+    if (separatorIndex === -1) continue;
+
+    const encodedSource = entry.slice(0, separatorIndex);
+    const pageValue = entry.slice(separatorIndex + 1);
+    let sourceName = "";
+    try {
+      sourceName = decodeURIComponent(encodedSource);
+    } catch {
+      continue;
+    }
+    const page = parsePositiveIntParam(pageValue, 1);
+    if (!sourceName || page <= 1) continue;
+
+    sourcePages[sourceName] = page;
+  }
+
+  return sourcePages;
+};
+
+const serializeSourcePagesParam = (sourcePages: Record<string, number>) => {
+  return Object.entries(sourcePages)
+    .filter(([, page]) => page > 1)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([sourceName, page]) => `${encodeURIComponent(sourceName)}:${page}`)
+    .join("|");
+};
+
+const buildPaginationItems = (currentPage: number, totalPages: number) => {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
+  const items: Array<number | "ellipsis-left" | "ellipsis-right"> = [1];
+  const windowStart = Math.max(2, currentPage - 1);
+  const windowEnd = Math.min(totalPages - 1, currentPage + 1);
+
+  if (windowStart > 2) {
+    items.push("ellipsis-left");
+  }
+
+  for (let page = windowStart; page <= windowEnd; page += 1) {
+    items.push(page);
+  }
+
+  if (windowEnd < totalPages - 1) {
+    items.push("ellipsis-right");
+  }
+
+  items.push(totalPages);
+  return items;
+};
 
 export default function TrackerSearchApp() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const activeTrackerParam = searchParams.get("tracker");
+  const routesPerPageFromQuery = parseRoutesPerPageParam(searchParams.get("perPage"));
+  const sourcePagesParamRaw = searchParams.get("sourcePages");
+  const sourcePagesFromQuery = useMemo(
+    () => parseSourcePagesParam(sourcePagesParamRaw),
+    [sourcePagesParamRaw]
+  );
 
   const [sourceSearch, setSourceSearch] = useState(searchParams.get("source") || "");
   const [targetSearch, setTargetSearch] = useState(searchParams.get("target") || "");
@@ -53,11 +139,12 @@ export default function TrackerSearchApp() {
     if (orderParam === "asc" || orderParam === "desc") {
       return orderParam;
     }
-    return searchParams.get("sort") === "officialInvites" ? "desc" : "asc";
+    return "asc";
   });
 
   const [showFilters, setShowFilters] = useState(false);
   const [showCollectionManager, setShowCollectionManager] = useState(false);
+  const [showViewControls, setShowViewControls] = useState(false);
 
   const [showSourceSug, setShowSourceSug] = useState(false);
   const [showTargetSug, setShowTargetSug] = useState(false);
@@ -70,6 +157,7 @@ export default function TrackerSearchApp() {
   const sourceWrapperRef = useRef<HTMLDivElement>(null);
   const targetWrapperRef = useRef<HTMLDivElement>(null);
   const collectionWrapperRef = useRef<HTMLDivElement>(null);
+  const viewControlsRef = useRef<HTMLDivElement>(null);
     
   const sourceListRef = useRef<HTMLDivElement>(null);
   const targetListRef = useRef<HTMLDivElement>(null);
@@ -90,7 +178,7 @@ export default function TrackerSearchApp() {
   const [collectionInput, setCollectionInput] = useState("");
 
   const isUsingCollection = myTrackers.length > 0 && sourceSearch === myTrackers.join(", ");
-  const [visiblePathsBySource, setVisiblePathsBySource] = useState<Record<string, number>>({});
+  const [, setVisiblePathsBySource] = useState<Record<string, number>>({});
   const latestRequestIdRef = useRef(0);
 
   useEffect(() => {
@@ -122,8 +210,15 @@ export default function TrackerSearchApp() {
       if (maxJumps !== 5) params.set("jumps", maxJumps.toString());
       if (maxDays !== null) params.set("days", maxDays.toString());
       if (sortBy !== 'jumps') params.set("sort", sortBy);
-      if (sortDirection !== 'asc' || sortBy === 'officialInvites') {
+      if (sortDirection !== 'asc') {
         params.set("order", sortDirection);
+      }
+      if (routesPerPageFromQuery !== DEFAULT_ROUTES_PER_PAGE) {
+        params.set("perPage", routesPerPageFromQuery.toString());
+      }
+      const serializedSourcePages = serializeSourcePagesParam(sourcePagesFromQuery);
+      if (serializedSourcePages) {
+        params.set("sourcePages", serializedSourcePages);
       }
     }
 
@@ -137,7 +232,7 @@ export default function TrackerSearchApp() {
     }
 
     router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
-  }, [deferredSource, deferredTarget, maxJumps, maxDays, sortBy, sortDirection, mounted, pathname, router, searchParams]);
+  }, [deferredSource, deferredTarget, maxJumps, maxDays, sortBy, sortDirection, mounted, pathname, router, searchParams, routesPerPageFromQuery, sourcePagesFromQuery]);
 
   useEffect(() => {
     if (!deferredSource && !deferredTarget) {
@@ -222,6 +317,9 @@ export default function TrackerSearchApp() {
       if (collectionWrapperRef.current && !collectionWrapperRef.current.contains(event.target as Node)) {
         setShowCollectionSug(false);
         setCollectionActiveIndex(-1);
+      }
+      if (viewControlsRef.current && !viewControlsRef.current.contains(event.target as Node)) {
+        setShowViewControls(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -584,6 +682,52 @@ export default function TrackerSearchApp() {
     router.push(nextUrl, { scroll: false });
   }, [pathname, router, searchParams]);
 
+  const setRoutePageForSourceInUrl = useCallback((
+    sourceName: string,
+    page: number,
+    pageSize: number,
+    method: "push" | "replace" = "push"
+  ) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const sourcePages = parseSourcePagesParam(params.get("sourcePages"));
+
+    if (page > 1) sourcePages[sourceName] = page;
+    else delete sourcePages[sourceName];
+
+    const serializedSourcePages = serializeSourcePagesParam(sourcePages);
+    if (serializedSourcePages) params.set("sourcePages", serializedSourcePages);
+    else params.delete("sourcePages");
+
+    if (pageSize !== DEFAULT_ROUTES_PER_PAGE) {
+      params.set("perPage", pageSize.toString());
+    } else {
+      params.delete("perPage");
+    }
+
+    const nextQuery = params.toString();
+    const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+    if (method === "replace") {
+      router.replace(nextUrl, { scroll: false });
+      return;
+    }
+
+    router.push(nextUrl, { scroll: false });
+  }, [pathname, router, searchParams]);
+
+  const setRoutesPerPageInUrl = useCallback((pageSize: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (pageSize !== DEFAULT_ROUTES_PER_PAGE) {
+      params.set("perPage", pageSize.toString());
+    } else {
+      params.delete("perPage");
+    }
+
+    params.delete("sourcePages");
+    const nextQuery = params.toString();
+    const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+    router.push(nextUrl, { scroll: false });
+  }, [pathname, router, searchParams]);
+
   const openOfficialInvitesDialog = useCallback((sourceName: string, updateUrl = true) => {
     if (updateUrl) {
       setDialogTrackerInUrl(sourceName);
@@ -605,6 +749,36 @@ export default function TrackerSearchApp() {
       setDialogTrackerInUrl(null, "replace");
     }
   }, [activeTrackerParam, allTrackers, setDialogTrackerInUrl]);
+
+  useEffect(() => {
+    if (!deferredSource && !deferredTarget) {
+      return;
+    }
+
+    const sanitizedSourcePages: Record<string, number> = {};
+    for (const sourceName of sortedSourceNames) {
+      const totalPages = Math.max(1, Math.ceil((groupedResults[sourceName]?.length ?? 0) / routesPerPageFromQuery));
+      const requestedPage = sourcePagesFromQuery[sourceName] ?? 1;
+      const clampedPage = Math.min(requestedPage, totalPages);
+      if (clampedPage > 1) {
+        sanitizedSourcePages[sourceName] = clampedPage;
+      }
+    }
+
+    const currentSerialized = serializeSourcePagesParam(sourcePagesFromQuery);
+    const nextSerialized = serializeSourcePagesParam(sanitizedSourcePages);
+    if (currentSerialized === nextSerialized) {
+      return;
+    }
+
+    const params = new URLSearchParams(searchParams.toString());
+    if (nextSerialized) params.set("sourcePages", nextSerialized);
+    else params.delete("sourcePages");
+
+    const nextQuery = params.toString();
+    const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+    router.replace(nextUrl, { scroll: false });
+  }, [deferredSource, deferredTarget, groupedResults, pathname, router, routesPerPageFromQuery, searchParams, sortedSourceNames, sourcePagesFromQuery]);
 
   const officialInvitesDialog = useMemo<OfficialInvitesData | null>(() => {
     if (!activeTrackerParam || !allTrackers.includes(activeTrackerParam)) {
@@ -928,33 +1102,110 @@ export default function TrackerSearchApp() {
               )}
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto pt-3 md:pt-0 border-t border-foreground/5 md:border-0 shrink-0">
-              <div className="flex items-center gap-2 flex-1 md:flex-none">
-                <span className="text-xs md:text-sm font-medium text-foreground/60 shrink-0 hidden sm:block">Sort by</span>
-                <div className="relative flex-1 md:w-44">
-                  <select
-                    value={sortBy}
-                    onChange={(event) => {
-                      const nextSortBy = event.target.value as SortByOption;
-                      setSortBy(nextSortBy);
-                      setSortDirection(nextSortBy === "officialInvites" ? "desc" : "asc");
-                      setVisiblePathsBySource({});
-                    }}
-                    className="w-full h-9 appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-3 pr-8 text-sm font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
-                    aria-label="Sort search results"
-                  >
-                    <option value="jumps">Jumps</option>
-                    <option value="days">Days</option>
-                    <option value="officialInvites">Official Invites</option>
-                  </select>
-                  <span className="pointer-events-none material-symbols-rounded absolute right-2 top-1/2 -translate-y-1/2 text-base text-foreground/50">
-                    expand_more
+            <div className="flex items-center justify-end w-full md:w-auto pt-3 md:pt-0 border-t border-foreground/5 md:border-0 shrink-0">
+              <div className="relative" ref={viewControlsRef}>
+                <button
+                  type="button"
+                  onClick={() => setShowViewControls((current) => !current)}
+                  aria-expanded={showViewControls}
+                  aria-haspopup="dialog"
+                  className="h-9 rounded-md border border-foreground/10 bg-foreground/5 px-3 text-sm font-semibold text-foreground/80 transition-colors hover:border-foreground/20 hover:bg-foreground/10"
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="material-symbols-rounded text-base">tune</span>
+                    View
                   </span>
-                </div>
-                <SortDirectionButton
-                  direction={sortDirection}
-                  onToggle={() => setSortDirection((current) => current === "asc" ? "desc" : "asc")}
-                />
+                </button>
+
+                {showViewControls && (
+                  <div className="absolute right-0 mt-2 w-fit max-w-[calc(100vw-2rem)] rounded-xl border border-foreground/10 bg-card p-3 z-20 shadow-lg motion-safe:animate-in fade-in zoom-in-95 duration-200">
+                    <div className="grid grid-cols-[max-content_auto_max-content] gap-3 items-stretch">
+                      <div className="w-32">
+                        <span className="text-sm font-semibold text-foreground/60 mb-1 block">Sort</span>
+                        <div className="h-px bg-foreground/10 mb-2" />
+                        <div className="flex flex-col gap-1">
+                          {SORT_OPTIONS.map((option) => {
+                              const isActive = sortBy === option.value;
+                              const optionDirection = isActive
+                                ? sortDirection
+                                : "asc";
+                              return (
+                                <div
+                                  key={option.value}
+                                  className={`h-8 rounded-md px-2 text-sm font-normal transition-colors grid grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-1 ${
+                                    isActive
+                                      ? "bg-foreground/10 text-foreground"
+                                      : "text-foreground/60 hover:text-foreground"
+                                  }`}
+                                >
+                                {isActive ? (
+                                  <button
+                                    type="button"
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      setSortDirection((current) => current === "asc" ? "desc" : "asc");
+                                      setVisiblePathsBySource({});
+                                    }}
+                                    className="h-5 w-5 inline-flex items-center justify-center text-foreground transition-colors hover:text-foreground/80"
+                                    aria-label={`${option.label} sort ${optionDirection === "asc" ? "ascending" : "descending"}`}
+                                  >
+                                    <span className="material-symbols-rounded text-sm">
+                                      {optionDirection === "asc" ? "arrow_upward" : "arrow_downward"}
+                                    </span>
+                                  </button>
+                                ) : (
+                                  <span className="h-5 w-5" aria-hidden="true" />
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSortBy(option.value);
+                                    if (!isActive) {
+                                      setSortDirection("asc");
+                                    }
+                                    setVisiblePathsBySource({});
+                                  }}
+                                  className="text-left min-w-0"
+                                >
+                                  {option.label}
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <div className="w-px bg-foreground/10 rounded-full" />
+
+                      <div className="w-32">
+                        <span className="text-sm font-semibold text-foreground/60 mb-1 block">Per page</span>
+                        <div className="h-px bg-foreground/10 mb-2" />
+                        <div className="flex flex-col gap-1">
+                          {ROUTES_PER_PAGE_OPTIONS.map((size) => {
+                            const isActive = routesPerPageFromQuery === size;
+                            return (
+                              <button
+                                key={size}
+                                type="button"
+                                onClick={() => setRoutesPerPageInUrl(size)}
+                                className={`h-8 w-full rounded-md px-2 text-sm font-normal transition-colors flex items-center justify-start gap-1 ${
+                                  isActive
+                                    ? "bg-foreground/10 text-foreground"
+                                    : "text-foreground/60 hover:text-foreground"
+                                }`}
+                              >
+                                <span className={`material-symbols-rounded w-4 text-sm ${isActive ? "text-foreground opacity-100" : "opacity-0"}`}>
+                                  radio_button_checked
+                                </span>
+                                <span className="leading-none">{size}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -965,8 +1216,11 @@ export default function TrackerSearchApp() {
               const sourceAbbr = getAbbr(sourceName);
               const officialInvites = trackerCanInviteTo[sourceName] || [];
               const sourceFoundCount = foundCountBySource[sourceName] || 0;
-              const visibleSourcePathsCount = visiblePathsBySource[sourceName] ?? PATHS_PAGE_SIZE;
-              const displayedSourcePaths = paths.slice(0, visibleSourcePathsCount);
+              const sourceTotalPages = Math.max(1, Math.ceil(paths.length / routesPerPageFromQuery));
+              const sourceRoutePage = Math.min(sourcePagesFromQuery[sourceName] ?? 1, sourceTotalPages);
+              const sourceRouteStart = (sourceRoutePage - 1) * routesPerPageFromQuery;
+              const displayedSourcePaths = paths.slice(sourceRouteStart, sourceRouteStart + routesPerPageFromQuery);
+              const sourcePageItems = buildPaginationItems(sourceRoutePage, sourceTotalPages);
               
               const bestHops = paths.length > 0 ? Math.min(...paths.map(p => p.routes.length)) : 0;
               const validDays = paths.filter(p => p.totalDays !== null).map(p => p.totalDays as number);
@@ -1121,26 +1375,60 @@ export default function TrackerSearchApp() {
                           })}
                         </div>
 
-                        {!isStale && !isLoading && paths.length > visibleSourcePathsCount && (
-                          <div className="flex flex-col items-center justify-center mt-6 pt-4 gap-3 border-t border-foreground/10">
-                            <span className="text-xs font-semibold text-foreground/40">
-                              Showing {displayedSourcePaths.length} of {paths.length} routes
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setVisiblePathsBySource((current) => ({
-                                  ...current,
-                                  [sourceName]: (current[sourceName] ?? PATHS_PAGE_SIZE) + PATHS_PAGE_SIZE,
-                                }))
-                              }
-                              className="px-5 py-2 text-sm font-semibold rounded-lg bg-foreground/5 text-foreground/80 hover:bg-foreground/10 border border-foreground/10 transition-all active:scale-95 flex items-center gap-2"
-                            >
-                              <span className="material-symbols-rounded text-[18px]">expand_more</span>
-                              Load more routes
-                            </button>
+                        {!isStale && !isLoading && paths.length > 0 && (
+                          <div className="mt-4 pt-3 border-t border-foreground/10 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                            <div className="text-xs font-medium text-foreground/50">
+                              Showing {sourceRouteStart + 1}-{Math.min(sourceRouteStart + routesPerPageFromQuery, paths.length)} of {paths.length} routes (page {sourceRoutePage}/{sourceTotalPages})
+                            </div>
+                            {sourceTotalPages > 1 && (
+                              <div className="flex flex-wrap items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => setRoutePageForSourceInUrl(sourceName, Math.max(1, sourceRoutePage - 1), routesPerPageFromQuery)}
+                                  disabled={sourceRoutePage === 1}
+                                  className="h-8 rounded-md border border-foreground/10 bg-foreground/5 px-2.5 text-xs font-semibold text-foreground/70 transition-colors hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                                >
+                                  Prev
+                                </button>
+                                {sourcePageItems.map((item, index) => {
+                                  if (item === "ellipsis-left" || item === "ellipsis-right") {
+                                    return (
+                                      <span key={`${sourceName}-${item}-${index}`} className="px-1 text-foreground/40">
+                                        …
+                                      </span>
+                                    );
+                                  }
+
+                                  const isActive = item === sourceRoutePage;
+                                  return (
+                                    <button
+                                      key={`${sourceName}-${item}`}
+                                      type="button"
+                                      onClick={() => setRoutePageForSourceInUrl(sourceName, item, routesPerPageFromQuery)}
+                                      aria-current={isActive ? "page" : undefined}
+                                      className={`h-8 min-w-8 rounded-md border px-2 text-xs font-semibold transition-colors ${
+                                        isActive
+                                          ? "border-foreground/20 bg-foreground/10 text-foreground"
+                                          : "border-foreground/10 bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground"
+                                      }`}
+                                    >
+                                      {item}
+                                    </button>
+                                  );
+                                })}
+                                <button
+                                  type="button"
+                                  onClick={() => setRoutePageForSourceInUrl(sourceName, Math.min(sourceTotalPages, sourceRoutePage + 1), routesPerPageFromQuery)}
+                                  disabled={sourceRoutePage === sourceTotalPages}
+                                  className="h-8 rounded-md border border-foreground/10 bg-foreground/5 px-2.5 text-xs font-semibold text-foreground/70 transition-colors hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                                >
+                                  Next
+                                </button>
+                              </div>
+                            )}
                           </div>
                         )}
+
                       </div>
                     </div>
                   </div>
