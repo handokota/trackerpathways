@@ -126,8 +126,8 @@ export default function OfficialInvitesContent({
               onClick={() => setOfficialInvitesTab("canInviteTo")}
               className={`justify-center sm:justify-start w-full sm:w-auto inline-flex items-center gap-1.5 px-2 py-1.5 rounded-md text-xs font-semibold transition-colors ${
                 officialInvitesTab === "canInviteTo"
-                  ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
-                  : "bg-foreground/8 text-foreground/70 hover:bg-foreground/12"
+                  ? "ui-accent-badge"
+                  : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10"
               }`}
             >
               <span className="material-symbols-rounded text-sm shrink-0">outbound</span>
@@ -138,8 +138,8 @@ export default function OfficialInvitesContent({
               onClick={() => setOfficialInvitesTab("invitedFrom")}
               className={`justify-center sm:justify-start w-full sm:w-auto inline-flex items-center gap-1.5 px-2 py-1.5 rounded-md text-xs font-semibold transition-colors ${
                 officialInvitesTab === "invitedFrom"
-                  ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
-                  : "bg-foreground/8 text-foreground/70 hover:bg-foreground/12"
+                  ? "ui-accent-badge"
+                  : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10"
               }`}
             >
               <span className="material-symbols-rounded text-sm shrink-0">south_west</span>

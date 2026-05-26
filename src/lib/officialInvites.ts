@@ -148,12 +148,12 @@ export const sortOfficialInvites = (
 export const getStatusColor = (status: string) => {
   const normalized = status.toLowerCase();
   if (normalized === "yes" || normalized === "open") {
-    return "text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30";
+    return "ui-status-open";
   }
   if (normalized === "no" || normalized === "closed") {
-    return "text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/30";
+    return "ui-status-closed";
   }
-  return "text-orange-700 dark:text-orange-300 bg-orange-100 dark:bg-orange-900/30";
+  return "ui-status-limited";
 };
 
 export const getStatusLabel = (status: string) => {

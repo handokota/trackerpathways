@@ -2,7 +2,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #27272a;
+  --foreground: #111827;
 
   --card: color-mix(in oklab, var(--background) 97%, var(--foreground));
   --card-foreground: var(--foreground);
@@ -10,6 +10,15 @@
   --border: color-mix(in oklab, var(--foreground) 14%, var(--background));
   --input: color-mix(in oklab, var(--foreground) 12%, var(--background));
   --ring: #1e66f5;
+  --accent-bg: #dbeafe;
+  --accent-text: #1d4ed8;
+  --accent-hover: #bfdbfe;
+  --status-open-bg: #dcfce7;
+  --status-open-text: #15803d;
+  --status-closed-bg: #fee2e2;
+  --status-closed-text: #b91c1c;
+  --status-limited-bg: #ffedd5;
+  --status-limited-text: #c2410c;
   --radius: 0.625rem;
   --motion-duration-fast: 150ms;
   --motion-duration-base: 200ms;
@@ -18,7 +27,7 @@
 
 .dark {
   --background: #0f0f10;
-  --foreground: #fafafa;
+  --foreground: #e5e7eb;
 
   --card: color-mix(in oklab, var(--background) 88%, var(--foreground));
   --card-foreground: var(--foreground);
@@ -26,6 +35,15 @@
   --border: color-mix(in oklab, var(--foreground) 18%, var(--background));
   --input: color-mix(in oklab, var(--foreground) 14%, var(--background));
   --ring: #89b4fa;
+  --accent-bg: color-mix(in oklab, #1e3a8a 40%, transparent);
+  --accent-text: #93c5fd;
+  --accent-hover: color-mix(in oklab, #1e3a8a 50%, transparent);
+  --status-open-bg: color-mix(in oklab, #14532d 35%, transparent);
+  --status-open-text: #86efac;
+  --status-closed-bg: color-mix(in oklab, #7f1d1d 35%, transparent);
+  --status-closed-text: #fca5a5;
+  --status-limited-bg: color-mix(in oklab, #7c2d12 35%, transparent);
+  --status-limited-text: #fdba74;
 }
 
 .text-ui-muted { color: color-mix(in oklab, var(--foreground) 60%, transparent); }
@@ -42,6 +60,31 @@
 .bg-ui-soft { background-color: color-mix(in oklab, var(--foreground) 3%, transparent); }
 .bg-ui-muted { background-color: color-mix(in oklab, var(--foreground) 5%, transparent); }
 .bg-ui-strong { background-color: color-mix(in oklab, var(--foreground) 10%, transparent); }
+
+.ui-accent-badge {
+  color: var(--accent-text);
+  background-color: var(--accent-bg);
+}
+
+.ui-accent-badge:hover {
+  background-color: var(--accent-hover);
+}
+
+.ui-status-open {
+  color: var(--status-open-text);
+  background-color: var(--status-open-bg);
+}
+
+.ui-status-closed {
+  color: var(--status-closed-text);
+  background-color: var(--status-closed-bg);
+}
+
+.ui-status-limited {
+  color: var(--status-limited-text);
+  background-color: var(--status-limited-bg);
+}
+
 
 .ui-chip {
   display: inline-flex;
