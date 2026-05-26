@@ -234,7 +234,7 @@ export default function DirectoryPageClient() {
                 onClick={() => setShowViewControls((current) => !current)}
                 aria-expanded={showViewControls}
                 aria-haspopup="dialog"
-                className="h-9 rounded-md border border-foreground/10 bg-foreground/5 px-3 text-sm font-semibold text-foreground/80 transition-colors hover:border-foreground/20 hover:bg-foreground/10"
+                className="h-10 rounded-xl border border-foreground/10 bg-foreground/5 px-3 text-sm font-semibold text-foreground/80 transition-colors hover:border-foreground/20 hover:bg-foreground/10"
               >
                 <span className="inline-flex items-center gap-1.5">
                   <span className="material-symbols-rounded text-base">tune</span>
