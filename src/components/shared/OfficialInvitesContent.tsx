@@ -94,14 +94,14 @@ export default function OfficialInvitesContent({
                       </div>
 
                       {section.requirements.length > 0 ? (
-                        <ul className="space-y-1.5 min-w-0">
-                          {section.requirements.map((requirement, requirementIndex) => (
-                            <li key={`${section.key}-${requirementIndex}`} className="text-sm text-foreground/80 leading-snug flex items-start gap-2">
-                              <span className="mt-[7px] h-1 w-1 rounded-full bg-foreground/45 shrink-0" />
-                              <span className="wrap-break-words min-w-0 flex-1">{renderReqs(requirement)}</span>
-                            </li>
+                        <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
+                          {section.requirements.map((requirement, index) => (
+                            <span key={index}>
+                              {index > 0 && ", "}
+                              {renderReqs(requirement)}
+                            </span>
                           ))}
-                        </ul>
+                        </p>
                       ) : (
                         <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
                           {section.requirementText ? renderReqs(section.requirementText) : "No additional requirements."}
@@ -249,14 +249,14 @@ export default function OfficialInvitesContent({
                                 </div>
                               )}
                               {section.requirements.length > 0 ? (
-                                <ul className="space-y-1.5 min-w-0">
-                                  {section.requirements.map((requirement, requirementIndex) => (
-                                    <li key={`${section.key}-join-${requirementIndex}`} className="text-sm text-foreground/80 leading-snug flex items-start gap-2">
-                                      <span className="mt-[7px] h-1 w-1 rounded-full bg-foreground/45 shrink-0" />
-                                      <span className="wrap-break-words min-w-0 flex-1">{renderReqs(requirement)}</span>
-                                    </li>
+                                <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
+                                  {section.requirements.map((requirement, index) => (
+                                    <span key={index}>
+                                      {index > 0 && ", "}
+                                      {renderReqs(requirement)}
+                                    </span>
                                   ))}
-                                </ul>
+                                </p>
                               ) : (
                                 <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
                                   {renderReqs(section.requirementText || "No requirements provided.")}
