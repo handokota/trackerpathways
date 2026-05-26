@@ -271,7 +271,7 @@ export default function OfficialInvitesContent({
                         </p>
                       )}
 
-                      <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-foreground/5 border-dashed">
+                      <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-foreground/5">
                         <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
                           <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${getStatusColor(invite.details.active)}`}>
                             {getStatusLabel(invite.details.active)}
@@ -289,7 +289,7 @@ export default function OfficialInvitesContent({
             })}
           </div>
         ) : (
-          <p className="text-sm text-foreground/70 text-center py-4 border border-dashed border-foreground/10 rounded-lg">
+          <p className="text-sm text-foreground/70 text-center py-4 border border-foreground/10 rounded-lg">
             {officialInvitesTab === "canInviteTo"
               ? "No active official invites were found for this tracker."
               : "No active invite routes into this tracker were found."}

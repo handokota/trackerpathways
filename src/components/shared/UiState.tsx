@@ -42,7 +42,7 @@ export default function UiState({
   const cardClass =
     kind === "error"
       ? "border border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300"
-      : "border-2 border-dashed border-foreground/10 bg-foreground/3 text-foreground/60";
+      : "border border-foreground/10 bg-foreground/3 text-foreground/60";
 
   const iconClass = kind === "error" ? "text-red-500/80" : "text-foreground/25";
 

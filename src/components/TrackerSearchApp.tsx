@@ -1353,7 +1353,7 @@ export default function TrackerSearchApp() {
                                         </div>
                                         <p className="text-foreground/70 leading-relaxed font-normal text-sm">{renderReqs(req.reqs)}</p>
                                         
-                                        <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-foreground/5 border-dashed">
+                                        <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-foreground/5">
                                           <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
                                             <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${getStatusColor(req.active)}`}>
                                               {getStatusLabel(req.active)}
