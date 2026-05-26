@@ -23,6 +23,11 @@ const TRACKERS_PAGE_SIZE = 20;
 
 type DirectorySortByOption = "alphabetical" | "officialInvites";
 
+const DIRECTORY_SORT_OPTIONS: Array<{ value: DirectorySortByOption; label: string }> = [
+  { value: "alphabetical", label: "Name" },
+  { value: "officialInvites", label: "Official" },
+];
+
 export default function DirectoryPageClient() {
   const router = useRouter();
   const pathname = usePathname();
@@ -32,8 +37,10 @@ export default function DirectoryPageClient() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<DirectorySortByOption>("alphabetical");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [showViewControls, setShowViewControls] = useState(false);
   const [visibleTrackersCount, setVisibleTrackersCount] = useState(TRACKERS_PAGE_SIZE);
   const directoryLoadMoreRef = useRef<HTMLDivElement | null>(null);
+  const viewControlsRef = useRef<HTMLDivElement | null>(null);
 
   const activeInviteCountBySource = useMemo(() => getActiveInviteCountBySource(data.routeInfo), []);
 
@@ -85,6 +92,17 @@ export default function DirectoryPageClient() {
       setDialogTrackerInUrl(null, "replace");
     }
   }, [activeTrackerParam, setDialogTrackerInUrl]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (viewControlsRef.current && !viewControlsRef.current.contains(event.target as Node)) {
+        setShowViewControls(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const officialInvitesDialog = useMemo<OfficialInvitesData | null>(() => {
     if (!activeTrackerParam || !data.abbrList[activeTrackerParam]) {
@@ -209,32 +227,56 @@ export default function DirectoryPageClient() {
           />
         </div>
 
-        <div className="w-full flex items-center justify-between md:justify-end gap-2 pt-2 md:pt-0 border-t border-foreground/5 md:border-0">
-          <span className="text-sm font-medium text-foreground/60 shrink-0">Sort by</span>
-          <div className="relative flex-1 md:flex-none">
-            <select
-              value={sortBy}
-              onChange={(event) => {
-                const nextSortBy = event.target.value as DirectorySortByOption;
-                setSortBy(nextSortBy);
-                setSortDirection(nextSortBy === "officialInvites" ? "desc" : "asc");
-                setVisibleTrackersCount(TRACKERS_PAGE_SIZE);
-              }}
-              className="w-full md:min-w-44 h-9 appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-3 pr-8 text-sm font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
-              aria-label="Sort directory results"
+        <div className="w-full flex items-center justify-end pt-2 md:pt-0 border-t border-foreground/5 md:border-0">
+          <div className="relative" ref={viewControlsRef}>
+            <button
+              type="button"
+              onClick={() => setShowViewControls((current) => !current)}
+              aria-expanded={showViewControls}
+              aria-haspopup="dialog"
+              className="h-9 rounded-md border border-foreground/10 bg-foreground/5 px-3 text-sm font-semibold text-foreground/80 transition-colors hover:border-foreground/20 hover:bg-foreground/10"
             >
-              <option value="alphabetical">Alphabetically</option>
-              <option value="officialInvites">Official Invites</option>
-            </select>
-            <span className="pointer-events-none material-symbols-rounded absolute right-2 top-1/2 -translate-y-1/2 text-base text-foreground/50">
-              expand_more
-            </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="material-symbols-rounded text-base">tune</span>
+                View
+              </span>
+            </button>
+
+            {showViewControls && (
+              <div className="absolute right-0 mt-2 w-fit max-w-[calc(100vw-2rem)] rounded-xl border border-foreground/10 bg-card p-3 z-20 shadow-lg motion-safe:animate-in fade-in zoom-in-95 duration-200">
+                <div className="w-44">
+                  <span className="text-sm font-semibold text-foreground/60 mb-1 block">Sort by</span>
+                  <div className="h-px bg-foreground/10 mb-2" />
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <select
+                        value={sortBy}
+                        onChange={(event) => {
+                          const nextSortBy = event.target.value as DirectorySortByOption;
+                          setSortBy(nextSortBy);
+                          setSortDirection(nextSortBy === "officialInvites" ? "desc" : "asc");
+                          setVisibleTrackersCount(TRACKERS_PAGE_SIZE);
+                        }}
+                        className="w-full h-9 appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-3 pr-8 text-sm font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
+                        aria-label="Sort directory results"
+                      >
+                        {DIRECTORY_SORT_OPTIONS.map((option) => (
+                          <option key={option.value} value={option.value}>{option.label}</option>
+                        ))}
+                      </select>
+                      <span className="pointer-events-none material-symbols-rounded absolute right-2 top-1/2 -translate-y-1/2 text-sm text-foreground/50">
+                        expand_more
+                      </span>
+                    </div>
+                    <SortDirectionButton
+                      direction={sortDirection}
+                      onToggle={() => setSortDirection((current) => current === "asc" ? "desc" : "asc")}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          <SortDirectionButton
-            direction={sortDirection}
-            onToggle={() => setSortDirection((current) => current === "asc" ? "desc" : "asc")}
-            showTooltip
-          />
         </div>
       </div>
 

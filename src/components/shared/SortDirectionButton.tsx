@@ -21,7 +21,7 @@ export default function SortDirectionButton({
     <button
       type="button"
       onClick={onToggle}
-      className={`relative group shrink-0 inline-flex items-center justify-center rounded-md border border-foreground/10 bg-foreground/5 text-foreground/70 outline-none transition-colors hover:border-foreground/20 focus-visible:border-foreground/30 ${
+      className={`relative group shrink-0 inline-flex items-center justify-center rounded-md text-foreground/60 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 ${
         isSmall ? "h-8 w-8" : "h-9 w-9"
       } ${className}`}
       aria-label={`Sort ${direction === "asc" ? "ascending" : "descending"}`}

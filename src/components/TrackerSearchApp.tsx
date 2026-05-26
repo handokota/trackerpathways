@@ -17,6 +17,7 @@ import {
   parseRequirementSections,
 } from "@/lib/officialInvites";
 import OfficialInvitesDialog from "@/components/shared/OfficialInvitesDialog";
+import SortDirectionButton from "@/components/shared/SortDirectionButton";
 import OfficialInvitesBadge from "@/components/shared/OfficialInvitesBadge";
 import UiState from "@/components/shared/UiState";
 
@@ -1121,64 +1122,43 @@ export default function TrackerSearchApp() {
                 {showViewControls && (
                   <div className="absolute right-0 mt-2 w-fit max-w-[calc(100vw-2rem)] rounded-xl border border-foreground/10 bg-card p-3 z-20 shadow-lg motion-safe:animate-in fade-in zoom-in-95 duration-200">
                     <div className="grid grid-cols-[max-content_auto_max-content] gap-3 items-stretch">
-                      <div className="w-32">
-                        <span className="text-sm font-semibold text-foreground/60 mb-1 block">Sort</span>
+                      <div className="w-40">
+                        <span className="text-sm font-semibold text-foreground/60 mb-1 block">Sort by</span>
                         <div className="h-px bg-foreground/10 mb-2" />
-                        <div className="flex flex-col gap-1">
-                          {SORT_OPTIONS.map((option) => {
-                              const isActive = sortBy === option.value;
-                              const optionDirection = isActive
-                                ? sortDirection
-                                : "asc";
-                              return (
-                                <div
-                                  key={option.value}
-                                  className={`h-8 rounded-md px-2 text-sm font-normal transition-colors grid grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-1 ${
-                                    isActive
-                                      ? "bg-foreground/10 text-foreground"
-                                      : "text-foreground/60 hover:text-foreground"
-                                  }`}
-                                >
-                                {isActive ? (
-                                  <button
-                                    type="button"
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                      setSortDirection((current) => current === "asc" ? "desc" : "asc");
-                                      setVisiblePathsBySource({});
-                                    }}
-                                    className="h-5 w-5 inline-flex items-center justify-center text-foreground transition-colors hover:text-foreground/80"
-                                    aria-label={`${option.label} sort ${optionDirection === "asc" ? "ascending" : "descending"}`}
-                                  >
-                                    <span className="material-symbols-rounded text-sm">
-                                      {optionDirection === "asc" ? "arrow_upward" : "arrow_downward"}
-                                    </span>
-                                  </button>
-                                ) : (
-                                  <span className="h-5 w-5" aria-hidden="true" />
-                                )}
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setSortBy(option.value);
-                                    if (!isActive) {
-                                      setSortDirection("asc");
-                                    }
-                                    setVisiblePathsBySource({});
-                                  }}
-                                  className="text-left min-w-0"
-                                >
-                                  {option.label}
-                                </button>
-                              </div>
-                            );
-                          })}
+                        <div className="flex items-center gap-2">
+                          <div className="relative flex-1">
+                            <select
+                              value={sortBy}
+                              onChange={(event) => {
+                                const nextSortBy = event.target.value as SortByOption;
+                                setSortBy(nextSortBy);
+                                setSortDirection("asc");
+                                setVisiblePathsBySource({});
+                              }}
+                              className="w-full h-9 appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-3 pr-8 text-sm font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
+                              aria-label="Sort search results"
+                            >
+                              {SORT_OPTIONS.map((option) => (
+                                <option key={option.value} value={option.value}>{option.label}</option>
+                              ))}
+                            </select>
+                            <span className="pointer-events-none material-symbols-rounded absolute right-2 top-1/2 -translate-y-1/2 text-sm text-foreground/50">
+                              expand_more
+                            </span>
+                          </div>
+                          <SortDirectionButton
+                            direction={sortDirection}
+                            onToggle={() => {
+                              setSortDirection((current) => current === "asc" ? "desc" : "asc");
+                              setVisiblePathsBySource({});
+                            }}
+                          />
                         </div>
                       </div>
 
                       <div className="w-px bg-foreground/10 rounded-full" />
 
-                      <div className="w-32">
+                      <div className="w-40">
                         <span className="text-sm font-semibold text-foreground/60 mb-1 block">Per page</span>
                         <div className="h-px bg-foreground/10 mb-2" />
                         <div className="flex flex-col gap-1">

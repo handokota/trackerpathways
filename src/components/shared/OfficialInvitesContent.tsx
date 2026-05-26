@@ -52,8 +52,8 @@ export default function OfficialInvitesContent({
     : "flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t border-foreground/5 sm:border-0";
   const selectWrapperClass = isPanel ? "relative flex-1" : "relative flex-1 sm:flex-none";
   const selectClass = isPanel
-    ? "w-full h-8 appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-2.5 pr-7 text-xs font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
-    : "w-full sm:w-auto sm:min-w-40 h-8 appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-2.5 pr-7 text-xs font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30";
+    ? "w-full h-9 appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-3 pr-8 text-sm font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30"
+    : "w-full sm:w-auto sm:min-w-44 h-9 appearance-none rounded-md border border-foreground/10 bg-foreground/5 pl-3 pr-8 text-sm font-semibold text-foreground/80 outline-none transition-colors hover:border-foreground/20 focus:border-foreground/30";
 
   return (
     <div className="space-y-2.5">
@@ -147,7 +147,7 @@ export default function OfficialInvitesContent({
             </button>
           </div>
           <div className={controlsRowClass}>
-            <span className="text-xs font-semibold text-foreground/60 shrink-0">Sort by</span>
+            <span className="text-sm font-semibold text-foreground/60 shrink-0">Sort by</span>
             <div className={selectWrapperClass}>
               <select
                 value={officialInvitesSortBy}
@@ -159,17 +159,16 @@ export default function OfficialInvitesContent({
                 className={selectClass}
                 aria-label="Sort dialog invite trackers"
               >
-                <option value="officialInvites">Official Invites</option>
-                <option value="alphabetical">Alphabetical</option>
+                <option value="officialInvites">Official</option>
+                <option value="alphabetical">Name</option>
               </select>
-              <span className="pointer-events-none material-symbols-rounded absolute right-1.5 top-1/2 -translate-y-1/2 text-sm text-foreground/50">
+              <span className="pointer-events-none material-symbols-rounded absolute right-2 top-1/2 -translate-y-1/2 text-sm text-foreground/50">
                 expand_more
               </span>
             </div>
             <SortDirectionButton
               direction={officialInvitesSortDirection}
               onToggle={() => setOfficialInvitesSortDirection((current) => current === "asc" ? "desc" : "asc")}
-              size="sm"
             />
           </div>
         </div>
