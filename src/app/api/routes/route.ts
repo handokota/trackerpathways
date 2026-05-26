@@ -7,7 +7,7 @@ const MAX_API_JUMPS = 8;
 const MAX_API_DAYS = 3650;
 const MAX_PATHS_LIMIT = 999;
 const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX_REQUESTS = 60;
+const RATE_LIMIT_MAX_REQUESTS = 6;
 const RATE_LIMIT_MAX_BUCKETS = 5000;
 const allTrackerKeys = Object.keys(data.routeInfo);
 const allTrackers = Array.from(new Set([
@@ -255,7 +255,7 @@ export async function GET(request: Request) {
           const forumReq = data.unlockInviteClass[currentNode];
           const forumDays = forumReq?.[0] ?? 0;
           let stepDays: number | null = null;
-          
+
           if (edgeDays !== null) {
             stepDays = Math.max(edgeDays, forumDays);
           }
