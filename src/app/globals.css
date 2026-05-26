@@ -2,7 +2,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #111827;
+  --foreground: #18181b;
 
   --card: color-mix(in oklab, var(--background) 97%, var(--foreground));
   --card-foreground: var(--foreground);
@@ -198,13 +198,13 @@
 .text-foreground\/80 { color: color-mix(in oklab, var(--foreground) 80%, transparent); }
 .text-foreground\/90 { color: color-mix(in oklab, var(--foreground) 90%, transparent); }
 
-.bg-foreground\/3 { background-color: color-mix(in oklab, var(--foreground) 3%, transparent); }
-.bg-foreground\/5 { background-color: color-mix(in oklab, var(--foreground) 5%, transparent); }
-.bg-foreground\/8 { background-color: color-mix(in oklab, var(--foreground) 8%, transparent); }
-.bg-foreground\/10 { background-color: color-mix(in oklab, var(--foreground) 10%, transparent); }
-.bg-foreground\/12 { background-color: color-mix(in oklab, var(--foreground) 12%, transparent); }
-.bg-foreground\/20 { background-color: color-mix(in oklab, var(--foreground) 20%, transparent); }
-.bg-foreground\/45 { background-color: color-mix(in oklab, var(--foreground) 45%, transparent); }
+.bg-foreground\/3 { background-color: color-mix(in oklab, var(--background) 97%, var(--foreground)); }
+.bg-foreground\/5 { background-color: color-mix(in oklab, var(--background) 95%, var(--foreground)); }
+.bg-foreground\/8 { background-color: color-mix(in oklab, var(--background) 92%, var(--foreground)); }
+.bg-foreground\/10 { background-color: color-mix(in oklab, var(--background) 90%, var(--foreground)); }
+.bg-foreground\/12 { background-color: color-mix(in oklab, var(--background) 88%, var(--foreground)); }
+.bg-foreground\/20 { background-color: color-mix(in oklab, var(--background) 80%, var(--foreground)); }
+.bg-foreground\/45 { background-color: color-mix(in oklab, var(--background) 55%, var(--foreground)); }
 
 .border-foreground\/5 { border-color: color-mix(in oklab, var(--foreground) 5%, transparent); }
 .border-foreground\/10 { border-color: color-mix(in oklab, var(--foreground) 10%, transparent); }
