@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: oklch(97% 0 0);        
-  --foreground: oklch(14.5% 0 0);       
-  
-  --card: oklch(100% 0 0);             
-  --card-foreground: oklch(14.5% 0 0);
-  
-  --border: oklch(92% 0 0);            
-  --input: oklch(92% 0 0);
-  --ring: oklch(14.5% 0 0);
+  --background: #ffffff;
+  --foreground: #27272a;
+
+  --card: color-mix(in oklab, var(--background) 97%, var(--foreground));
+  --card-foreground: var(--foreground);
+
+  --border: color-mix(in oklab, var(--foreground) 14%, var(--background));
+  --input: color-mix(in oklab, var(--foreground) 12%, var(--background));
+  --ring: #1e66f5;
   --radius: 0.625rem;
   --motion-duration-fast: 150ms;
   --motion-duration-base: 200ms;
@@ -17,15 +17,15 @@
 }
 
 .dark {
-  --background: oklch(14.5% 0 0);      
-  --foreground: oklch(98.5% 0 0);       
-  
-  --card: oklch(20.5% 0 0);            
-  --card-foreground: oklch(98.5% 0 0);
-  
-  --border: oklch(100% 0 0 / 0.1);     
-  --input: oklch(100% 0 0 / 0.1);
-  --ring: oklch(98.5% 0 0);
+  --background: #0f0f10;
+  --foreground: #fafafa;
+
+  --card: color-mix(in oklab, var(--background) 88%, var(--foreground));
+  --card-foreground: var(--foreground);
+
+  --border: color-mix(in oklab, var(--foreground) 18%, var(--background));
+  --input: color-mix(in oklab, var(--foreground) 14%, var(--background));
+  --ring: #89b4fa;
 }
 
 .text-ui-muted { color: color-mix(in oklab, var(--foreground) 60%, transparent); }
