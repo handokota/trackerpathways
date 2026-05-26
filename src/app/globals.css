@@ -1,49 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #18181b;
+  --background: hsl(30 8% 98%);
+  --foreground: hsl(30 0% 10%);
 
-  --card: color-mix(in oklab, var(--background) 97%, var(--foreground));
-  --card-foreground: var(--foreground);
+  --card: hsl(30 0% 100%);
+  --card-foreground: hsl(240 6% 12%);
 
-  --border: color-mix(in oklab, var(--foreground) 14%, var(--background));
-  --input: color-mix(in oklab, var(--foreground) 12%, var(--background));
-  --ring: #1e66f5;
-  --accent-bg: #dbeafe;
-  --accent-text: #1d4ed8;
-  --accent-hover: #bfdbfe;
-  --status-open-bg: #dcfce7;
-  --status-open-text: #15803d;
-  --status-closed-bg: #fee2e2;
-  --status-closed-text: #b91c1c;
-  --status-limited-bg: #ffedd5;
-  --status-limited-text: #c2410c;
-  --radius: 0.75rem;
+  --border: hsl(30 8.11% 85.49%);
+  --input: hsl(30 4.29% 72.55%);
+  --ring: hsl(30 3.97% 49.41%);
+  --accent-bg: hsl(20 23.08% 94%);
+  --accent-text: hsl(240 5.88% 10%);
+  --accent-hover: hsl(20 23.08% 90%);
+  --status-open-bg: hsl(140 50% 90%);
+  --status-open-text: hsl(140 53% 29%);
+  --status-closed-bg: hsl(0 66% 92%);
+  --status-closed-text: hsl(0 62% 38%);
+  --status-limited-bg: hsl(30 80% 90%);
+  --status-limited-text: hsl(30 55% 38%);
+  --radius: 0.8rem;
   --motion-duration-fast: 150ms;
   --motion-duration-base: 200ms;
   --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
 }
 
 .dark {
-  --background: #0f0f10;
-  --foreground: #e5e7eb;
+  --background: hsl(220 5.5% 9%);
+  --foreground: hsl(220 2% 97%);
 
-  --card: color-mix(in oklab, var(--background) 88%, var(--foreground));
-  --card-foreground: var(--foreground);
+  --card: hsl(220 5.5% 10.5%);
+  --card-foreground: hsl(220 2% 97%);
 
-  --border: color-mix(in oklab, var(--foreground) 18%, var(--background));
-  --input: color-mix(in oklab, var(--foreground) 14%, var(--background));
-  --ring: #89b4fa;
-  --accent-bg: color-mix(in oklab, #1e3a8a 40%, transparent);
-  --accent-text: #93c5fd;
-  --accent-hover: color-mix(in oklab, #1e3a8a 50%, transparent);
-  --status-open-bg: color-mix(in oklab, #14532d 35%, transparent);
-  --status-open-text: #86efac;
-  --status-closed-bg: color-mix(in oklab, #7f1d1d 35%, transparent);
-  --status-closed-text: #fca5a5;
-  --status-limited-bg: color-mix(in oklab, #7c2d12 35%, transparent);
-  --status-limited-text: #fdba74;
+  --border: hsl(220 3% 17%);
+  --input: hsl(220 4% 22%);
+  --ring: hsl(220 4% 80%);
+  --accent-bg: hsl(220 5% 15.5%);
+  --accent-text: hsl(220 2% 98%);
+  --accent-hover: hsl(220 5% 18%);
+  --status-open-bg: hsl(140 40% 20%);
+  --status-open-text: hsl(140 55% 80%);
+  --status-closed-bg: hsl(0 50% 20%);
+  --status-closed-text: hsl(0 70% 85%);
+  --status-limited-bg: hsl(30 55% 20%);
+  --status-limited-text: hsl(30 75% 85%);
 }
 
 .text-ui-muted { color: color-mix(in oklab, var(--foreground) 60%, transparent); }
