@@ -64,7 +64,7 @@ export default function OfficialInvitesContent({
           className="w-full flex items-center justify-between gap-2 text-left text-sm font-semibold text-foreground cursor-pointer"
           aria-expanded={isUnlockAccordionOpen}
         >
-          <span>Official invite forum unlock requirements</span>
+          <span>Forum unlock requirements</span>
           <span className={`material-symbols-rounded text-lg text-foreground/60 transition-transform duration-200 ${isUnlockAccordionOpen ? "rotate-180" : ""}`}>
             keyboard_arrow_down
           </span>
@@ -112,7 +112,7 @@ export default function OfficialInvitesContent({
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-foreground/70">No specific requirements were provided.</p>
+              <p className="text-sm text-foreground/70">No requirements provided.</p>
             )}
           </div>
         </div>
@@ -260,7 +260,7 @@ export default function OfficialInvitesContent({
                                 </ul>
                               ) : (
                                 <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
-                                  {renderReqs(section.requirementText || "No specific requirements.")}
+                                  {renderReqs(section.requirementText || "No requirements provided.")}
                                 </p>
                               )}
                             </div>
@@ -268,7 +268,7 @@ export default function OfficialInvitesContent({
                         </div>
                       ) : (
                         <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
-                          No specific requirements.
+                          No requirements provided.
                         </p>
                       )}
 
