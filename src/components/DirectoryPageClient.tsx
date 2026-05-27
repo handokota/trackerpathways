@@ -243,9 +243,12 @@ export default function DirectoryPageClient() {
               </button>
 
               {showViewControls && (
-                <div className="absolute right-0 mt-2 w-fit max-w-[calc(100vw-2rem)] rounded-xl border border-foreground/10 bg-card p-3 z-20 shadow-lg motion-safe:animate-in fade-in zoom-in-95 duration-200">
-                  <div className="w-32">
-                    <span className="text-sm font-semibold text-foreground/60 mb-1 block">Sort by</span>
+                <div className="absolute right-0 mt-2 w-40 max-w-[calc(100vw-2rem)] rounded-xl border border-foreground/10 bg-card p-3 z-20 shadow-lg motion-safe:animate-in fade-in zoom-in-95 duration-200">
+                  <div className="w-full min-w-0">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-foreground/60 mb-1">
+                      <span className="material-symbols-rounded text-base">sort</span>
+                      <span>Sort by</span>
+                    </div>
                     <div className="h-px bg-foreground/10 mb-2" />
                     <div className="flex flex-col gap-1">
                       {DIRECTORY_SORT_OPTIONS.map((option) => {
@@ -258,7 +261,7 @@ export default function DirectoryPageClient() {
                         return (
                           <div
                             key={option.value}
-                            className={`h-8 rounded-md px-2 text-sm font-normal transition-colors grid grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-1 ${
+                            className={`h-8 w-full rounded-md px-2 text-sm font-normal transition-colors grid grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-1 ${
                               isActive
                                 ? "bg-foreground/10 text-foreground"
                                 : "text-foreground/60 hover:text-foreground"
