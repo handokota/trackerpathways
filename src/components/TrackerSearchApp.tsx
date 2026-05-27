@@ -936,9 +936,9 @@ export default function TrackerSearchApp() {
                     setShowFilters(!showFilters);
                     if (showCollectionManager) setShowCollectionManager(false);
                   }}
-                  className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all text-sm font-medium bg-foreground/5 ${
+                  className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all text-sm font-medium border border-foreground/10 bg-foreground/5 hover:border-foreground/20 hover:bg-foreground/10 ${
                     showFilters 
-                      ? 'text-foreground' 
+                      ? 'text-foreground border-foreground/20' 
                       : 'text-foreground/50 hover:text-foreground' 
                   }`}
                 >
@@ -951,9 +951,9 @@ export default function TrackerSearchApp() {
                     setShowCollectionManager(!showCollectionManager);
                     if (showFilters) setShowFilters(false);
                   }}
-                  className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all text-sm font-medium bg-foreground/5 ${
+                  className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all text-sm font-medium border border-foreground/10 bg-foreground/5 hover:border-foreground/20 hover:bg-foreground/10 ${
                     showCollectionManager 
-                      ? 'text-foreground' 
+                      ? 'text-foreground border-foreground/20' 
                       : 'text-foreground/50 hover:text-foreground' 
                   }`}
                 >
@@ -1119,7 +1119,7 @@ export default function TrackerSearchApp() {
                 </button>
 
                 {showViewControls && (
-                  <div className="absolute right-0 mt-2 w-40 md:w-[19.25rem] max-w-[calc(100vw-2rem)] rounded-xl border border-foreground/10 bg-card p-3 z-20 shadow-lg motion-safe:animate-in fade-in zoom-in-95 duration-200">
+                  <div className="absolute right-0 mt-2 w-40 md:w-77 max-w-[calc(100vw-2rem)] rounded-xl border border-foreground/10 bg-card p-3 z-20 shadow-lg motion-safe:animate-in fade-in zoom-in-95 duration-200">
                     <div className="grid grid-cols-1 gap-3 items-stretch md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
                       <div className="w-full min-w-0">
                         <div className="flex items-center gap-2 text-sm font-semibold text-foreground/60 mb-1">
