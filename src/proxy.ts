@@ -12,14 +12,15 @@ const createNonce = () => {
 function buildCsp(nonce?: string) {
   const scriptSrc = isDevelopment
     ? `'self' 'unsafe-eval' 'unsafe-inline'`
-    : nonce
-      ? `'self' 'nonce-${nonce}'`
-      : `'self'`;
+    : `'self' 'nonce-${nonce}'`;
+  const styleSrc = isDevelopment
+    ? `'self' 'unsafe-inline'`
+    : `'self' 'nonce-${nonce}'`;
 
   return [
     "default-src 'self'",
     `script-src ${scriptSrc}`,
-    "style-src 'self' 'unsafe-inline'",
+    `style-src ${styleSrc}`,
     "img-src 'self' blob: data:",
     "font-src 'self'",
     "object-src 'none'",
@@ -31,7 +32,7 @@ function buildCsp(nonce?: string) {
 }
 
 export function proxy(request: NextRequest) {
-  const nonce = isDevelopment ? undefined : createNonce();
+  const nonce = createNonce();
   const csp = buildCsp(nonce);
   const requestHeaders = new Headers(request.headers);
 
