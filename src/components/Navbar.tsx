@@ -2,17 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
-
-const subscribe = () => () => {};
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { resolvedTheme } = useTheme();
-  const mounted = useSyncExternalStore(subscribe, () => true, () => false);
 
   return (
     <header className="fixed w-full top-0 z-50 bg-background/80 backdrop-blur-xl transition-colors duration-300 border-b border-border/40">
@@ -23,19 +17,24 @@ export default function Navbar() {
           className="flex items-center gap-3 select-none group rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/25"
         >
           <div className="w-8 h-8 transition-transform group-hover:scale-105">
-            {mounted ? (
-              <Image
-                src={resolvedTheme === "dark" ? "/logo-dark.svg" : "/logo-light.svg"}
-                alt=""
-                aria-hidden="true"
-                width={32}
-                height={32}
-                className="w-8 h-8 object-contain"
-                priority
-              />
-            ) : (
-              <div className="w-8 h-8" />
-            )}
+            <Image
+              src="/logo-light.svg"
+              alt=""
+              aria-hidden="true"
+              width={32}
+              height={32}
+              className="w-8 h-8 object-contain ui-logo-light"
+              priority
+            />
+            <Image
+              src="/logo-dark.svg"
+              alt=""
+              aria-hidden="true"
+              width={32}
+              height={32}
+              className="w-8 h-8 object-contain ui-logo-dark"
+              priority
+            />
           </div>
 
           <span className="text-xl font-bold tracking-tight text-foreground hidden sm:block">

@@ -85,6 +85,26 @@
   background-color: var(--status-limited-bg);
 }
 
+.ui-logo-light,
+.ui-icon-light {
+  display: inline-block;
+}
+
+.ui-logo-dark,
+.ui-icon-dark {
+  display: none;
+}
+
+.dark .ui-logo-light,
+.dark .ui-icon-light {
+  display: none;
+}
+
+.dark .ui-logo-dark,
+.dark .ui-icon-dark {
+  display: inline-block;
+}
+
 
 .ui-chip {
   display: inline-flex;

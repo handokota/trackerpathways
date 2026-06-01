@@ -18,9 +18,9 @@ export default function ThemeSwitcher() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (!resolvedTheme) return <div className="w-9 h-9" />;
-
-  const currentIcon = resolvedTheme === 'dark' ? 'dark_mode' : 'light_mode';
+  const activeTheme = resolvedTheme ?? theme ?? "light";
+  const currentIcon =
+    activeTheme === "dark" ? "dark_mode" : activeTheme === "light" ? "light_mode" : "desktop_windows";
 
   const themes = [
     { id: 'light', icon: 'light_mode', label: 'Light' },

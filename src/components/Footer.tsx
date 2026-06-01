@@ -1,16 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
-
-const subscribe = () => () => {};
 
 export default function Footer() {
   const pathname = usePathname();
-  const { resolvedTheme } = useTheme();
-  const mounted = useSyncExternalStore(subscribe, () => true, () => false);
 
   if (pathname === "/map") {
     return null;
@@ -31,17 +25,20 @@ export default function Footer() {
           rel="noopener noreferrer"
           className="group flex items-center gap-1.5 text-foreground/60 hover:text-foreground transition-colors"
         >
-          {mounted ? (
-            <Image
-              src={resolvedTheme === "dark" ? "/github-dark.svg" : "/github-light.svg"}
-              alt="GitHub"
-              width={14}
-              height={14}
-              className="w-3.5 h-3.5 opacity-100"
-            />
-          ) : (
-            <div className="w-3.5 h-3.5" />
-          )}
+          <Image
+            src="/github-light.svg"
+            alt="GitHub"
+            width={14}
+            height={14}
+            className="w-3.5 h-3.5 opacity-100 ui-icon-light"
+          />
+          <Image
+            src="/github-dark.svg"
+            alt="GitHub"
+            width={14}
+            height={14}
+            className="w-3.5 h-3.5 opacity-100 ui-icon-dark"
+          />
           <span>GitHub</span>
         </a>
       </div>
