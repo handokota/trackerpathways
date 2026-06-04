@@ -562,7 +562,8 @@
     },
     "HD-Space": {
       "DigitalCore.Club": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
-      "seedpool": { "days": 30, "reqs": "HD Spacer, 1 month", "active": "Yes", "updated": "Nov 2025" }
+      "seedpool": { "days": 30, "reqs": "HD Spacer, 1 month", "active": "Yes", "updated": "Nov 2025" },
+      "YuScene": { "days": 30, "reqs": "HD Spacer, 1 month", "active": "Yes", "updated": "Jun 2026" }
     },
     "HD-Torrents": {
       "DigitalCore.Club": { "days": 0, "reqs": "Profile will be reviewed", "active": "Yes", "updated": "Nov 2025" },
