@@ -561,8 +561,7 @@
       "ZmPT": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Aug 2025" }
     },
     "HD-Space": {
-      "DigitalCore.Club": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
-      "seedpool": { "days": 30, "reqs": "HD Spacer, 1 month", "active": "Yes", "updated": "Nov 2025" }
+      "DigitalCore.Club": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" }
     },
     "HD-Torrents": {
       "DigitalCore.Club": { "days": 0, "reqs": "Profile will be reviewed", "active": "Yes", "updated": "Nov 2025" },
