@@ -48,7 +48,6 @@
     "ExtremeBits": "XB",
     "F1Carreras": "F1C",
     "Fappaizuri": "FZ",
-    "FearNoPeer": "FNP",
     "FileList": "FL",
     "FunFile": "FF",
     "GazelleGames": "GGn",
@@ -185,7 +184,6 @@
     "DarkPeers": [120, "ExtremeUser: 4 months, 20TiB upload, ratio>0.8, avg seedtime >= 2 months, 15 torrents"],
     "Dolphin Is Coming": [14, "PU: 2 weeks, 5 torrents, 25GB upload, ratio>=1.05"],
     "Empornium": [56, "Great Perv: 8 weeks, 100 GB upload, 5 torrents, ratio>1.05 or Sextreme Perv: 13 weeks, 1 TB upload, 50 torrents, ratio>1.05"],
-    "FearNoPeer": [60, "Seeder: 2 months, 15 TiB seedsize, avg seed time >= 1 month, ratio >= 0.8"],
     "GazelleGames": [30, "Pro Gamer: 1200 points, 30 days; Legendary Gamer: 3000 points, 90 days"],
     "Great Poster Wall": [14, "PU: 2 weeks, 200GB download, 1 upload, ratio>=1.2"],
     "HD-Space": [0, "HD Spacer: 100GB upload, ratio>1.05"],
@@ -422,7 +420,6 @@
     "CapybaraBR": {
       "DarkPeers": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
       "F1Carreras": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Feb 2026" },
-      "FearNoPeer": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
       "LST": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Feb 2026" },
       "Luminarr": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Feb 2026" },
       "OldToonsWorld": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
@@ -458,7 +455,6 @@
     "DarkPeers": {
       "BitPorn": { "days": 30, "reqs": "5 TiB of uploaded, avg seedtime >= 1 month", "active": "Yes", "updated": "Apr 2026" },
       "DigitalCore.Club": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Apr 2026" },
-      "FearNoPeer": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Apr 2026" },
       "HomieHelpDesk": { "days": 120, "reqs": "Account age  >=4 months minimum, 5TB upload, 2 additional proofs", "active": "Yes", "updated": "Apr 2026" },
       "Luminarr": { "days": 90, "reqs": "3 months", "active": "YEes", "updated": "Apr 2026" },
       "seedpool": { "days": 0, "reqs": "1 TiB seeding size", "active": "Yes", "updated": "Apr 2026" },
@@ -480,15 +476,6 @@
       "AvistaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
       "CinemaZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
       "PrivateHD": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" }
-    },
-    "FearNoPeer": {
-      "BrokenStones": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Apr 2026" },
-      "CapybaraBR": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Apr 2026" },
-      "Luminarr": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Apr 2026" },
-      "OldToonsWorld": { "days": 365, "reqs": "1 year, avg seedtime>=6 months, seedsize>=1 TiB", "active": "Yes", "updated": "Apr 2026" },
-      "ReelFliX": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Apr 2026" },
-      "RetroFlix": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Apr 2026" },
-      "Upload.cx": { "days": 0, "reqs": "SuperUser+", "active": "Yes", "updated": "Apr 2026" }
     },
     "GazelleGames": {
       "Aither": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Jan 2026" },
@@ -613,7 +600,6 @@
     "Last Digital Underground": {
       "BitPorn": { "days": 180, "reqs": "6 months, 8TB \"upload volume\", \"No warnings ever\", 2x additional tracker profile screenshots (Not IPT, TL, FL, TD or \"low quality\")", "active": "Yes", "updated": "Jan 2026" },
       "Fappaizuri": { "days": 0, "reqs": "10TB \"upload size\", \"Screenshot of personal data\"", "active": "Yes", "updated": "Jan 2026" },
-      "FearNoPeer": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jan 2026" },
       "HDCity": { "days": 0, "reqs": "10TB \"upload size\", \"Screenshots of your stats from well-known trackers\"", "active": "Yes", "updated": "Jan 2026" },
       "Kufirc": { "days": 180, "reqs": "6 months, 8TB \"upload volume\", \"No warnings ever\", 2x additional tracker profile screenshots (Not IPT, TL, FL, TD or \"low quality\")", "active": "Yes", "updated": "Jan 2026" }
     },
@@ -634,7 +620,6 @@
     "Luminarr": {
       "BrokenStones": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Apr 2026" },
       "DarkPeers": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Apr 2026" },
-      "FearNoPeer": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Apr 2026" },
       "HomieHelpDesk": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Apr 2026" },
       "RetroFlix": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Apr 2026" },
       "seedpool": { "days": 0, "reqs": "1TiB seedsize", "active": "Yes", "updated": "Apr 2026" },
@@ -830,7 +815,6 @@
     "ReelFliX": {
       "BitPorn": { "days": 180, "reqs": "Elite+, 6 months, 8TB \"upload volume\", \"No warnings ever\", 2x additional tracker profile screenshots (Not FL, IPT, TD, TL or \"low quality\")", "active": "Yes", "updated": "Aug 2025" },
       "Fappaizuri": { "days": 0, "reqs": "Elite+, 10TB \"upload size\"", "active": "Yes", "updated": "Aug 2025" },
-      "FearNoPeer": { "days": 0, "reqs": "Elite+", "active": "Yes", "updated": "Aug 2025" },
       "HDCity": { "days": 0, "reqs": "Elite+, 10TB \"upload size\", (optional) additional tracker profile screenshots", "active": "Yes", "updated": "Aug 2025" },
       "Last Digital Underground": { "days": 0, "reqs": "Elite+", "active": "Yes", "updated": "Aug 2025" },
       "LST": { "days": 90, "reqs": "Elite+, 3 months", "active": "Yes", "updated": "Aug 2025" },
@@ -842,7 +826,6 @@
     "RetroFlix": {
       "DarkPeers": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
       "DigitalCore.Club": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
-      "FearNoPeer": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
       "Great Poster Wall": { "days": 0, "reqs": "upload 10 non music torrents or 5+ album torrents", "active": "Yes", "updated": "Feb 2026" },
       "LST": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
       "seedpool": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
@@ -927,7 +910,6 @@
     },
     "Upload.cx": {
       "DigitalCore.Club": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Apr 2026" },
-      "FearNoPeer": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Apr 2026" },
       "LST": { "days": 90, "reqs": "PU+, 3 months", "active": "Yes", "updated": "Apr 2026" },
       "Luminarr": { "days": 90, "reqs": "PU+, 3 months", "active": "Yes", "updated": "Apr 2026" },
       "ReelFliX": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Apr 2026" },
@@ -939,7 +921,6 @@
       "CapybaraBR": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Mar 2026" },
       "DarkPeers": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Mar 2026" },
       "DigitalCore.Club": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Mar 2026" },
-      "FearNoPeer": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Mar 2026" },
       "Luminarr": { "days": 90, "reqs": "3 months account age", "active": "Yes", "updated": "Mar 2026" },
       "seedpool": { "days": 0, "reqs": "1 TiB seeding size", "active": "Yes", "updated": "Mar 2026" },
       "Upload.cx": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Mar 2026" }
