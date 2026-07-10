@@ -1191,16 +1191,16 @@ export default function TrackerSearchApp() {
                                 key={size}
                                 type="button"
                                 onClick={() => setRoutesPerPageInUrl(size)}
-                                className={`h-8 w-full rounded-md px-2 text-sm font-normal transition-colors flex items-center justify-start gap-1 ${
+                                className={`h-8 w-full rounded-md px-2 text-sm font-normal transition-colors grid grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-1 ${
                                   isActive
                                     ? "bg-foreground/10 text-foreground"
                                     : "text-foreground/60 hover:text-foreground"
                                 }`}
                               >
-                                <span className={`material-symbols-rounded w-4 text-sm ${isActive ? "text-foreground opacity-100" : "opacity-0"}`}>
+                                <span className={`material-symbols-rounded h-5 w-5 text-sm ${isActive ? "text-foreground opacity-100" : "opacity-0"}`}>
                                   radio_button_checked
                                 </span>
-                                <span className="leading-none">{size}</span>
+                                <span className="leading-none text-left">{size}</span>
                               </button>
                             );
                           })}
