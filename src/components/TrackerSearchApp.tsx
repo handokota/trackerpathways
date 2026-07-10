@@ -81,31 +81,6 @@ const serializeSourcePagesParam = (sourcePages: Record<string, number>) => {
     .join("|");
 };
 
-const buildPaginationItems = (currentPage: number, totalPages: number) => {
-  if (totalPages <= 7) {
-    return Array.from({ length: totalPages }, (_, index) => index + 1);
-  }
-
-  const items: Array<number | "ellipsis-left" | "ellipsis-right"> = [1];
-  const windowStart = Math.max(2, currentPage - 1);
-  const windowEnd = Math.min(totalPages - 1, currentPage + 1);
-
-  if (windowStart > 2) {
-    items.push("ellipsis-left");
-  }
-
-  for (let page = windowStart; page <= windowEnd; page += 1) {
-    items.push(page);
-  }
-
-  if (windowEnd < totalPages - 1) {
-    items.push("ellipsis-right");
-  }
-
-  items.push(totalPages);
-  return items;
-};
-
 export default function TrackerSearchApp() {
   const router = useRouter();
   const pathname = usePathname();
@@ -1222,8 +1197,8 @@ export default function TrackerSearchApp() {
               const sourceTotalPages = Math.max(1, Math.ceil(paths.length / routesPerPageFromQuery));
               const sourceRoutePage = Math.min(sourcePagesFromQuery[sourceName] ?? 1, sourceTotalPages);
               const sourceRouteStart = (sourceRoutePage - 1) * routesPerPageFromQuery;
+              const sourceRouteEnd = Math.min(sourceRouteStart + routesPerPageFromQuery, paths.length);
               const displayedSourcePaths = paths.slice(sourceRouteStart, sourceRouteStart + routesPerPageFromQuery);
-              const sourcePageItems = buildPaginationItems(sourceRoutePage, sourceTotalPages);
               
               const bestHops = paths.length > 0 ? Math.min(...paths.map(p => p.routes.length)) : 0;
               const validDays = paths.filter(p => p.totalDays !== null).map(p => p.totalDays as number);
@@ -1377,53 +1352,50 @@ export default function TrackerSearchApp() {
                         </div>
 
                         {!isStale && !isLoading && paths.length > 0 && (
-                          <div className="mt-4 pt-3 border-t border-foreground/10 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                            <div className="text-xs font-medium text-foreground/50">
-                              Showing {sourceRouteStart + 1}-{Math.min(sourceRouteStart + routesPerPageFromQuery, paths.length)} of {paths.length} routes (page {sourceRoutePage}/{sourceTotalPages})
+                          <div className="mt-4 pt-3 border-t border-foreground/10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="text-xs font-medium text-foreground/55">
+                              Showing <span className="font-semibold text-foreground/80">{sourceRouteStart + 1}-{sourceRouteEnd}</span> of <span className="font-semibold text-foreground/80">{paths.length}</span>
                             </div>
                             {sourceTotalPages > 1 && (
-                              <div className="flex flex-wrap items-center gap-1">
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => setRoutePageForSourceInUrl(sourceName, 1, routesPerPageFromQuery)}
+                                  disabled={sourceRoutePage === 1}
+                                  aria-label="First page"
+                                  className="h-8 min-w-8 rounded-md border border-foreground/10 bg-foreground/5 px-2 text-xs font-semibold text-foreground/70 transition-colors inline-flex items-center justify-center hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                                >
+                                  <span className="material-symbols-rounded text-sm">first_page</span>
+                                </button>
                                 <button
                                   type="button"
                                   onClick={() => setRoutePageForSourceInUrl(sourceName, Math.max(1, sourceRoutePage - 1), routesPerPageFromQuery)}
                                   disabled={sourceRoutePage === 1}
-                                  className="h-8 rounded-md border border-foreground/10 bg-foreground/5 px-2.5 text-xs font-semibold text-foreground/70 transition-colors hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                                  aria-label="Previous page"
+                                  className="h-8 min-w-8 rounded-md border border-foreground/10 bg-foreground/5 px-2 text-xs font-semibold text-foreground/70 transition-colors inline-flex items-center justify-center hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                                 >
-                                  Prev
+                                  <span className="material-symbols-rounded text-sm">chevron_left</span>
                                 </button>
-                                {sourcePageItems.map((item, index) => {
-                                  if (item === "ellipsis-left" || item === "ellipsis-right") {
-                                    return (
-                                      <span key={`${sourceName}-${item}-${index}`} className="px-1 text-foreground/40">
-                                        …
-                                      </span>
-                                    );
-                                  }
-
-                                  const isActive = item === sourceRoutePage;
-                                  return (
-                                    <button
-                                      key={`${sourceName}-${item}`}
-                                      type="button"
-                                      onClick={() => setRoutePageForSourceInUrl(sourceName, item, routesPerPageFromQuery)}
-                                      aria-current={isActive ? "page" : undefined}
-                                      className={`h-8 min-w-8 rounded-md border px-2 text-xs font-semibold transition-colors ${
-                                        isActive
-                                          ? "border-foreground/20 bg-foreground/10 text-foreground"
-                                          : "border-foreground/10 bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground"
-                                      }`}
-                                    >
-                                      {item}
-                                    </button>
-                                  );
-                                })}
+                                <span className="h-8 min-w-8 rounded-md border border-foreground/20 bg-foreground/10 px-2 text-xs font-semibold text-foreground inline-flex items-center justify-center">
+                                  {sourceRoutePage}
+                                </span>
                                 <button
                                   type="button"
                                   onClick={() => setRoutePageForSourceInUrl(sourceName, Math.min(sourceTotalPages, sourceRoutePage + 1), routesPerPageFromQuery)}
                                   disabled={sourceRoutePage === sourceTotalPages}
-                                  className="h-8 rounded-md border border-foreground/10 bg-foreground/5 px-2.5 text-xs font-semibold text-foreground/70 transition-colors hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                                  aria-label="Next page"
+                                  className="h-8 min-w-8 rounded-md border border-foreground/10 bg-foreground/5 px-2 text-xs font-semibold text-foreground/70 transition-colors inline-flex items-center justify-center hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                                 >
-                                  Next
+                                  <span className="material-symbols-rounded text-sm">chevron_right</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setRoutePageForSourceInUrl(sourceName, sourceTotalPages, routesPerPageFromQuery)}
+                                  disabled={sourceRoutePage === sourceTotalPages}
+                                  aria-label="Last page"
+                                  className="h-8 min-w-8 rounded-md border border-foreground/10 bg-foreground/5 px-2 text-xs font-semibold text-foreground/70 transition-colors inline-flex items-center justify-center hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                                >
+                                  <span className="material-symbols-rounded text-sm">last_page</span>
                                 </button>
                               </div>
                             )}
