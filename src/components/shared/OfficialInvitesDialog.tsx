@@ -42,7 +42,7 @@ export default function OfficialInvitesDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center md:items-center bg-black/55 p-0 md:p-4 motion-safe:animate-in fade-in duration-200 overscroll-none touch-none"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 motion-safe:animate-in fade-in duration-200 overscroll-none touch-none"
       onClick={onClose}
     >
       <div
@@ -51,13 +51,10 @@ export default function OfficialInvitesDialog({
         aria-labelledby="official-invites-dialog-title"
         tabIndex={-1}
         ref={dialogRef}
-        className="w-full md:max-w-2xl max-h-[85dvh] rounded-t-2xl md:rounded-xl border border-foreground/15 bg-card flex flex-col overflow-hidden motion-safe:animate-in zoom-in-95 slide-in-from-bottom-4 md:slide-in-from-bottom-0 duration-200 pointer-events-auto touch-auto"
+        className="w-full max-w-2xl max-h-[85dvh] rounded-xl border border-foreground/15 bg-card/95 flex flex-col overflow-hidden motion-safe:animate-in zoom-in-95 duration-200 pointer-events-auto touch-auto"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex justify-center pt-3 pb-1 md:hidden shrink-0">
-          <span className="h-1.5 w-12 rounded-full bg-foreground/20" />
-        </div>
-        <div className="flex items-start justify-between gap-4 px-4 pb-4 md:pt-4 border-b border-foreground/10 shrink-0">
+        <div className="flex items-start justify-between gap-4 px-4 pb-4 pt-4 border-b border-foreground/10 shrink-0">
           <div>
             <h2 id="official-invites-dialog-title" className="text-lg font-bold text-foreground">
               {data.sourceName}
