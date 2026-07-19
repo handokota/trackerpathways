@@ -450,13 +450,13 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
 
   const handleCollectionSelect = (selectedItem: string) => {
     const currentList = collection.split(",").map(s => s.trim()).filter(s => s);
-    
+
     if (!currentList.includes(selectedItem)) {
       const newValue = [...currentList, selectedItem].join(", ");
       setCollection(newValue);
       localStorage.setItem("tracker-collection", newValue);
     }
-    
+
     setCollectionInput("");
     setShowCollectionSug(false);
     setCollectionActiveIndex(-1);
@@ -571,7 +571,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             <span className={`material-symbols-rounded text-lg shrink-0 transition-transform duration-300 text-foreground ${isPanelOpen ? "rotate-90" : ""}`}>
               directions
             </span>
-            <span className={`text-sm font-bold tracking-tight transition-all duration-500 ${isPanelOpen ? "opacity-100 max-w-[200px] ml-2" : "opacity-0 max-w-0 ml-0"}`}>
+            <span className={`text-sm font-bold tracking-tight transition-all duration-500 ${isPanelOpen ? "opacity-100 max-w-50 ml-2" : "opacity-0 max-w-0 ml-0"}`}>
               Pathfinder
             </span>
 
@@ -580,8 +580,8 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             )}
           </button>
 
-          <div className={`transition-all duration-500 ease-in-out ${isPanelOpen ? "max-h-[800px] opacity-100 border-t border-foreground/10 overflow-visible" : "max-h-0 opacity-0 border-t-0 overflow-hidden"}`}>
-            <div className="p-4 flex flex-col gap-4 min-w-[250px]">
+          <div className={`transition-all duration-500 ease-in-out ${isPanelOpen ? "max-h-200 opacity-100 border-t border-foreground/10 overflow-visible" : "max-h-0 opacity-0 border-t-0 overflow-hidden"}`}>
+            <div className="p-4 flex flex-col gap-4 min-w-62.5">
               <div className="flex items-center justify-between gap-2">
                 <button
                   onClick={toggleCollectionSourceMode}
@@ -599,7 +599,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                 </button>
 
                 {useCollectionAsSource && (
-                  <div className="grid grid-cols-2 w-[120px] shrink-0 rounded-md bg-foreground/5 p-0.5">
+                  <div className="grid grid-cols-2 w-30 shrink-0 rounded-md bg-foreground/5 p-0.5">
                     <button
                       onClick={() => setPathSortBy("jumps")}
                       className={`text-center px-2 py-1 text-xs rounded-sm transition-colors ${
@@ -629,7 +629,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                   Add trackers in the Collection panel to find routes from your current trackers.
                 </p>
               )}
-              
+
               <div className="flex flex-col gap-1.5 relative">
                 <label className="text-sm font-medium text-muted-foreground ml-1">Source Tracker</label>
                 <input
@@ -652,7 +652,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                       return;
                     }
                     setPathStartInput(e.target.value);
-                    setPathStart(""); 
+                    setPathStart("");
                     setShowPathStartSug(true);
                     setPathStartActiveIndex(-1);
                   }}
@@ -664,7 +664,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                     Using {collectionNodes.length} tracker{collectionNodes.length === 1 ? "" : "s"} from collection.
                   </span>
                 )}
-                
+
                 {!useCollectionAsSource && showPathStartSug && getSuggestions(pathStartInput).length > 0 && (
                   <>
                     <div className="fixed inset-0 z-30" onClick={() => setShowPathStartSug(false)} />
@@ -703,7 +703,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                   }}
                   onKeyDown={handlePathEndKeyDown}
                 />
-                
+
                 {showPathEndSug && getSuggestions(pathEndInput).length > 0 && (
                   <>
                     <div className="fixed inset-0 z-30" onClick={() => setShowPathEndSug(false)} />
@@ -797,9 +797,9 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
 
               {(pathStart || pathEnd || pathStartInput || pathEndInput || useCollectionAsSource) && (
                 <button
-                  onClick={() => { 
-                    setPathStart(""); setPathEnd(""); 
-                    setPathStartInput(""); setPathEndInput(""); 
+                  onClick={() => {
+                    setPathStart(""); setPathEnd("");
+                    setPathStartInput(""); setPathEndInput("");
                     setSelectedCollectionPathId(null);
                   }}
                   className="text-sm text-muted-foreground hover:text-foreground underline decoration-dotted mt-1 self-center"
@@ -819,7 +819,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             <span className={`material-symbols-rounded text-lg shrink-0 transition-transform duration-300 text-foreground ${isCollectionPanelOpen ? "rotate-90" : ""}`}>
               bookmarks
             </span>
-            <span className={`text-sm font-bold tracking-tight transition-all duration-500 ${isCollectionPanelOpen ? "opacity-100 max-w-[200px] ml-2" : "opacity-0 max-w-0 ml-0"}`}>
+            <span className={`text-sm font-bold tracking-tight transition-all duration-500 ${isCollectionPanelOpen ? "opacity-100 max-w-50 ml-2" : "opacity-0 max-w-0 ml-0"}`}>
               Collection
             </span>
 
@@ -828,8 +828,8 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             )}
           </button>
 
-          <div className={`transition-all duration-500 ease-in-out ${isCollectionPanelOpen ? "max-h-[800px] opacity-100 border-t border-foreground/10 overflow-visible" : "max-h-0 opacity-0 border-t-0 overflow-hidden"}`}>
-            <div className="p-4 flex flex-col gap-4 min-w-[250px]">
+          <div className={`transition-all duration-500 ease-in-out ${isCollectionPanelOpen ? "max-h-200 opacity-100 border-t border-foreground/10 overflow-visible" : "max-h-0 opacity-0 border-t-0 overflow-hidden"}`}>
+            <div className="p-4 flex flex-col gap-4 min-w-62.5">
               <div className="flex flex-col gap-1.5 relative" ref={collectionWrapperRef}>
                 <label className="text-sm font-medium text-muted-foreground ml-1">My Trackers</label>
                 <input
@@ -871,8 +871,8 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
               {collectionNodes.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-1">
                   {collectionNodes.map((node) => (
-                    <button 
-                      key={node} 
+                    <button
+                      key={node}
                       onClick={() => removeCollectionItem(node)}
                       className="px-2.5 py-1 rounded-md text-sm font-medium bg-purple-500/10 hover:bg-red-500/10 text-purple-600 dark:text-purple-400 hover:text-red-600 dark:hover:text-red-400 border border-purple-500/20 hover:border-red-500/20 transition-colors cursor-pointer"
                     >
