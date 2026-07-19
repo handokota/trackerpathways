@@ -51,7 +51,7 @@ export default function OfficialInvitesDialog({
         aria-labelledby="official-invites-dialog-title"
         tabIndex={-1}
         ref={dialogRef}
-        className="w-full max-w-2xl max-h-[85dvh] rounded-xl border border-foreground/15 bg-card/95 flex flex-col overflow-hidden motion-safe:animate-in zoom-in-95 duration-200 pointer-events-auto touch-auto"
+        className="w-full max-w-2xl max-h-[85dvh] rounded-xl border border-foreground/15 bg-card flex flex-col overflow-hidden motion-safe:animate-in zoom-in-95 duration-200 pointer-events-auto touch-auto"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4 px-4 pb-4 pt-4 border-b border-foreground/10 shrink-0">
