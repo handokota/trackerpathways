@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useDeferredValue, useRef, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import rawData from "@/data/trackers.json"; 
+import rawData from "@/data/trackers.json";
 import { DataStructure, PathResult } from "@/types";
 import {
   OfficialInviteEntry,
@@ -95,7 +95,7 @@ export default function TrackerSearchApp() {
 
   const [sourceSearch, setSourceSearch] = useState(searchParams.get("source") || "");
   const [targetSearch, setTargetSearch] = useState(searchParams.get("target") || "");
-    
+
   const [maxJumps, setMaxJumps] = useState<number>(
     searchParams.get("jumps") ? Number.parseInt(searchParams.get("jumps")!, 10) : 5
   );
@@ -124,7 +124,7 @@ export default function TrackerSearchApp() {
   const [showSourceSug, setShowSourceSug] = useState(false);
   const [showTargetSug, setShowTargetSug] = useState(false);
   const [showCollectionSug, setShowCollectionSug] = useState(false);
-    
+
   const [sourceActiveIndex, setSourceActiveIndex] = useState(-1);
   const [targetActiveIndex, setTargetActiveIndex] = useState(-1);
   const [collectionActiveIndex, setCollectionActiveIndex] = useState(-1);
@@ -133,7 +133,7 @@ export default function TrackerSearchApp() {
   const targetWrapperRef = useRef<HTMLDivElement>(null);
   const collectionWrapperRef = useRef<HTMLDivElement>(null);
   const viewControlsRef = useRef<HTMLDivElement>(null);
-    
+
   const sourceListRef = useRef<HTMLDivElement>(null);
   const targetListRef = useRef<HTMLDivElement>(null);
   const collectionListRef = useRef<HTMLDivElement>(null);
@@ -148,7 +148,7 @@ export default function TrackerSearchApp() {
   const [isLoading, setIsLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [expandedSources, setExpandedSources] = useState<Record<string, boolean>>({});
-  
+
   const [myTrackers, setMyTrackers] = useState<string[]>([]);
   const [collectionInput, setCollectionInput] = useState("");
 
@@ -157,7 +157,9 @@ export default function TrackerSearchApp() {
   const latestRequestIdRef = useRef(0);
 
   useEffect(() => {
-    setMounted(true);
+    setTimeout(() => {
+      setMounted(true);
+    }, 0);
   }, []);
 
   useEffect(() => {
@@ -168,7 +170,9 @@ export default function TrackerSearchApp() {
         .map((tracker) => tracker.trim())
         .filter(Boolean);
 
-      setMyTrackers(trackers);
+      setTimeout(() => {
+        setMyTrackers(trackers);
+      }, 0);
     } catch (error) {
       console.error("Failed to read tracker collection", error);
     }
@@ -180,7 +184,7 @@ export default function TrackerSearchApp() {
     const params = new URLSearchParams();
     if (deferredSource) params.set("source", deferredSource);
     if (deferredTarget) params.set("target", deferredTarget);
-    
+
     if (deferredSource || deferredTarget) {
       if (maxJumps !== 5) params.set("jumps", maxJumps.toString());
       if (maxDays !== null) params.set("days", maxDays.toString());
@@ -210,11 +214,13 @@ export default function TrackerSearchApp() {
   }, [deferredSource, deferredTarget, maxJumps, maxDays, sortBy, sortDirection, mounted, pathname, router, searchParams, routesPerPageFromQuery, sourcePagesFromQuery]);
 
   useEffect(() => {
-    if (!deferredSource && !deferredTarget) {
-      setFoundPaths([]);
-      setSearchError(null);
-      return;
-    }
+      if (!deferredSource && !deferredTarget) {
+        setTimeout(() => {
+          setFoundPaths([]);
+          setSearchError(null);
+        }, 0);
+        return;
+      }
 
     const requestId = latestRequestIdRef.current + 1;
     latestRequestIdRef.current = requestId;
@@ -271,12 +277,14 @@ export default function TrackerSearchApp() {
 
   useEffect(() => {
      if (!searchParams.get("source") && !searchParams.get("target")) {
-        setSourceSearch("");
-        setTargetSearch("");
-        setFoundPaths([]);
-        setSearchError(null);
-        setVisiblePathsBySource({});
-      }
+       setTimeout(() => {
+         setSourceSearch("");
+         setTargetSearch("");
+         setFoundPaths([]);
+         setSearchError(null);
+         setVisiblePathsBySource({});
+       }, 0);
+     }
   }, [searchParams]);
 
   useEffect(() => {
@@ -381,9 +389,9 @@ export default function TrackerSearchApp() {
 
   const handleSourceSelect = (selectedItem: string) => {
     const terms = sourceSearch.split(",");
-    terms.pop(); 
-    terms.push(selectedItem); 
-    setSourceSearch(terms.join(", ")); 
+    terms.pop();
+    terms.push(selectedItem);
+    setSourceSearch(terms.join(", "));
     setVisiblePathsBySource({});
     setShowSourceSug(false);
     setSourceActiveIndex(-1);
@@ -566,7 +574,7 @@ export default function TrackerSearchApp() {
           return aTotalDays - bTotalDays;
         }
       }
-        
+
       return a.target.localeCompare(b.target);
     });
   }, [activeInviteCountBySource, foundPaths, sortBy, sortDirection]);
@@ -595,11 +603,13 @@ export default function TrackerSearchApp() {
   }, [sortedPaths]);
 
   useEffect(() => {
-    if (sortedSourceNames.length > 0) {
-      setExpandedSources({ [sortedSourceNames[0]]: true });
-    } else {
-      setExpandedSources({});
-    }
+    setTimeout(() => {
+      if (sortedSourceNames.length > 0) {
+        setExpandedSources({ [sortedSourceNames[0]]: true });
+      } else {
+        setExpandedSources({});
+      }
+    }, 0);
   }, [deferredSource, deferredTarget, sortedSourceNames]);
 
   const getUnlockRequirementSections = useCallback((sourceName: string) => {
@@ -790,7 +800,7 @@ export default function TrackerSearchApp() {
 
         <div className="w-full max-w-2xl mx-auto bg-foreground/3 border border-foreground/10 rounded-xl p-2 motion-safe:animate-in fade-in zoom-in-95 duration-200 relative z-30">
           <div className="flex flex-col relative">
-              
+
             <div className="absolute left-4 top-4 bottom-14 flex flex-col items-center gap-1 z-0 pointer-events-none">
               <div className="w-2.5 h-2.5 rounded-full border-[3px] border-foreground/10 bg-background"></div>
               <div className="w-px flex-1 bg-foreground/10"></div>
@@ -798,15 +808,15 @@ export default function TrackerSearchApp() {
             </div>
 
             <div className="flex flex-col gap-1 pl-9 pr-2 py-2">
-              
+
               <div className="relative" ref={sourceWrapperRef}>
                 <div className="relative flex items-center w-full">
-                  <input 
+                  <input
                     aria-label="Source tracker"
                     type="text"
                     disabled={isUsingCollection}
                     placeholder={isUsingCollection ? "Using My Trackers" : "Source tracker(s)"}
-                    className={`w-full h-10 bg-transparent border-none outline-none font-medium text-sm pr-10 sm:pr-[150px] ${
+                    className={`w-full h-10 bg-transparent border-none outline-none font-medium text-sm pr-10 sm:pr-37.5 ${
                       isUsingCollection ? "text-foreground/50 cursor-not-allowed" : "text-foreground placeholder:text-foreground/30"
                     }`}
                     value={sourceSearch}
@@ -843,11 +853,11 @@ export default function TrackerSearchApp() {
                   <div className="absolute top-full -left-8 w-[calc(100%+2rem)] mt-2 bg-card rounded-xl overflow-hidden z-50 motion-safe:animate-in fade-in zoom-in-95 duration-200 border border-foreground/10">
                     <div className="max-h-60 overflow-y-auto p-1" ref={sourceListRef}>
                       {sourceSuggestions.map((item, i) => (
-                        <div 
+                        <div
                           key={i}
                           className={`px-3 py-2.5 rounded-md text-sm cursor-pointer transition-colors text-foreground/90 font-medium flex items-center justify-between ${
-                            i === sourceActiveIndex 
-                              ? 'bg-foreground/10' 
+                            i === sourceActiveIndex
+                              ? 'bg-foreground/10'
                               : 'hover:bg-foreground/5'
                           }`}
                           onClick={() => handleSourceSelect(item)}
@@ -864,7 +874,7 @@ export default function TrackerSearchApp() {
               <div className="h-px w-full bg-foreground/5 my-1"></div>
 
               <div className="relative" ref={targetWrapperRef}>
-                <input 
+                <input
                   aria-label="Target tracker"
                   type="text"
                   placeholder="Target tracker(s)"
@@ -883,11 +893,11 @@ export default function TrackerSearchApp() {
                   <div className="absolute top-full -left-8 w-[calc(100%+2rem)] mt-2 bg-card rounded-xl overflow-hidden z-50 motion-safe:animate-in fade-in zoom-in-95 duration-200 border border-foreground/10">
                     <div className="max-h-60 overflow-y-auto p-1" ref={targetListRef}>
                       {targetSuggestions.map((item, i) => (
-                        <div 
+                        <div
                           key={i}
                           className={`px-3 py-2.5 rounded-md text-sm cursor-pointer transition-colors text-foreground/90 font-medium flex items-center justify-between ${
-                            i === targetActiveIndex 
-                              ? 'bg-foreground/10' 
+                            i === targetActiveIndex
+                              ? 'bg-foreground/10'
                               : 'hover:bg-foreground/5'
                           }`}
                           onClick={() => handleTargetSelect(item)}
@@ -904,7 +914,7 @@ export default function TrackerSearchApp() {
             </div>
 
             <div className="flex items-center justify-between mt-1 pt-1 px-2 pb-1">
-              
+
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
@@ -912,24 +922,24 @@ export default function TrackerSearchApp() {
                     if (showCollectionManager) setShowCollectionManager(false);
                   }}
                   className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all text-sm font-medium border border-foreground/10 bg-foreground/5 hover:border-foreground/20 hover:bg-foreground/10 ${
-                    showFilters 
-                      ? 'text-foreground border-foreground/20' 
-                      : 'text-foreground/50 hover:text-foreground' 
+                    showFilters
+                      ? 'text-foreground border-foreground/20'
+                      : 'text-foreground/50 hover:text-foreground'
                   }`}
                 >
                   <span className="material-symbols-rounded text-lg">tune</span>
                   <span className="hidden sm:inline">Options</span>
                 </button>
-                
+
                 <button
                   onClick={() => {
                     setShowCollectionManager(!showCollectionManager);
                     if (showFilters) setShowFilters(false);
                   }}
                   className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all text-sm font-medium border border-foreground/10 bg-foreground/5 hover:border-foreground/20 hover:bg-foreground/10 ${
-                    showCollectionManager 
-                      ? 'text-foreground border-foreground/20' 
-                      : 'text-foreground/50 hover:text-foreground' 
+                    showCollectionManager
+                      ? 'text-foreground border-foreground/20'
+                      : 'text-foreground/50 hover:text-foreground'
                   }`}
                 >
                   <span className="material-symbols-rounded text-lg">collections_bookmark</span>
@@ -945,7 +955,7 @@ export default function TrackerSearchApp() {
         {showFilters && (
           <div className="max-w-2xl mx-auto mt-2 p-6 bg-foreground/3 border border-foreground/10 rounded-xl motion-safe:animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
+
               <div>
                 <label className="text-sm font-medium text-foreground/50 mb-2 block">Max jumps</label>
                 <div className="flex rounded-lg bg-foreground/5 p-1">
@@ -957,8 +967,8 @@ export default function TrackerSearchApp() {
                         setVisiblePathsBySource({});
                       }}
                       className={`flex-1 px-3 py-1.5 text-sm rounded-md transition-all ring-0 focus:ring-0 font-medium ${
-                        maxJumps === val 
-                          ? 'bg-foreground/10 text-foreground' 
+                        maxJumps === val
+                          ? 'bg-foreground/10 text-foreground'
                           : 'text-foreground/60 hover:text-foreground'
                       }`}
                     >
@@ -985,8 +995,8 @@ export default function TrackerSearchApp() {
                         setVisiblePathsBySource({});
                       }}
                       className={`flex-1 px-2 py-1.5 text-sm rounded-md whitespace-nowrap transition-all ring-0 focus:ring-0 font-medium ${
-                        maxDays === opt.v 
-                          ? 'bg-foreground/10 text-foreground' 
+                        maxDays === opt.v
+                          ? 'bg-foreground/10 text-foreground'
                           : 'text-foreground/60 hover:text-foreground'
                       }`}
                     >
@@ -1005,7 +1015,7 @@ export default function TrackerSearchApp() {
             <div className="flex flex-col gap-4">
               <div className="relative" ref={collectionWrapperRef}>
                 <label className="text-sm font-medium text-foreground/50 mb-2 block">Add to My Trackers</label>
-                <input 
+                <input
                   type="text"
                   placeholder="Search tracker to add..."
                   className="w-full h-10 bg-foreground/5 border border-foreground/10 rounded-md text-sm p-2.5 outline-none focus:border-purple-500/50 transition-colors"
@@ -1022,11 +1032,11 @@ export default function TrackerSearchApp() {
                   <div className="absolute top-full left-0 w-full mt-2 bg-card rounded-xl overflow-hidden z-50 motion-safe:animate-in fade-in zoom-in-95 duration-200 border border-foreground/10">
                     <div className="max-h-60 overflow-y-auto p-1" ref={collectionListRef}>
                       {collectionSuggestions.map((item, i) => (
-                        <div 
+                        <div
                           key={i}
                           className={`px-3 py-2.5 rounded-md text-sm cursor-pointer transition-colors text-foreground/90 font-medium flex items-center justify-between ${
-                            i === collectionActiveIndex 
-                              ? 'bg-foreground/10' 
+                            i === collectionActiveIndex
+                              ? 'bg-foreground/10'
                               : 'hover:bg-foreground/5'
                           }`}
                           onClick={() => handleCollectionSelect(item)}
@@ -1039,7 +1049,7 @@ export default function TrackerSearchApp() {
                   </div>
                 )}
               </div>
-              
+
               {myTrackers.length > 0 ? (
                 <div className="flex flex-wrap gap-2 mt-1">
                   {myTrackers.map(t => (
@@ -1065,7 +1075,7 @@ export default function TrackerSearchApp() {
 
       {(sourceSearch || targetSearch) && (
         <div className="mt-12 motion-safe:animate-in fade-in slide-in-from-bottom-8 duration-200">
-          
+
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-foreground/3 border border-foreground/10 rounded-xl p-4 mb-6">
             <div className="flex flex-col gap-1 min-w-0">
               <h2 className="text-base md:text-lg font-bold text-foreground tracking-tight">Search Results</h2>
@@ -1199,7 +1209,7 @@ export default function TrackerSearchApp() {
               const sourceRouteStart = (sourceRoutePage - 1) * routesPerPageFromQuery;
               const sourceRouteEnd = Math.min(sourceRouteStart + routesPerPageFromQuery, paths.length);
               const displayedSourcePaths = paths.slice(sourceRouteStart, sourceRouteStart + routesPerPageFromQuery);
-              
+
               const bestHops = paths.length > 0 ? Math.min(...paths.map(p => p.routes.length)) : 0;
               const validDays = paths.filter(p => p.totalDays !== null).map(p => p.totalDays as number);
               const bestDays = validDays.length > 0 ? Math.min(...validDays) : null;
@@ -1207,7 +1217,7 @@ export default function TrackerSearchApp() {
 
               return (
                 <div key={sourceName} className="flex flex-col bg-card border border-foreground/10 rounded-xl overflow-hidden transition-colors hover:border-foreground/20 motion-safe:animate-in fade-in duration-200">
-                  
+
                   <div
                     role="button"
                     tabIndex={0}
@@ -1277,11 +1287,11 @@ export default function TrackerSearchApp() {
                                     : "bg-card border-foreground/10"
                                 }`}
                               >
-                                <div className="flex justify-between items-start mb-3 gap-4"> 
+                                <div className="flex justify-between items-start mb-3 gap-4">
                                   <div className="min-w-0">
                                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-1">
                                       <div className="font-bold text-foreground text-lg wrap-break-word">{path.target}</div>
-                                      
+
                                       <div className="flex items-center gap-2 shrink-0">
                                         <span className={badgeClass}>
                                           {targetAbbr}
@@ -1294,7 +1304,7 @@ export default function TrackerSearchApp() {
                                         />
                                       </div>
                                     </div>
-                                    
+
                                     {isBestPath && (
                                       <div className="mt-1.5 mb-1">
                                         <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded-md">
@@ -1308,18 +1318,18 @@ export default function TrackerSearchApp() {
                                       </div>
                                     )}
                                   </div>
-                                  
+
                                   <span className={`text-sm font-medium bg-foreground/8 px-2 py-1 rounded-md whitespace-nowrap shrink-0 ${path.totalDays === null ? 'text-foreground/40' : 'text-foreground/70'}`}>
                                     {path.totalDays === null ? 'Unknown' : `${path.totalDays} days`}
                                   </span>
                                 </div>
-                                
+
                                 <div className="space-y-3 mt-auto flex-1">
                                   {path.routes.map((req, rIdx) => {
                                     const fromNode = path.nodes[rIdx];
                                     const toNode = path.nodes[rIdx + 1];
                                     const stepDays = getStepDays(path, rIdx);
-                                    
+
                                     return (
                                       <div key={rIdx} className="text-sm pl-3 relative border-l-2 border-foreground/10">
                                         {!isDirect && (
@@ -1331,7 +1341,7 @@ export default function TrackerSearchApp() {
                                           Step time: {stepDays === null ? "Unknown" : `${stepDays} days`}
                                         </div>
                                         <p className="text-foreground/70 leading-relaxed font-normal text-sm">{renderReqs(req.reqs)}</p>
-                                        
+
                                         <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-foreground/5">
                                           <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
                                             <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${getStatusColor(req.active)}`}>
@@ -1409,7 +1419,7 @@ export default function TrackerSearchApp() {
                 </div>
               );
             })}
-            
+
             {!searchError && !isStale && !isLoading && foundPaths.length === 0 && (sourceSearch || targetSearch) && (
               <UiState
                 kind="empty"
