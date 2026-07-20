@@ -70,7 +70,6 @@
     "HELLENIC-HD": "HLN",
     "HomieHelpDesk": "HHD",
     "Immortal-s": "IMT",
-    "Infinity": "INF",
     "InfinityHD": "IHD",
     "inTheShadow": "iTS",
     "IPTorrents": "IPT",
@@ -204,6 +203,7 @@
     "MyAnonamouse": [180, "PU: 6 months, 1 TiB upload, ratio>=2"],
     "MySpleen": [0, "No requirement"],
     "Nebulance": [28, "Ensign: 4 weeks, 100GB upload, 100 snatches, 100k BP"],
+    "OldToonsWorld": [90, "ExtremeUser: 3 months, 20 TB upload, ratio >=0.4"],
     "OnlyEncodes+": [60, "Trailblazer: 2 months, 5 TB upload, seedsize 100 GB, ratio >=0.4"],
     "Orpheus": [28, "Elite: 4 weeks, 100GiB upload, 50 torrents, ratio>1.05"],
     "PassThePopcorn": [28, "PU: 4 weeks, 80GB upload, 1 torrent, ratio>1.05"],
@@ -709,6 +709,9 @@
       "ReelFliX": { "days": 0, "reqs": "Ensign", "active": "Yes", "updated": "Jun 2026" },
       "RetroFlix": { "days": 0, "reqs": "Ensign", "active": "Yes", "updated": "Jun 2026" },
       "seedpool": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jun 2026" }
+    },
+    "OldToonsWorld": {
+      "BrokenStones": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Jul 2026" }
     },
     "OnlyEncodes+": {
       "CapybaraBR": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
