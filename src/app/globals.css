@@ -10,9 +10,9 @@
   --border: hsl(30 8.11% 85.49%);
   --input: hsl(30 4.29% 72.55%);
   --ring: hsl(30 3.97% 49.41%);
-  --accent-bg: hsl(20 23.08% 94%);
-  --accent-text: hsl(240 5.88% 10%);
-  --accent-hover: hsl(20 23.08% 90%);
+  --accent-bg: hsl(30 6% 88%);
+  --accent-text: hsl(240 6% 10%);
+  --accent-hover: hsl(30 6% 82%);
   --status-open-bg: hsl(140 50% 90%);
   --status-open-text: hsl(140 53% 29%);
   --status-closed-bg: hsl(0 66% 92%);
@@ -35,9 +35,9 @@
   --border: hsl(220 3% 17%);
   --input: hsl(220 4% 22%);
   --ring: hsl(220 4% 80%);
-  --accent-bg: hsl(220 5% 15.5%);
+  --accent-bg: hsl(220 6% 18%);
   --accent-text: hsl(220 2% 98%);
-  --accent-hover: hsl(220 5% 18%);
+  --accent-hover: hsl(220 6% 24%);
   --status-open-bg: hsl(140 40% 20%);
   --status-open-text: hsl(140 55% 80%);
   --status-closed-bg: hsl(0 50% 20%);
