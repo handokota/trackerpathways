@@ -1072,7 +1072,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             <button
               onClick={closeSelectedNodePanel}
               ref={selectedNodeCloseButtonRef}
-              className="p-1.5 rounded-md text-foreground/70 transition-colors hover:text-foreground"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-foreground/10 hover:text-foreground"
               aria-label="Close panel"
             >
               <span className="material-symbols-rounded text-lg">close</span>
