@@ -1182,9 +1182,13 @@ export default function TrackerSearchApp() {
                                     : "text-foreground/60 hover:text-foreground"
                                 }`}
                               >
-                                <span className={`material-symbols-rounded h-5 w-5 text-sm ${isActive ? "text-foreground opacity-100" : "opacity-0"}`}>
-                                  radio_button_checked
-                                </span>
+                                <div className="flex h-5 w-5 items-center justify-center">
+                                  <div
+                                    className={`h-1.5 w-1.5 rounded-full bg-current transition-all duration-200 ${
+                                      isActive ? "opacity-100 scale-100" : "opacity-0 scale-50"
+                                    }`}
+                                  />
+                                </div>
                                 <span className="leading-none text-left">{size}</span>
                               </button>
                             );
