@@ -844,8 +844,7 @@
     "RetroFlix": {
       "DarkPeers": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jul 2026" },
       "LST": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jul 2026" },
-      "MidnightScene": { "days": 180, "reqs": "6 months, 3 TB upload", "active": "Yes", "updated": "Jul 2026" },
-      "SpeedApp": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jul 2026" }
+      "MidnightScene": { "days": 180, "reqs": "6 months, 3 TB upload", "active": "Yes", "updated": "Jul 2026" }
     },
     "RocketHD": {
       "AnimeWorld": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
