@@ -224,7 +224,7 @@
     "U2.dmhy": [56, "PU: 8 weeks, 50GB download, ratio >= 1.05"],
     "Upload.cx": [84, "PU: 12 weeks, 3TiB upload, ratio >= 1"],
     "UpscaleVault": [0, "No requirement"],
-    "YuScene": [30, "Seeder: 1 month, ratio >=0.40, seedsize 4 TiB"]
+    "YuScene": [60, "Super User: 2 months, ratio >=0.70, uploaded >=5 TiB"]
   },
   "routeInfo": {
     "Aither": {
@@ -243,7 +243,7 @@
       "PassThePopcorn": { "days": 730, "reqs": "Titan+, 2 years, 200 uploads", "active": "Yes", "updated": "Dec 2025" },
       "Racing4Everyone": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
       "ReelFliX": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
-      "seedpool": { "days": 0, "reqs": "1TiB seedsize", "active": "Yes", "updated": "Dec 2025" },
+      "seedpool": { "days": 0, "reqs": "1TiB seedsize", "active": "Yes", "updated": "Aug 2026" },
       "Unwalled": { "days": 0, "reqs": "Harmonia+, 5 seeded uploads", "active": "Yes", "updated": "Dec 2025" }
     },
     "AlphaRatio": {
@@ -814,6 +814,7 @@
       "SceneHD": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Feb 2026" },
       "Secret Cinema": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Feb 2026" },
       "seedpool": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
+      "Simurg": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2026" },
       "TheGeeks": { "days": 180, "reqs": "2-3 full tracker profile screenshots (including RED) that meet the following criteria: 180 days, 60GB real upload, real ratio>=1.05", "active": "Yes", "updated": "Feb 2026" },
       "TLFBits": { "days": 90, "reqs": "3 months (13 weeks)", "active": "Yes", "updated": "Feb 2026" },
       "Unwalled": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
