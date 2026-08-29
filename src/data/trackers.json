@@ -661,7 +661,7 @@
       "Bit-HDTV": { "days": 0, "reqs": "No requirement", "active": "No", "updated": "Aug 2026" },
       "Blutopia": { "days": 180, "reqs": "9 months or 6 months and 10+ uploads", "active": "Yes", "updated": "Aug 2026" },
       "BrokenStones": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2026" },
-      "Canal Street": { "days": 365, "reqs": "1 year", "active": "Yes", "updated": "Aug 2026" },
+      "Canal Street": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2026" },
       "CapybaraBR": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2026" },
       "DarkPeers": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2026" },
       "DigitalCore.Club": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2026" },
@@ -933,7 +933,7 @@
       "HomieHelpDesk": { "days": 180, "reqs": "6 months, 5TB upload", "active": "Yes", "updated": "Aug 2026" },
       "Luminarr": { "days": 90, "reqs": "3 months account age", "active": "Yes", "updated": "Aug 2026" },
       "MidnightScene": { "days": 180, "reqs": "6 months, 3TB uplo", "active": "Yes", "updated": "Aug 2026" },
-      "seedpool": { "days": 0, "reqs": "Removed", "active": "No", "updated": "Aug 2026" },
+      "seedpool": { "days": 90, "reqs": "3 months, 1 TiB seed size, 1 month average seed time", "active": "Yes", "updated": "Aug 2026" },
       "Unwalled": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Aug 2026" },
       "Upload.cx": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Aug 2026" },
       "Zenith": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Aug 2026" }
