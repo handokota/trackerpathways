@@ -123,7 +123,7 @@
     "ReelFliX": "RF",
     "RetroFlix": "RTF",
     "RocketHD": "RHD",
-    "SAMARITANO": "SAM",
+    "Samaritano": "SAM",
     "SceneHD": "SHD",
     "Secret Cinema": "SC",
     "seedpool": "SP",
@@ -635,6 +635,7 @@
       "OldToonsWorld": { "days": 365, "reqs": "1 year, avg seedtime 6 months, 1TiB seedsize", "active": "Yes", "updated": "Aug 2026" },
       "ReelFliX": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2026" },
       "RetroFlix": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2026" },
+      "Samaritano": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2026" },
       "seedpool": { "days": 0, "reqs": "1TiB seedsize", "active": "Yes", "updated": "Aug 2026" },
       "Upload.cx": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2026" },
       "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2026" }
@@ -843,7 +844,7 @@
     "RuTracker": {
       "TeamHD": { "days": 365, "reqs": "1 year, 20TB upload in public tracker or 2TB upload in private tracker", "active": "Yes", "updated": "Jul 2026" }
     },
-    "SAMARITANO": {
+    "Samaritano": {
       "CapybaraBR": { "days": 0, "reqs": "Profile link and screenshots", "active": "Yes", "updated": "Jan 2026" }
     },
     "seedpool": {
