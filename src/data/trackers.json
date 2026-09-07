@@ -1,6 +1,6 @@
 {
   "trackerInfo": {
-    "ABTorrents": { "abbr": "ABT", "type": "eBooks, Audiobooks", "country": "International", "birthdate": "2009", "description": "" },
+    "ABTorrents": { "abbr": "ABT", "type": "eBooks, Audiobooks", "country": "", "birthdate": "2009", "description": "" },
     "Aither": { "abbr": "ATH", "type": "Movie, TV", "birthdate": "2020", "description": "Aither is a Private Torrent Tracker for HD MOVIES / TV", "country": "" },
     "AlphaRatio": { "abbr": "AR", "type": "General, Scene", "birthdate": "2014", "description": "", "country": "" },
     "AnimeBytes": { "abbr": "AB", "type": "Anime", "birthdate": "2009", "description": "", "country": "" },
