@@ -413,7 +413,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
     lastCenteredTrackerRef.current = selectedNodeId;
   }, [data.nodes, selectedNodeId]);
 
-  const getAbbr = (name: string) => getTrackerAbbr(name, rawData.abbrList);
+  const getAbbr = (name: string) => getTrackerAbbr(name, rawData.trackerInfo);
 
   const renderReqs = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;

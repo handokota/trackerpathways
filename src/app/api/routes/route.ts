@@ -33,7 +33,7 @@ interface RateLimitResult {
 const rateLimitBuckets = new Map<string, RateLimitBucket>();
 
 const getAbbr = (name: string) => {
-  if (data.abbrList[name]) return data.abbrList[name];
+  if (data.trackerInfo[name]) return data.trackerInfo[name].abbr;
   const capitals = name.match(/[A-Z]/g);
   if (capitals && capitals.length >= 2) return capitals.join("");
   return name.substring(0, 3).toUpperCase();

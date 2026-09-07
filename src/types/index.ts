@@ -19,9 +19,17 @@ export interface DataStructure {
   unlockInviteClass: {
     [trackerName: string]: UnlockClass;
   };
-  abbrList: {
-    [trackerName: string]: string;
+  trackerInfo: {
+    [trackerName: string | undefined]: TrackerDetail;
   };
+}
+
+export interface TrackerDetail {
+  abbr: string,
+  type: string,
+  country: string,
+  birthdate: string | number,
+  description: string
 }
 
 export interface PathResult {
