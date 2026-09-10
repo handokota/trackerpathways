@@ -311,7 +311,7 @@
     },
     "AsianCinema": {
       "Luminarr": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Feb 2026" },
-      "Nebulance": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" }
+      "Nebulance": { "days": 0, "reqs": "No requirement", "active": "No", "updated": "Sep 2026" }
     },
     "AvistaZ": {
       "AnimeZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
@@ -494,7 +494,7 @@
       "AnimeBytes": { "days": 180, "reqs": "Elite Gamer, 6 months", "active": "Yes", "updated": "Nov 2025" },
       "Anthelion": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
       "BakaBT": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Nov 2025" },
-      "BeyondHD": { "days": 730, "reqs": "Legendary Gamer, 2 years, Legendary Invites forum", "active": "Yes", "updated": "Nov 2025" },
+      "BeyondHD": { "days": 0, "reqs": "Legendary Gamer, Legendary Invites forum", "active": "Yes", "updated": "Sep 2026" },
       "BroadcasTheNet": { "days": 730, "reqs": "Master Gamer, 2 years,  250 uploads, Legendary Invites forum", "active": "Yes", "updated": "Nov 2025" },
       "Canal Street": { "days": 365, "reqs": "1 year", "active": "Yes", "updated": "Nov 2025" },
       "Cathode-Ray.Tube": { "days": 0, "reqs": "Ratio>=1.0", "active": "Yes", "updated": "Nov 2025" },
@@ -670,6 +670,8 @@
       "Canal Street": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2026" },
       "CapybaraBR": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2026" },
       "DarkPeers": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2026" },
+      "DesiGaane": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Sep 2026" },
+      "DesiTorrents": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Sep 2026" },
       "DigitalCore.Club": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2026" },
       "Immortal-s": { "days": 365, "reqs": "3x 1 year old additional profile links and screenshots + profile links to any other BT forum you are a member of", "active": "Yes", "updated": "Aug 2026" },
       "LST": { "days": 270, "reqs": "9 months, No warning PU", "active": "Yes", "updated": "Aug 2026" },
@@ -718,7 +720,7 @@
     "Orpheus": {
       "Aither": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Feb 2026" },
       "Anthelion": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
-      "BeyondHD": { "days": 547, "reqs": "TM+, 1.5 years", "active": "Yes", "updated": "Feb 2026" },
+      "BeyondHD": { "days": 365, "reqs": "250 uploads, 1 year", "active": "Yes", "updated": "Feb 2026" },
       "Cathode-Ray.Tube": { "days": 0, "reqs": "ratio > 1.0", "active": "Yes", "updated": "Feb 2026" },
       "Concertos": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
       "Empornium": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Feb 2026" },
@@ -817,7 +819,7 @@
       "ReelFliX": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
       "RocketHD": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
       "SceneHD": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Feb 2026" },
-      "Secret Cinema": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Feb 2026" },
+      "Secret Cinema": { "days": 180, "reqs": "6 months", "active": "No", "updated": "Sep 2026" },
       "seedpool": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" },
       "Simurg": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2026" },
       "TheGeeks": { "days": 180, "reqs": "2-3 full tracker profile screenshots (including RED) that meet the following criteria: 180 days, 60GB real upload, real ratio>=1.05", "active": "Yes", "updated": "Feb 2026" },
@@ -856,11 +858,12 @@
       "BrokenStones": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Aug 2026" },
       "CapybaraBR": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Aug 2026" },
       "DarkPeers": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Aug 2026" },
+      "DesiTorrents": { "days": 180, "reqs": "6 months,Uberpool+", "active": "Yes", "updated": "Sep 2026" },
       "DigitalCore.Club": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Aug 2026" },
       "HDCity": { "days": 0, "reqs": "Removed", "active": "No", "updated": "Aug 2026" },
       "HomieHelpDesk": { "days": 0, "reqs": "3 TB upload, 2 more proofs", "active": "Yes", "updated": "Aug 2026" },
-      "LST": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Aug 2026" },
       "Luminarr": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Aug 2026" },
+      "Periodical": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Sep 2026" },
       "ReelFliX": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Aug 2026" },
       "RetroFlix": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Aug 2026" },
       "RocketHD": { "days": 0, "reqs": "No requirements", "active": "Yes", "updated": "Aug 2026" },
@@ -901,7 +904,6 @@
     },
     "TV-Vault": {
       "AlphaRatio": { "days": 90, "reqs": "3 months, ratio>1", "active": "Yes", "updated": "Apr 2025" },
-      "BeyondHD": { "days": 0, "reqs": "Superfan+", "active": "Closed", "updated": "Apr 2025" },
       "Blutopia": { "days": 0, "reqs": "Elite+", "active": "Yes", "updated": "Oct 2025" },
       "Cinemageddon": { "days": 0, "reqs": "Unstated", "active": "Yes", "updated": "Apr 2025" },
       "Great Poster Wall": { "days": 0, "reqs": "PU+, 10 torrents", "active": "Yes", "updated": "Apr 2025" },
