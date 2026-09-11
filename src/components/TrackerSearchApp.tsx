@@ -840,7 +840,7 @@ export default function TrackerSearchApp() {
                         myTrackers.length === 0
                           ? "text-foreground/30 cursor-not-allowed bg-transparent border-transparent"
                           : isUsingCollection
-                            ? "bg-green-500/15 text-green-600 dark:text-green-300 border-green-500/40"
+                            ? "ui-status-open border border-foreground/10"
                             : "text-foreground/70 bg-foreground/5 hover:bg-foreground/10 hover:text-foreground border-transparent"
                       }`}
                     >
@@ -1018,7 +1018,7 @@ export default function TrackerSearchApp() {
                 <input
                   type="text"
                   placeholder="Search tracker to add..."
-                  className="w-full h-10 bg-foreground/5 border border-foreground/10 rounded-md text-sm p-2.5 outline-none focus:border-purple-500/50 transition-colors"
+                  className="w-full h-10 bg-foreground/5 border border-foreground/10 rounded-md text-sm p-2.5 outline-none focus:border-foreground/30 transition-colors"
                   value={collectionInput}
                   onFocus={() => setShowCollectionSug(true)}
                   onChange={(e) => {
@@ -1056,7 +1056,7 @@ export default function TrackerSearchApp() {
                     <button
                       key={t}
                       onClick={() => removeCollectionItem(t)}
-                      className="px-2.5 py-1 rounded-md text-sm font-medium bg-purple-500/10 hover:bg-red-500/10 text-purple-600 dark:text-purple-400 hover:text-red-600 dark:hover:text-red-400 border border-purple-500/20 hover:border-red-500/20 transition-colors cursor-pointer"
+                      className="px-2.5 py-1 rounded-md text-sm font-medium ui-accent-badge hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 border border-foreground/10 hover:border-red-500/20 transition-colors cursor-pointer"
                     >
                       {t}
                     </button>
@@ -1287,7 +1287,7 @@ export default function TrackerSearchApp() {
                                 key={pathId}
                                 className={`flex flex-col p-5 rounded-xl border transition-colors duration-200 h-full ${
                                   isBestPath
-                                    ? "border-green-500/40 bg-green-500/5"
+                                    ? "border-foreground/20 bg-foreground/5"
                                     : "bg-card border-foreground/10"
                                 }`}
                               >
@@ -1311,7 +1311,7 @@ export default function TrackerSearchApp() {
 
                                     {isBestPath && (
                                       <div className="mt-1.5 mb-1">
-                                        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded-md">
+                                        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold ui-status-open px-2 py-0.5 rounded-md">
                                           <span className="material-symbols-rounded text-sm">workspace_premium</span>
                                           {sortBy === 'days'
                                             ? sortDirection === "asc" ? "Fastest route overall" : "Slowest route overall"

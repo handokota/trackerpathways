@@ -1,18 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: hsl(30 8% 98%);
-  --foreground: hsl(30 0% 10%);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
 
-  --card: hsl(30 0% 100%);
-  --card-foreground: hsl(240 6% 12%);
+  --card: oklch(0.98 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --surface-subtle: oklch(0.98 0 0);
 
-  --border: hsl(30 8.11% 85.49%);
-  --input: hsl(30 4.29% 72.55%);
-  --ring: hsl(30 3.97% 49.41%);
-  --accent-bg: hsl(30 6% 88%);
-  --accent-text: hsl(240 6% 10%);
-  --accent-hover: hsl(30 6% 82%);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --accent-bg: oklch(0.97 0 0);
+  --accent-text: oklch(0.205 0 0);
+  --accent-hover: oklch(0.94 0 0);
   --status-open-bg: hsl(140 50% 90%);
   --status-open-text: hsl(140 53% 29%);
   --status-closed-bg: hsl(0 66% 92%);
@@ -26,18 +27,19 @@
 }
 
 .dark {
-  --background: hsl(220 5.5% 9%);
-  --foreground: hsl(220 2% 97%);
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
 
-  --card: hsl(220 5.5% 10.5%);
-  --card-foreground: hsl(220 2% 97%);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --surface-subtle: oklch(0.18 0 0);
 
-  --border: hsl(220 3% 17%);
-  --input: hsl(220 4% 22%);
-  --ring: hsl(220 4% 80%);
-  --accent-bg: hsl(220 6% 18%);
-  --accent-text: hsl(220 2% 98%);
-  --accent-hover: hsl(220 6% 24%);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --accent-bg: oklch(0.269 0 0);
+  --accent-text: oklch(0.985 0 0);
+  --accent-hover: oklch(0.32 0 0);
   --status-open-bg: hsl(140 40% 20%);
   --status-open-text: hsl(140 55% 80%);
   --status-closed-bg: hsl(0 50% 20%);
@@ -48,18 +50,19 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
-    --background: hsl(220 5.5% 9%);
-    --foreground: hsl(220 2% 97%);
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
 
-    --card: hsl(220 5.5% 10.5%);
-    --card-foreground: hsl(220 2% 97%);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --surface-subtle: oklch(0.18 0 0);
 
-    --border: hsl(220 3% 17%);
-    --input: hsl(220 4% 22%);
-    --ring: hsl(220 4% 80%);
-    --accent-bg: hsl(220 6% 18%);
-    --accent-text: hsl(220 2% 98%);
-    --accent-hover: hsl(220 6% 24%);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --accent-bg: oklch(0.269 0 0);
+    --accent-text: oklch(0.985 0 0);
+    --accent-hover: oklch(0.32 0 0);
     --status-open-bg: hsl(140 40% 20%);
     --status-open-text: hsl(140 55% 80%);
     --status-closed-bg: hsl(0 50% 20%);
@@ -235,7 +238,7 @@ html {
 
 .bg-background\/50 { background-color: color-mix(in oklab, var(--background) 50%, transparent); }
 .bg-background\/80 { background-color: color-mix(in oklab, var(--background) 80%, transparent); }
-.bg-card\/90 { background-color: color-mix(in oklab, var(--card) 90%, transparent); }
+.bg-card\/90 { background-color: var(--card); }
 
 .text-foreground\/25 { color: color-mix(in oklab, var(--foreground) 25%, transparent); }
 .text-foreground\/30 { color: color-mix(in oklab, var(--foreground) 30%, transparent); }
@@ -246,7 +249,7 @@ html {
 .text-foreground\/80 { color: color-mix(in oklab, var(--foreground) 80%, transparent); }
 .text-foreground\/90 { color: color-mix(in oklab, var(--foreground) 90%, transparent); }
 
-.bg-foreground\/3 { background-color: color-mix(in oklab, var(--background) 97%, var(--foreground)); }
+.bg-foreground\/3 { background-color: var(--surface-subtle); }
 .bg-foreground\/5 { background-color: color-mix(in oklab, var(--background) 95%, var(--foreground)); }
 .bg-foreground\/8 { background-color: color-mix(in oklab, var(--background) 92%, var(--foreground)); }
 .bg-foreground\/10 { background-color: color-mix(in oklab, var(--background) 90%, var(--foreground)); }
