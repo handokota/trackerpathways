@@ -313,22 +313,28 @@ export default function DirectoryPageClient() {
             {displayedTrackers.map((t) => (
               <div
                 key={t.name}
-                className="bg-card border border-foreground/10 rounded-xl p-4 flex flex-wrap items-center justify-between"
+                className="bg-card border border-foreground/10 rounded-xl p-4 flex flex-col h-full gap-3"
               >
-                <span className="text-sm font-medium truncate text-foreground/80 pr-3" title={t.name}>
-                  {t.name}
-                </span>
-                <div className="shrink-0 flex items-center gap-1.5">
-                  <OfficialInvitesBadge
-                    count={t.officialInvites}
-                    ariaLabel={`Official invites for ${t.name}: ${t.officialInvites}`}
-                    onClick={() => openOfficialInvitesDialog(t.name)}
-                  />
-                  <span className="px-2 py-0.5 text-xs font-semibold rounded-md bg-foreground/10 text-foreground/80">
-                    {t.info.abbr}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-medium truncate text-foreground/80" title={t.name}>
+                    {t.name}
                   </span>
+                  <div className="shrink-0 flex items-center gap-1.5">
+                    <OfficialInvitesBadge
+                      count={t.officialInvites}
+                      ariaLabel={`Official invites for ${t.name}: ${t.officialInvites}`}
+                      onClick={() => openOfficialInvitesDialog(t.name)}
+                    />
+                    <span className="px-2 py-0.5 text-xs font-semibold rounded-md bg-foreground/10 text-foreground/80">
+                      {t.info.abbr}
+                    </span>
+                  </div>
                 </div>
-                <span className="text-xs font-light text-foreground/70 max-w-9/12 basis-full" title={t.info.description}>
+
+                <span
+                  className="text-xs font-light text-foreground/70 line-clamp-2"
+                  title={t.info.description}
+                >
                   {t.info.description ? t.info.description : "No description for this tracker is available."}
                 </span>
               </div>
