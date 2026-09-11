@@ -46,6 +46,34 @@
   --status-limited-text: hsl(30 75% 85%);
 }
 
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --background: hsl(220 5.5% 9%);
+    --foreground: hsl(220 2% 97%);
+
+    --card: hsl(220 5.5% 10.5%);
+    --card-foreground: hsl(220 2% 97%);
+
+    --border: hsl(220 3% 17%);
+    --input: hsl(220 4% 22%);
+    --ring: hsl(220 4% 80%);
+    --accent-bg: hsl(220 6% 18%);
+    --accent-text: hsl(220 2% 98%);
+    --accent-hover: hsl(220 6% 24%);
+    --status-open-bg: hsl(140 40% 20%);
+    --status-open-text: hsl(140 55% 80%);
+    --status-closed-bg: hsl(0 50% 20%);
+    --status-closed-text: hsl(0 70% 85%);
+    --status-limited-bg: hsl(30 55% 20%);
+    --status-limited-text: hsl(30 75% 85%);
+  }
+}
+
+html {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
 .text-ui-muted { color: color-mix(in oklab, var(--foreground) 60%, transparent); }
 .text-ui-emphasis { color: color-mix(in oklab, var(--foreground) 70%, transparent); }
 .text-ui-dim { color: color-mix(in oklab, var(--foreground) 50%, transparent); }
@@ -261,9 +289,6 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  transition-property: background-color, color, border-color;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 300ms;
 }
 
 *, ::before, ::after {

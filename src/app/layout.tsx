@@ -20,6 +20,19 @@ const materialSymbols = localFont({
   weight: "100 700",
 });
 
+const themeInitScript = `
+  (() => {
+    const storedTheme = localStorage.getItem("theme");
+    const theme = storedTheme === "light" || storedTheme === "dark"
+      ? storedTheme
+      : window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    document.documentElement.classList.add(theme);
+    document.documentElement.style.colorScheme = theme;
+  })();
+`;
+
 export const metadata: Metadata = {
   title: "Tracker Pathways",
   description: "Find your way to the trackers worth chasing.",
@@ -35,7 +48,10 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${materialSymbols.variable} font-sans antialiased bg-background text-foreground transition-colors duration-300`} suppressHydrationWarning>
+      <head>
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
+      <body className={`${inter.variable} ${materialSymbols.variable} font-sans antialiased bg-background text-foreground`} suppressHydrationWarning>
         <Providers nonce={nonce}>
           <div className="min-h-screen flex flex-col">
             <Navbar />
