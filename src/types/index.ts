@@ -20,7 +20,7 @@ export interface DataStructure {
     [trackerName: string]: UnlockClass;
   };
   trackerInfo: {
-    [trackerName: string | undefined]: TrackerDetail;
+    [trackerName: string]: TrackerDetail;
   };
 }
 
