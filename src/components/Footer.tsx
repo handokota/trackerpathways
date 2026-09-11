@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 export default function Footer() {
@@ -25,20 +24,7 @@ export default function Footer() {
           rel="noopener noreferrer"
           className="group flex items-center gap-1.5 text-foreground/60 hover:text-foreground transition-colors"
         >
-          <Image
-            src="/github-light.svg"
-            alt="GitHub"
-            width={14}
-            height={14}
-            className="w-3.5 h-3.5 opacity-100 ui-icon-light"
-          />
-          <Image
-            src="/github-dark.svg"
-            alt="GitHub"
-            width={14}
-            height={14}
-            className="w-3.5 h-3.5 opacity-100 ui-icon-dark"
-          />
+          <span className="ui-github-icon" aria-hidden="true" />
           <span>GitHub</span>
         </a>
       </div>

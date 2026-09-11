@@ -116,24 +116,31 @@ html {
   background-color: var(--status-limited-bg);
 }
 
-.ui-logo-light,
-.ui-icon-light {
-  display: inline-block;
+.ui-logo,
+.ui-github-icon {
+  display: block;
+  flex-shrink: 0;
+  background-color: var(--foreground);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
 }
 
-.ui-logo-dark,
-.ui-icon-dark {
-  display: none;
+.ui-logo {
+  width: 2rem;
+  height: 2rem;
+  -webkit-mask-image: url("/logo.svg");
+  mask-image: url("/logo.svg");
 }
 
-.dark .ui-logo-light,
-.dark .ui-icon-light {
-  display: none;
-}
-
-.dark .ui-logo-dark,
-.dark .ui-icon-dark {
-  display: inline-block;
+.ui-github-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  -webkit-mask-image: url("/github.svg");
+  mask-image: url("/github.svg");
 }
 
 

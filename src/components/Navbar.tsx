@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
@@ -16,25 +15,8 @@ export default function Navbar() {
           aria-label="Go to home"
           className="flex items-center gap-3 select-none group rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/25"
         >
-          <div className="w-8 h-8 transition-transform group-hover:scale-105">
-            <Image
-              src="/logo-light.svg"
-              alt=""
-              aria-hidden="true"
-              width={32}
-              height={32}
-              className="w-8 h-8 object-contain ui-logo-light"
-              priority
-            />
-            <Image
-              src="/logo-dark.svg"
-              alt=""
-              aria-hidden="true"
-              width={32}
-              height={32}
-              className="w-8 h-8 object-contain ui-logo-dark"
-              priority
-            />
+          <div className="w-8 h-8 transition-transform group-hover:scale-105" aria-hidden="true">
+            <span className="ui-logo" />
           </div>
 
           <span className="text-xl font-bold tracking-tight text-foreground hidden sm:block">
