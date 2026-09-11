@@ -143,16 +143,28 @@ export default function DirectoryPageClient() {
     if (!data.trackerInfo) return [];
 
     return Object.entries(data.trackerInfo).map(([name, info]) => ({
-      name, info, officialInvites: activeInviteCountBySource[name] || 0
+      name,
+      info,
+      officialInvites: activeInviteCountBySource[name] || 0,
+      searchableText: [
+        name,
+        info.abbr,
+        info.type,
+        info.country,
+        info.birthdate,
+        info.description,
+      ]
+        .filter((value) => value !== null && value !== undefined && String(value).trim() !== "")
+        .join(" ")
+        .toLowerCase(),
     }));
   }, [activeInviteCountBySource]);
 
   const filteredTrackers = useMemo(() => {
-    const normalizedSearch = search.toLowerCase();
-    const filtered = search
+    const normalizedSearch = search.trim().toLowerCase();
+    const filtered = normalizedSearch
       ? trackers.filter(t =>
-        t.name.toLowerCase().includes(normalizedSearch) ||
-          t.info.abbr.toLowerCase().includes(normalizedSearch)
+        t.searchableText.includes(normalizedSearch)
       )
       : trackers;
 
@@ -351,7 +363,7 @@ export default function DirectoryPageClient() {
         <UiState
           kind="empty"
           title="No trackers found"
-          description={`No match for "${search}". Try another tracker name or abbreviation.`}
+          description={`No match for "${search}". Try another tracker name, abbreviation, type, country, year, or description.`}
           className="py-20"
         />
       )}
