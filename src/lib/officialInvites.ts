@@ -25,11 +25,11 @@ export type DialogSortByOption = "officialInvites" | "alphabetical";
 export type SortDirection = "asc" | "desc";
 
 type RouteInfo = DataStructure["routeInfo"];
-type AbbrList = DataStructure["abbrList"];
+type TrackerInfo = DataStructure["trackerInfo"];
 
-export const getTrackerAbbr = (name: string, abbrList: AbbrList) => {
-  if (abbrList[name]) {
-    return abbrList[name];
+export const getTrackerAbbr = (name: string, trackerInfo: TrackerInfo) => {
+  if (trackerInfo[name]) {
+    return trackerInfo[name].abbr
   }
 
   const capitals = name.match(/[A-Z]/g);

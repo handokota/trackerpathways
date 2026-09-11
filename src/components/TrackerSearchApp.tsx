@@ -357,7 +357,7 @@ export default function TrackerSearchApp() {
     }
   }, [collectionActiveIndex]);
 
-  const getAbbr = useCallback((name: string) => getTrackerAbbr(name, data.abbrList), []);
+  const getAbbr = useCallback((name: string) => getTrackerAbbr(name, data.trackerInfo), []);
 
   const allTrackers = useMemo(() => {
     const set = new Set<string>();

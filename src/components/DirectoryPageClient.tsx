@@ -87,7 +87,7 @@ export default function DirectoryPageClient() {
       return;
     }
 
-    if (!data.abbrList[activeTrackerParam]) {
+    if (!data.trackerInfo[activeTrackerParam]) {
       setDialogTrackerInUrl(null, "replace");
     }
   }, [activeTrackerParam, setDialogTrackerInUrl]);
@@ -104,7 +104,7 @@ export default function DirectoryPageClient() {
   }, []);
 
   const officialInvitesDialog = useMemo<OfficialInvitesData | null>(() => {
-    if (!activeTrackerParam || !data.abbrList[activeTrackerParam]) {
+    if (!activeTrackerParam || !data.trackerInfo[activeTrackerParam]) {
       return null;
     }
 
@@ -116,7 +116,7 @@ export default function DirectoryPageClient() {
     };
   }, [activeInviteCountBySource, activeTrackerParam, getUnlockRequirementSections]);
 
-  const getAbbr = (name: string) => getTrackerAbbr(name, data.abbrList);
+  const getAbbr = (name: string) => getTrackerAbbr(name, data.trackerInfo);
 
   const renderReqs = (text: string) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -140,10 +140,10 @@ export default function DirectoryPageClient() {
   };
 
   const trackers = useMemo(() => {
-    if (!data.abbrList) return [];
-    
-    return Object.entries(data.abbrList).map(([name, abbr]) => ({
-      name, abbr, officialInvites: activeInviteCountBySource[name] || 0
+    if (!data.trackerInfo) return [];
+
+    return Object.entries(data.trackerInfo).map(([name, info]) => ({
+      name, info, officialInvites: activeInviteCountBySource[name] || 0
     }));
   }, [activeInviteCountBySource]);
 
@@ -152,7 +152,7 @@ export default function DirectoryPageClient() {
     const filtered = search
       ? trackers.filter(t =>
         t.name.toLowerCase().includes(normalizedSearch) ||
-          t.abbr.toLowerCase().includes(normalizedSearch)
+          t.info.abbr.toLowerCase().includes(normalizedSearch)
       )
       : trackers;
 
@@ -309,25 +309,34 @@ export default function DirectoryPageClient() {
 
       {filteredTrackers.length > 0 ? (
         <div className="flex flex-col gap-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-fr">
             {displayedTrackers.map((t) => (
-              <div 
-                key={t.name} 
-                className="bg-card border border-foreground/10 rounded-xl p-4 flex items-center justify-between"
+              <div
+                key={t.name}
+                className="bg-card border border-foreground/10 rounded-xl p-4 flex flex-col h-full gap-3"
               >
-                <span className="text-sm font-medium truncate text-foreground/80 pr-3" title={t.name}>
-                  {t.name}
-                </span>
-                <div className="shrink-0 flex items-center gap-1.5">
-                  <OfficialInvitesBadge
-                    count={t.officialInvites}
-                    ariaLabel={`Official invites for ${t.name}: ${t.officialInvites}`}
-                    onClick={() => openOfficialInvitesDialog(t.name)}
-                  />
-                  <span className="px-2 py-0.5 text-xs font-semibold rounded-md bg-foreground/10 text-foreground/80">
-                    {t.abbr}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-medium truncate text-foreground/80" title={t.name}>
+                    {t.name}
                   </span>
+                  <div className="shrink-0 flex items-center gap-1.5">
+                    <OfficialInvitesBadge
+                      count={t.officialInvites}
+                      ariaLabel={`Official invites for ${t.name}: ${t.officialInvites}`}
+                      onClick={() => openOfficialInvitesDialog(t.name)}
+                    />
+                    <span className="px-2 py-0.5 text-xs font-semibold rounded-md bg-foreground/10 text-foreground/80">
+                      {t.info.abbr}
+                    </span>
+                  </div>
                 </div>
+
+                <span
+                  className="text-xs font-light text-foreground/70 line-clamp-2"
+                  title={t.info.description}
+                >
+                  {t.info.description ? t.info.description : "No description for this tracker is available."}
+                </span>
               </div>
             ))}
           </div>
