@@ -328,7 +328,7 @@ export default function DirectoryPageClient() {
                 className="bg-card border border-foreground/10 rounded-xl p-4 flex flex-col h-full gap-3"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-medium truncate text-foreground/80" title={t.name}>
+                  <span className="text-sm font-semibold truncate text-foreground/80" title={t.name}>
                     {t.name}
                   </span>
                   <div className="shrink-0 flex items-center gap-1.5">
@@ -344,10 +344,10 @@ export default function DirectoryPageClient() {
                 </div>
 
                 <span
-                  className="text-xs font-light text-foreground/70 line-clamp-2"
+                  className="text-sm font-normal text-foreground/70 line-clamp-2"
                   title={t.info.description}
                 >
-                  {t.info.description ? t.info.description : "No description for this tracker is available."}
+                  {t.info.description ? t.info.description : "No description for this tracker is available"}
                 </span>
               </div>
             ))}
