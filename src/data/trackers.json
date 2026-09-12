@@ -1,6 +1,6 @@
 {
   "trackerInfo": {
-    "1PTBAR": {"abbr":"1PT","type":"Movie, TV, E-Learning","country":"CN","birthdate":"","description":"1PTBAR is a Chinese Private Torrent Tracker for MOVIES / TV / E-LEARNING"},
+    "1PTBA": {"abbr":"1PT","type":"Movie, TV, E-Learning","country":"CN","birthdate":"","description":"1PTBA is a Chinese Private Torrent Tracker for MOVIES / TV / E-LEARNING"},
     "52PT": {"abbr":"52P","type":"Movie, TV","country":"CN","birthdate":"","description":"52PT is a Chinese Private Torrent Tracker for HD MOVIES / TV"},
     "ABTorrents": {"abbr":"ABT","type":"eBooks, Audiobooks","country":"","birthdate":"2009","description":"ABTorrents is a Private Torrent Tracker for AUDIOBOOKS"},
     "AgsvPT": {"abbr":"AGS","type":"Movie, TV, General","country":"CN","birthdate":"","description":"AgsvPT is a Chinese Private Torrent Tracker for MOVIES / TV / GENERAL"},
@@ -48,7 +48,7 @@
     "DigitalCore.Club": {"abbr":"DCC","type":"General, Scene","country":"","birthdate":"2019","description":"DigitalCore.Club is a Private Torrent Tracker for 0DAY / GENERAL"},
     "DiscFan": {"abbr":"DIS","type":"Movie, TV","country":"CN","birthdate":"","description":"DiscFan is a Chinese Private Torrent Tracker for MOVIES / TV"},
     "Docspedia": {"abbr":"DOC","type":"E-Learning","country":"","birthdate":"","description":"Docspedia is a Private Torrent Tracker for E-LEARNING"},
-    "DICMusic": {"abbr":"DIC","type":"Music","country":"CN","birthdate":"2019","description":"DICMusic is a Chinese Private Torrent Tracker for MUSIC"},
+    "Dolphin Is Coming": {"abbr":"DIC","type":"Music","country":"CN","birthdate":"2019","description":"Dolphin Is Coming is a Chinese Private Torrent Tracker for MUSIC"},
     "Empornium": {"abbr":"EMP","type":"Porn","country":"","birthdate":"2011","description":"Empornium is a Private Torrent Tracker for 3X"},
     "eMuwarez": {"abbr":"EMW","type":"Movies, TV, Audio, Console, PC","country":"ES","birthdate":"","description":"eMuwarez is a Spanish Private Torrent Tracker for MOVIES / TV / GENERAL"},
     "ExoticaZ": {"abbr":"EZ","type":"Porn, Asian","country":"","birthdate":"2005","description":"ExoticaZ is a Private Torrent Tracker for 3X"},
