@@ -21,8 +21,8 @@ import OfficialInvitesBadge from "@/components/shared/OfficialInvitesBadge";
 import UiState from "@/components/shared/UiState";
 
 const data = rawData as unknown as DataStructure;
-const DEFAULT_ROUTES_PER_PAGE = 10;
-const ROUTES_PER_PAGE_OPTIONS = [10, 20, 50] as const;
+const DEFAULT_ROUTES_PER_PAGE = 12;
+const ROUTES_PER_PAGE_OPTIONS = [12, 24, 48] as const;
 
 type SortByOption = "days" | "jumps" | "officialInvites";
 const SORT_OPTIONS: Array<{ value: SortByOption; label: string }> = [
