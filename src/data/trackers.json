@@ -572,7 +572,7 @@
       "TopTBDev": { "days": 0, "reqs": "4 profile links", "active": "Yes", "updated": "Aug 2025" },
       "U2.dmhy": { "days": 84, "reqs": "PU+, 12 weeks, one of 2 options: A) Five 1-month-old uploads that are ACG, moderation-checked, and alive B) Photos of your physical ACG collection", "active": "Yes", "updated": "Feb 2026" },
       "Vicomo": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Aug 2025" },
-      "Wintersakura": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Aug 2025" },
+      "WinterSakura": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Aug 2025" },
       "ZmPT": { "days": 0, "reqs": "PU+", "active": "Yes", "updated": "Aug 2025" }
     },
     "HD-Space": {
@@ -857,9 +857,7 @@
       "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2025" }
     },
     "RetroFlix": {
-      "DarkPeers": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jul 2026" },
-      "LST": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jul 2026" },
-      "MidnightScene": { "days": 180, "reqs": "6 months, 3 TB upload", "active": "Yes", "updated": "Jul 2026" }
+      "DarkPeers": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jul 2026" }
     },
     "RocketHD": {
       "AnimeWorld": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
