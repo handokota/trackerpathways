@@ -255,13 +255,17 @@
       "Hawke-uno": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
       "HDBits": { "days": 730, "reqs": "Titan+, 2 years, 200 uploads", "active": "Yes", "updated": "Mar 2026" },
       "LST": { "days": 90, "reqs": "Prometheus+, 3 months", "active": "Yes", "updated": "Dec 2025" },
+      "Luminarr": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Sep 2026" },
+      "MidnightScene": { "days": 0, "reqs": "Prometheus+, 3TB upload", "active": "Yes", "updated": "Sep 2026" },
       "Nebulance": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
-      "OldToonsWorld": { "days": 180, "reqs": "Prometheus+, 6 months", "active": "Yes", "updated": "Dec 2025" },
+      "OldToonsWorld": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
       "OnlyEncodes+": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
       "Orpheus": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Aug 2026" },
       "PassThePopcorn": { "days": 730, "reqs": "Titan+, 2 years, 200 uploads", "active": "Yes", "updated": "Dec 2025" },
       "Racing4Everyone": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
-      "ReelFliX": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
+      "ReelFliX": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Sep 2026" },
+      "RetroFlix": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Sep 2026" },
+      "RocketHD": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Sep 2026" },
       "seedpool": { "days": 0, "reqs": "1TiB seedsize", "active": "Yes", "updated": "Aug 2026" },
       "Unwalled": { "days": 0, "reqs": "Harmonia+, 5 seeded uploads", "active": "Yes", "updated": "Dec 2025" }
     },
@@ -281,7 +285,6 @@
       "Aither": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Jan 2026" },
       "AsianCinema": { "days": 180, "reqs": "6 months, 4TB upload", "active": "Yes", "updated": "Jan 2026" },
       "BakaBT": { "days": 180, "reqs": "6 months, ratio>1, seeding at least half of your snatched torrents", "active": "Yes", "updated": "Jan 2026" },
-      "BroadcasTheNet": { "days": 365, "reqs": "TM, 1 year", "active": "Yes", "updated": "Jan 2026" },
       "Concertos": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jan 2026" },
       "D3Si": { "days": 360, "reqs": "TM, 12 months, 50 perfect FLACs, ratio>=1.5", "active": "Yes", "updated": "Jan 2026" },
       "Dolphin Is Coming": { "days": 0, "reqs": "10 music torrents or 15 other torrents", "active": "Yes", "updated": "Jan 2026" },
@@ -328,8 +331,7 @@
       "Unwalled": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Feb 2026" }
     },
     "AsianCinema": {
-      "Luminarr": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Feb 2026" },
-      "Nebulance": { "days": 0, "reqs": "No requirement", "active": "No", "updated": "Sep 2026" }
+      "Luminarr": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Feb 2026" }
     },
     "AvistaZ": {
       "AnimeZ": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" },
@@ -338,7 +340,6 @@
       "PrivateHD": { "days": 120, "reqs": "10k bp, Member Rank, 4 months, seeding 5 torrents, ratio>2.0, 300 GB", "active": "Yes", "updated": "Apr 2026" }
     },
     "Bemaniso": {
-      "Orpheus": { "days": 0, "reqs": "PU", "active": "Yes", "updated": "Oct 2024" },
       "PixelCove": { "days": 84, "reqs": "PU, 12 weeks", "active": "Yes", "updated": "Sep 2024" }
     },
     "BeyondHD": {
@@ -433,9 +434,11 @@
       "TeamHD": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2024" }
     },
     "BrokenStones": {
-      "LST": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Jun 2026" },
+      "inTheShadow": { "days": 0, "reqs": "Elite or higher", "active": "Limited", "updated": "Sep 2026" },
+      "LST": { "days": 270, "reqs": "Elite or higher, 9 months", "active": "Yes", "updated": "Sep 2026" },
       "Luminarr": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Jun 2026" },
       "MyAnonamouse": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jun 2026" },
+      "OldToonsWorld": { "days": 0, "reqs": "Extreme User or higher, actively seeding at least 10 GiB total", "active": "Yes", "updated": "Sep 2026" },
       "PixelCove": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jun 2026" },
       "ReelFliX": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jun 2026" },
       "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jun 2026" }
@@ -449,8 +452,9 @@
       "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Feb 2026" }
     },
     "Cathode-Ray.Tube": {
-      "Aither": { "days": null, "reqs": "Unknown", "active": "Unknown", "updated": "Dec 2024" },
-      "Hawke-uno": { "days": null, "reqs": "Unknown", "active": "Unknown", "updated": "Dec 2024" }
+      "Hawke-uno": { "days": null, "reqs": "Unknown", "active": "Unknown", "updated": "Dec 2024" },
+      "OldToonsWorld": { "days": 0, "reqs": "Analog Ace user or higher", "active": "Yes", "updated": "Sep 2026" },
+      "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Sep 2026" }
     },
     "Cinemageddon": {
       "Aither": { "days": 0, "reqs": "Abandoned", "active": "No", "updated": "Mar 2025" },
@@ -856,7 +860,11 @@
       "YuScene": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Aug 2025" }
     },
     "RetroFlix": {
-      "DarkPeers": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Jul 2026" }
+      "DarkPeers": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Sep 2026" },
+      "MidnightScene": { "days": 180, "reqs": "6 months, 3TB upload", "active": "Yes", "updated": "Sep 2026" }
+    },
+    "RetroMoviesClub": {
+      "OldToonsWorld": { "days": 0, "reqs": "Supporting Actor+", "active": "Yes", "updated": "Sep 2026" }
     },
     "RocketHD": {
       "AnimeWorld": { "days": 0, "reqs": "No requirement", "active": "Yes", "updated": "Nov 2025" },
