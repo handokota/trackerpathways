@@ -34,7 +34,7 @@ export default function Navbar() {
             }`}
             aria-label="View Map"
           >
-            <span className="material-symbols-rounded text-lg">map</span>
+            <span aria-hidden="true" className="material-symbols-rounded text-lg">map</span>
           </Link>
 
           <Link 
@@ -46,7 +46,7 @@ export default function Navbar() {
             }`}
             aria-label="Tracker Directory"
           >
-            <span className="material-symbols-rounded text-lg">menu_book</span>
+            <span aria-hidden="true" className="material-symbols-rounded text-lg">menu_book</span>
           </Link>
           
           <ThemeSwitcher />

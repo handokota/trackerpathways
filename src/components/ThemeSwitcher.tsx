@@ -35,7 +35,7 @@ export default function ThemeSwitcher() {
         className="w-9 h-9 flex items-center justify-center rounded-md text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-all"
         aria-label="Change Theme"
       >
-        <span className="material-symbols-rounded text-lg">
+        <span aria-hidden="true" className="material-symbols-rounded text-lg">
            {currentIcon}
         </span>
       </button>
@@ -55,7 +55,7 @@ export default function ThemeSwitcher() {
                   : "text-foreground/60" 
               }`}
             >
-              <span className="material-symbols-rounded text-lg">
+              <span aria-hidden="true" className="material-symbols-rounded text-lg">
                 {t.icon}
               </span>
               {t.label}

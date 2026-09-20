@@ -844,7 +844,7 @@ export default function TrackerSearchApp() {
                             : "text-foreground/70 bg-foreground/5 hover:bg-foreground/10 hover:text-foreground border-transparent"
                       }`}
                     >
-                      <span className="material-symbols-rounded text-[14px]">bookmarks</span>
+                      <span aria-hidden="true" className="material-symbols-rounded text-[14px]">bookmarks</span>
                       <span className="hidden sm:inline">Use My Trackers</span>
                     </button>
                   </div>
@@ -927,7 +927,7 @@ export default function TrackerSearchApp() {
                       : 'text-foreground/50 hover:text-foreground'
                   }`}
                 >
-                  <span className="material-symbols-rounded text-lg">tune</span>
+                  <span aria-hidden="true" className="material-symbols-rounded text-lg">tune</span>
                   <span className="hidden sm:inline">Options</span>
                 </button>
 
@@ -942,7 +942,7 @@ export default function TrackerSearchApp() {
                       : 'text-foreground/50 hover:text-foreground'
                   }`}
                 >
-                  <span className="material-symbols-rounded text-lg">collections_bookmark</span>
+                  <span aria-hidden="true" className="material-symbols-rounded text-lg">collections_bookmark</span>
                   <span className="hidden sm:inline">My Trackers</span>
                 </button>
               </div>
@@ -1098,7 +1098,7 @@ export default function TrackerSearchApp() {
                   className="h-10 rounded-xl border border-foreground/10 bg-foreground/5 px-3 text-sm font-semibold text-foreground/80 transition-colors hover:border-foreground/20 hover:bg-foreground/10"
                 >
                   <span className="inline-flex items-center gap-1.5">
-                    <span className="material-symbols-rounded text-base">tune</span>
+                    <span aria-hidden="true" className="material-symbols-rounded text-base">tune</span>
                     View
                   </span>
                 </button>
@@ -1108,7 +1108,7 @@ export default function TrackerSearchApp() {
                     <div className="grid grid-cols-1 gap-3 items-stretch md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
                       <div className="w-full min-w-0">
                         <div className="flex items-center gap-2 text-sm font-semibold text-foreground/60 mb-1">
-                          <span className="material-symbols-rounded text-base">sort</span>
+                          <span aria-hidden="true" className="material-symbols-rounded text-base">sort</span>
                           <span>Sort by</span>
                         </div>
                         <div className="h-px bg-foreground/10 mb-2" />
@@ -1136,7 +1136,7 @@ export default function TrackerSearchApp() {
                                     className="h-5 w-5 inline-flex items-center justify-center text-foreground transition-colors hover:text-foreground/80"
                                     aria-label={`${option.label} sort ${optionDirection === "asc" ? "ascending" : "descending"}`}
                                   >
-                                    <span className="material-symbols-rounded text-sm">
+                                    <span aria-hidden="true" className="material-symbols-rounded text-sm">
                                       {optionDirection === "asc" ? "arrow_upward" : "arrow_downward"}
                                     </span>
                                   </button>
@@ -1164,7 +1164,7 @@ export default function TrackerSearchApp() {
 
                       <div className="w-full min-w-0">
                         <div className="flex items-center gap-2 text-sm font-semibold text-foreground/60 mb-1">
-                          <span className="material-symbols-rounded text-base">format_list_numbered</span>
+                          <span aria-hidden="true" className="material-symbols-rounded text-base">format_list_numbered</span>
                           <span>Per page</span>
                         </div>
                         <div className="h-px bg-foreground/10 mb-2" />
@@ -1252,19 +1252,19 @@ export default function TrackerSearchApp() {
 
                     <div className="flex flex-wrap items-center gap-2 md:gap-3 shrink-0">
                       <div className={infoBadgeClass}>
-                        <span className="material-symbols-rounded text-[14px] opacity-70">route</span>
+                        <span aria-hidden="true" className="material-symbols-rounded text-[14px] opacity-70">route</span>
                         <span>{sourceFoundCount} route{sourceFoundCount !== 1 && 's'}</span>
                       </div>
                       <div className={infoBadgeClass}>
-                        <span className="material-symbols-rounded text-[14px] opacity-70">linear_scale</span>
+                        <span aria-hidden="true" className="material-symbols-rounded text-[14px] opacity-70">linear_scale</span>
                         <span>Best: {bestHops} hop{bestHops !== 1 && 's'}</span>
                       </div>
                       <div className={infoBadgeClass}>
-                        <span className="material-symbols-rounded text-[14px] opacity-70">schedule</span>
+                        <span aria-hidden="true" className="material-symbols-rounded text-[14px] opacity-70">schedule</span>
                         <span>{bestDays !== null ? `${bestDays}d` : 'Unk'}</span>
                       </div>
                       <div className="flex items-center justify-center w-7 h-7 rounded-full transition-colors ml-1">
-                        <span className={`material-symbols-rounded text-xl text-foreground/60 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}>
+                        <span aria-hidden="true" className={`material-symbols-rounded text-xl text-foreground/60 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}>
                           keyboard_arrow_down
                         </span>
                       </div>
@@ -1312,7 +1312,7 @@ export default function TrackerSearchApp() {
                                     {isBestPath && (
                                       <div className="mt-1.5 mb-1">
                                         <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold ui-status-open px-2 py-0.5 rounded-md">
-                                          <span className="material-symbols-rounded text-sm">workspace_premium</span>
+                                          <span aria-hidden="true" className="material-symbols-rounded text-sm">workspace_premium</span>
                                           {sortBy === 'days'
                                             ? sortDirection === "asc" ? "Fastest route overall" : "Slowest route overall"
                                             : sortBy === "officialInvites"
@@ -1338,7 +1338,7 @@ export default function TrackerSearchApp() {
                                       <div key={rIdx} className="text-sm pl-3 relative border-l-2 border-foreground/10">
                                         {!isDirect && (
                                           <div className="text-sm font-bold text-foreground/70 mb-1 flex items-center gap-1">
-                                            <span>{fromNode}</span><span className="material-symbols-rounded text-base">arrow_right_alt</span><span>{toNode}</span>
+                                            <span>{fromNode}</span><span aria-hidden="true" className="material-symbols-rounded text-base">arrow_right_alt</span><span>{toNode}</span>
                                           </div>
                                         )}
                                         <div className={`text-xs font-medium mb-1 ${stepDays === null ? "text-foreground/40" : "text-foreground/70"}`}>
@@ -1379,7 +1379,7 @@ export default function TrackerSearchApp() {
                                   aria-label="First page"
                                   className="h-8 min-w-8 rounded-md border border-foreground/10 bg-foreground/5 px-2 text-xs font-semibold text-foreground/70 transition-colors inline-flex items-center justify-center hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                                 >
-                                  <span className="material-symbols-rounded text-sm">first_page</span>
+                                  <span aria-hidden="true" className="material-symbols-rounded text-sm">first_page</span>
                                 </button>
                                 <button
                                   type="button"
@@ -1388,7 +1388,7 @@ export default function TrackerSearchApp() {
                                   aria-label="Previous page"
                                   className="h-8 min-w-8 rounded-md border border-foreground/10 bg-foreground/5 px-2 text-xs font-semibold text-foreground/70 transition-colors inline-flex items-center justify-center hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                                 >
-                                  <span className="material-symbols-rounded text-sm">chevron_left</span>
+                                  <span aria-hidden="true" className="material-symbols-rounded text-sm">chevron_left</span>
                                 </button>
                                 <span className="h-8 min-w-8 rounded-md border border-foreground/20 bg-foreground/10 px-2 text-xs font-semibold text-foreground inline-flex items-center justify-center">
                                   {sourceRoutePage}
@@ -1400,7 +1400,7 @@ export default function TrackerSearchApp() {
                                   aria-label="Next page"
                                   className="h-8 min-w-8 rounded-md border border-foreground/10 bg-foreground/5 px-2 text-xs font-semibold text-foreground/70 transition-colors inline-flex items-center justify-center hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                                 >
-                                  <span className="material-symbols-rounded text-sm">chevron_right</span>
+                                  <span aria-hidden="true" className="material-symbols-rounded text-sm">chevron_right</span>
                                 </button>
                                 <button
                                   type="button"
@@ -1409,7 +1409,7 @@ export default function TrackerSearchApp() {
                                   aria-label="Last page"
                                   className="h-8 min-w-8 rounded-md border border-foreground/10 bg-foreground/5 px-2 text-xs font-semibold text-foreground/70 transition-colors inline-flex items-center justify-center hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                                 >
-                                  <span className="material-symbols-rounded text-sm">last_page</span>
+                                  <span aria-hidden="true" className="material-symbols-rounded text-sm">last_page</span>
                                 </button>
                               </div>
                             )}

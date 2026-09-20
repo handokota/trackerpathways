@@ -26,7 +26,7 @@ export default function SortDirectionButton({
       } ${className}`}
       aria-label={`Sort ${direction === "asc" ? "ascending" : "descending"}`}
     >
-      <span className={`material-symbols-rounded ${isSmall ? "text-sm" : "text-base"}`}>
+      <span aria-hidden="true" className={`material-symbols-rounded ${isSmall ? "text-sm" : "text-base"}`}>
         {direction === "asc" ? "arrow_upward" : "arrow_downward"}
       </span>
       {showTooltip && (

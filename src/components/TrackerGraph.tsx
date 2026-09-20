@@ -568,7 +568,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             onClick={() => setIsPanelOpen(!isPanelOpen)}
             className={`w-full flex items-center py-3 text-left outline-none whitespace-nowrap overflow-hidden transition-all duration-500 ${isPanelOpen ? "justify-start px-4" : "justify-center px-0"}`}
           >
-            <span className={`material-symbols-rounded text-lg shrink-0 transition-transform duration-300 text-foreground ${isPanelOpen ? "rotate-90" : ""}`}>
+            <span aria-hidden="true" className={`material-symbols-rounded text-lg shrink-0 transition-transform duration-300 text-foreground ${isPanelOpen ? "rotate-90" : ""}`}>
               directions
             </span>
             <span className={`text-sm font-bold tracking-tight transition-all duration-500 ${isPanelOpen ? "opacity-100 max-w-50 ml-2" : "opacity-0 max-w-0 ml-0"}`}>
@@ -594,7 +594,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                         : "bg-foreground/5 text-foreground/70 border-foreground/10 hover:bg-foreground/10 hover:text-foreground"
                   }`}
                 >
-                  <span className="material-symbols-rounded text-sm">bookmarks</span>
+                  <span aria-hidden="true" className="material-symbols-rounded text-sm">bookmarks</span>
                   Use My Trackers
                 </button>
 
@@ -733,7 +733,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
               )}
               {useCollectionAsSource && pathEnd && selectedCollectionPath && (
                 <div className="text-sm text-green-500 font-medium text-center py-1 flex items-center justify-center gap-1.5">
-                  <span className="material-symbols-rounded text-base">check_circle</span>
+                  <span aria-hidden="true" className="material-symbols-rounded text-base">check_circle</span>
                   Best route: {collectionPathOptions[0].source} ({collectionPathOptions[0].nodes.length - 1} steps)
                 </div>
               )}
@@ -744,7 +744,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
               )}
               {!useCollectionAsSource && pathStart && pathEnd && activePath && (
                 <div className="text-sm text-green-500 font-medium text-center py-1 flex items-center justify-center gap-1.5">
-                  <span className="material-symbols-rounded text-base">check_circle</span>
+                  <span aria-hidden="true" className="material-symbols-rounded text-base">check_circle</span>
                   Path found ({activePath.length - 1} steps)
                 </div>
               )}
@@ -776,7 +776,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                             <span key={`${pathOption.id}-${node}-${stepIndex}`}>
                               {stepIndex > 0 && " • "}
                               {node}
-                              <span className="material-symbols-rounded align-middle text-[11px] mx-0.5">arrow_right_alt</span>
+                              <span aria-hidden="true" className="material-symbols-rounded align-middle text-[11px] mx-0.5">arrow_right_alt</span>
                               {pathOption.nodes[stepIndex + 1]}
                               {" ("}
                               {formatStepDays(pathOption.stepDays[stepIndex] ?? null)}
@@ -816,7 +816,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             onClick={() => setIsCollectionPanelOpen(!isCollectionPanelOpen)}
             className={`w-full flex items-center py-3 text-left outline-none whitespace-nowrap overflow-hidden transition-all duration-500 ${isCollectionPanelOpen ? "justify-start px-4" : "justify-center px-0"}`}
           >
-            <span className={`material-symbols-rounded text-lg shrink-0 transition-transform duration-300 text-foreground ${isCollectionPanelOpen ? "rotate-90" : ""}`}>
+            <span aria-hidden="true" className={`material-symbols-rounded text-lg shrink-0 transition-transform duration-300 text-foreground ${isCollectionPanelOpen ? "rotate-90" : ""}`}>
               bookmarks
             </span>
             <span className={`text-sm font-bold tracking-tight transition-all duration-500 ${isCollectionPanelOpen ? "opacity-100 max-w-50 ml-2" : "opacity-0 max-w-0 ml-0"}`}>
@@ -1075,7 +1075,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
               className="inline-flex h-8 w-8 items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-foreground/10 hover:text-foreground"
               aria-label="Close panel"
             >
-              <span className="material-symbols-rounded text-lg">close</span>
+              <span aria-hidden="true" className="material-symbols-rounded text-lg">close</span>
             </button>
           </div>
 
