@@ -734,7 +734,6 @@
     },
     "OnlyEncodes+": {
       "CapybaraBR": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Aug 2026" },
-      "LST": { "days": 90, "reqs": "6TB seedsize with an average seedtime of 3 months. Account age 9 months", "active": "Yes", "updated": "Aug 2026" },
       "ReelFliX": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Aug 2026" },
       "YuScene": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Aug 2026" }
     },
@@ -964,7 +963,7 @@
       "Luminarr": { "days": 90, "reqs": "3 months account age", "active": "Yes", "updated": "Aug 2026" },
       "MidnightScene": { "days": 180, "reqs": "6 months, 3TB uplo", "active": "Yes", "updated": "Aug 2026" },
       "seedpool": { "days": 90, "reqs": "3 months, 1 TiB seed size, 1 month average seed time", "active": "Yes", "updated": "Aug 2026" },
-      "Unwalled": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Aug 2026" },
+      "Unwalled": { "days": 0, "reqs": "1 torrent upload", "active": "Yes", "updated": "Sep 2026" },
       "Upload.cx": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Aug 2026" },
       "Zenith": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Aug 2026" }
     },
