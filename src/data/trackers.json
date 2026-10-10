@@ -658,6 +658,7 @@
       "HomieHelpDesk": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Aug 2026" },
       "MidnightScene": { "days": 180, "reqs": "6 months, 3 TB upload", "active": "Yes", "updated": "Aug 2026" },
       "OldToonsWorld": { "days": 365, "reqs": "1 year, avg seedtime 6 months, 1TiB seedsize", "active": "Yes", "updated": "Aug 2026" },
+      "PeerGarden": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Oct 2026" },
       "ReelFliX": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Aug 2026" },
       "RetroFlix": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Aug 2026" },
       "Samaritano": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Aug 2026" },
