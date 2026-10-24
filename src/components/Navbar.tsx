@@ -1,5 +1,6 @@
 "use client";
 
+import Icon from "@/components/shared/Icon";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
@@ -34,7 +35,7 @@ export default function Navbar() {
             }`}
             aria-label="View Map"
           >
-            <span aria-hidden="true" className="material-symbols-rounded text-lg">map</span>
+            <Icon name="map" className="text-lg" />
           </Link>
 
           <Link 
@@ -46,7 +47,7 @@ export default function Navbar() {
             }`}
             aria-label="Tracker Directory"
           >
-            <span aria-hidden="true" className="material-symbols-rounded text-lg">menu_book</span>
+            <Icon name="menu_book" className="text-lg" />
           </Link>
           
           <ThemeSwitcher />

@@ -1,5 +1,6 @@
 "use client";
 
+import Icon from "@/components/shared/Icon";
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import rawData from "@/data/trackers.json";
@@ -225,7 +226,7 @@ export default function DirectoryPageClient() {
         <div className="w-full flex items-center gap-2 md:contents">
           <div className="relative flex-1 md:justify-self-center shrink-0">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/30 flex items-center">
-              <span aria-hidden="true" className="material-symbols-rounded">search</span>
+              <Icon name="search" className="" />
             </span>
             <input
               type="text"
@@ -249,7 +250,7 @@ export default function DirectoryPageClient() {
                 className="h-10 rounded-xl border border-foreground/10 bg-foreground/5 px-3 text-sm font-semibold text-foreground/80 transition-colors hover:border-foreground/20 hover:bg-foreground/10"
               >
                 <span className="inline-flex items-center gap-1.5">
-                  <span aria-hidden="true" className="material-symbols-rounded text-base">tune</span>
+                  <Icon name="tune" className="text-base" />
                   View
                 </span>
               </button>
@@ -258,7 +259,7 @@ export default function DirectoryPageClient() {
                 <div className="absolute right-0 mt-2 w-40 max-w-[calc(100vw-2rem)] rounded-xl border border-foreground/10 bg-card p-3 z-20 shadow-lg motion-safe:animate-in fade-in zoom-in-95 duration-200">
                   <div className="w-full min-w-0">
                     <div className="flex items-center gap-2 text-sm font-semibold text-foreground/60 mb-1">
-                      <span aria-hidden="true" className="material-symbols-rounded text-base">sort</span>
+                      <Icon name="sort" className="text-base" />
                       <span>Sort by</span>
                     </div>
                     <div className="h-px bg-foreground/10 mb-2" />
@@ -289,9 +290,7 @@ export default function DirectoryPageClient() {
                                 className="h-5 w-5 inline-flex items-center justify-center text-foreground transition-colors hover:text-foreground/80"
                                 aria-label={`${option.label} sort ${optionDirection === "asc" ? "ascending" : "descending"}`}
                               >
-                                <span aria-hidden="true" className="material-symbols-rounded text-sm">
-                                  {optionDirection === "asc" ? "arrow_upward" : "arrow_downward"}
-                                </span>
+                                <Icon name={ optionDirection === "asc" ? "arrow_upward" : "arrow_downward" } className="text-sm" />
                               </button>
                             ) : (
                               <span className="h-5 w-5" aria-hidden="true" />

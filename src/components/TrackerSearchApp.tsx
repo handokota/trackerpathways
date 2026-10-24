@@ -1,5 +1,6 @@
 "use client";
 
+import Icon from "@/components/shared/Icon";
 import { useState, useMemo, useEffect, useDeferredValue, useRef, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import rawData from "@/data/trackers.json";
@@ -779,8 +780,6 @@ export default function TrackerSearchApp() {
   }, [activeTrackerParam, allTrackers, getUnlockRequirementSections, trackerCanInviteTo, trackerInvitedFrom]);
 
 
-  if (!mounted) return <div className="w-full" />;
-
   const badgeClass = "flex items-center gap-1.5 text-xs font-semibold text-foreground/80 bg-foreground/10 px-2 py-0.5 rounded-md shrink-0 whitespace-nowrap";
   const infoBadgeClass = "flex items-center gap-1.5 px-2 py-1 bg-foreground/8 rounded-md text-xs md:text-sm font-medium text-foreground/70";
 
@@ -844,7 +843,7 @@ export default function TrackerSearchApp() {
                             : "text-foreground/70 bg-foreground/5 hover:bg-foreground/10 hover:text-foreground border-transparent"
                       }`}
                     >
-                      <span aria-hidden="true" className="material-symbols-rounded text-[14px]">bookmarks</span>
+                      <Icon name="bookmarks" className="text-[14px]" />
                       <span className="hidden sm:inline">Use My Trackers</span>
                     </button>
                   </div>
@@ -927,7 +926,7 @@ export default function TrackerSearchApp() {
                       : 'text-foreground/50 hover:text-foreground'
                   }`}
                 >
-                  <span aria-hidden="true" className="material-symbols-rounded text-lg">tune</span>
+                  <Icon name="tune" className="text-lg" />
                   <span className="hidden sm:inline">Options</span>
                 </button>
 
@@ -942,7 +941,7 @@ export default function TrackerSearchApp() {
                       : 'text-foreground/50 hover:text-foreground'
                   }`}
                 >
-                  <span aria-hidden="true" className="material-symbols-rounded text-lg">collections_bookmark</span>
+                  <Icon name="collections_bookmark" className="text-lg" />
                   <span className="hidden sm:inline">My Trackers</span>
                 </button>
               </div>
@@ -1098,7 +1097,7 @@ export default function TrackerSearchApp() {
                   className="h-10 rounded-xl border border-foreground/10 bg-foreground/5 px-3 text-sm font-semibold text-foreground/80 transition-colors hover:border-foreground/20 hover:bg-foreground/10"
                 >
                   <span className="inline-flex items-center gap-1.5">
-                    <span aria-hidden="true" className="material-symbols-rounded text-base">tune</span>
+                    <Icon name="tune" className="text-base" />
                     View
                   </span>
                 </button>
@@ -1108,7 +1107,7 @@ export default function TrackerSearchApp() {
                     <div className="grid grid-cols-1 gap-3 items-stretch md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
                       <div className="w-full min-w-0">
                         <div className="flex items-center gap-2 text-sm font-semibold text-foreground/60 mb-1">
-                          <span aria-hidden="true" className="material-symbols-rounded text-base">sort</span>
+                          <Icon name="sort" className="text-base" />
                           <span>Sort by</span>
                         </div>
                         <div className="h-px bg-foreground/10 mb-2" />
@@ -1136,9 +1135,7 @@ export default function TrackerSearchApp() {
                                     className="h-5 w-5 inline-flex items-center justify-center text-foreground transition-colors hover:text-foreground/80"
                                     aria-label={`${option.label} sort ${optionDirection === "asc" ? "ascending" : "descending"}`}
                                   >
-                                    <span aria-hidden="true" className="material-symbols-rounded text-sm">
-                                      {optionDirection === "asc" ? "arrow_upward" : "arrow_downward"}
-                                    </span>
+                                    <Icon name={ optionDirection === "asc" ? "arrow_upward" : "arrow_downward" } className="text-sm" />
                                   </button>
                                 ) : (
                                   <span className="h-5 w-5" aria-hidden="true" />
@@ -1164,7 +1161,7 @@ export default function TrackerSearchApp() {
 
                       <div className="w-full min-w-0">
                         <div className="flex items-center gap-2 text-sm font-semibold text-foreground/60 mb-1">
-                          <span aria-hidden="true" className="material-symbols-rounded text-base">format_list_numbered</span>
+                          <Icon name="format_list_numbered" className="text-base" />
                           <span>Per page</span>
                         </div>
                         <div className="h-px bg-foreground/10 mb-2" />
@@ -1252,21 +1249,19 @@ export default function TrackerSearchApp() {
 
                     <div className="flex flex-wrap items-center gap-2 md:gap-3 shrink-0">
                       <div className={infoBadgeClass}>
-                        <span aria-hidden="true" className="material-symbols-rounded text-[14px] opacity-70">route</span>
+                        <Icon name="route" className="text-[14px] opacity-70" />
                         <span>{sourceFoundCount} route{sourceFoundCount !== 1 && 's'}</span>
                       </div>
                       <div className={infoBadgeClass}>
-                        <span aria-hidden="true" className="material-symbols-rounded text-[14px] opacity-70">linear_scale</span>
+                        <Icon name="linear_scale" className="text-[14px] opacity-70" />
                         <span>Best: {bestHops} hop{bestHops !== 1 && 's'}</span>
                       </div>
                       <div className={infoBadgeClass}>
-                        <span aria-hidden="true" className="material-symbols-rounded text-[14px] opacity-70">schedule</span>
+                        <Icon name="schedule" className="text-[14px] opacity-70" />
                         <span>{bestDays !== null ? `${bestDays}d` : 'Unk'}</span>
                       </div>
                       <div className="flex items-center justify-center w-7 h-7 rounded-full transition-colors ml-1">
-                        <span aria-hidden="true" className={`material-symbols-rounded text-xl text-foreground/60 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}>
-                          keyboard_arrow_down
-                        </span>
+                        <Icon name="keyboard_arrow_down" className={`text-xl text-foreground/60 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
                       </div>
                     </div>
                   </div>
@@ -1312,7 +1307,7 @@ export default function TrackerSearchApp() {
                                     {isBestPath && (
                                       <div className="mt-1.5 mb-1">
                                         <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold ui-status-open px-2 py-0.5 rounded-md">
-                                          <span aria-hidden="true" className="material-symbols-rounded text-sm">workspace_premium</span>
+                                          <Icon name="workspace_premium" className="text-sm" />
                                           {sortBy === 'days'
                                             ? sortDirection === "asc" ? "Fastest route overall" : "Slowest route overall"
                                             : sortBy === "officialInvites"
@@ -1338,7 +1333,7 @@ export default function TrackerSearchApp() {
                                       <div key={rIdx} className="text-sm pl-3 relative border-l-2 border-foreground/10">
                                         {!isDirect && (
                                           <div className="text-sm font-bold text-foreground/70 mb-1 flex items-center gap-1">
-                                            <span>{fromNode}</span><span aria-hidden="true" className="material-symbols-rounded text-base">arrow_right_alt</span><span>{toNode}</span>
+                                            <span>{fromNode}</span><Icon name="arrow_right_alt" className="text-base" /><span>{toNode}</span>
                                           </div>
                                         )}
                                         <div className={`text-xs font-medium mb-1 ${stepDays === null ? "text-foreground/40" : "text-foreground/70"}`}>
@@ -1379,7 +1374,7 @@ export default function TrackerSearchApp() {
                                   aria-label="First page"
                                   className="h-8 min-w-8 rounded-md border border-foreground/10 bg-foreground/5 px-2 text-xs font-semibold text-foreground/70 transition-colors inline-flex items-center justify-center hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                                 >
-                                  <span aria-hidden="true" className="material-symbols-rounded text-sm">first_page</span>
+                                  <Icon name="first_page" className="text-sm" />
                                 </button>
                                 <button
                                   type="button"
@@ -1388,7 +1383,7 @@ export default function TrackerSearchApp() {
                                   aria-label="Previous page"
                                   className="h-8 min-w-8 rounded-md border border-foreground/10 bg-foreground/5 px-2 text-xs font-semibold text-foreground/70 transition-colors inline-flex items-center justify-center hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                                 >
-                                  <span aria-hidden="true" className="material-symbols-rounded text-sm">chevron_left</span>
+                                  <Icon name="chevron_left" className="text-sm" />
                                 </button>
                                 <span className="h-8 min-w-8 rounded-md border border-foreground/20 bg-foreground/10 px-2 text-xs font-semibold text-foreground inline-flex items-center justify-center">
                                   {sourceRoutePage}
@@ -1400,7 +1395,7 @@ export default function TrackerSearchApp() {
                                   aria-label="Next page"
                                   className="h-8 min-w-8 rounded-md border border-foreground/10 bg-foreground/5 px-2 text-xs font-semibold text-foreground/70 transition-colors inline-flex items-center justify-center hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                                 >
-                                  <span aria-hidden="true" className="material-symbols-rounded text-sm">chevron_right</span>
+                                  <Icon name="chevron_right" className="text-sm" />
                                 </button>
                                 <button
                                   type="button"
@@ -1409,7 +1404,7 @@ export default function TrackerSearchApp() {
                                   aria-label="Last page"
                                   className="h-8 min-w-8 rounded-md border border-foreground/10 bg-foreground/5 px-2 text-xs font-semibold text-foreground/70 transition-colors inline-flex items-center justify-center hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                                 >
-                                  <span aria-hidden="true" className="material-symbols-rounded text-sm">last_page</span>
+                                  <Icon name="last_page" className="text-sm" />
                                 </button>
                               </div>
                             )}

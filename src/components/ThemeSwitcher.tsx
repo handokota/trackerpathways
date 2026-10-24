@@ -1,12 +1,19 @@
 "use client";
 
+import Icon from "@/components/shared/Icon";
+import type { IconName } from "@/components/shared/Icon";
 import { useState, useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
 
 export default function ThemeSwitcher() {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -18,11 +25,11 @@ export default function ThemeSwitcher() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const activeTheme = resolvedTheme ?? theme ?? "light";
+  const activeTheme = mounted ? resolvedTheme ?? theme ?? "light" : "light";
   const currentIcon =
     activeTheme === "dark" ? "dark_mode" : activeTheme === "light" ? "light_mode" : "desktop_windows";
 
-  const themes = [
+  const themes: Array<{ id: "light" | "dark" | "system"; icon: IconName; label: string }> = [
     { id: 'light', icon: 'light_mode', label: 'Light' },
     { id: 'dark', icon: 'dark_mode', label: 'Dark' },
     { id: 'system', icon: 'desktop_windows', label: 'System' },
@@ -35,9 +42,7 @@ export default function ThemeSwitcher() {
         className="w-9 h-9 flex items-center justify-center rounded-md text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-all"
         aria-label="Change Theme"
       >
-        <span aria-hidden="true" className="material-symbols-rounded text-lg">
-           {currentIcon}
-        </span>
+        <Icon name={ currentIcon } className="text-lg" />
       </button>
 
       {isOpen && (
@@ -55,9 +60,7 @@ export default function ThemeSwitcher() {
                   : "text-foreground/60" 
               }`}
             >
-              <span aria-hidden="true" className="material-symbols-rounded text-lg">
-                {t.icon}
-              </span>
+              <Icon name={ t.icon } className="text-lg" />
               {t.label}
             </button>
           ))}

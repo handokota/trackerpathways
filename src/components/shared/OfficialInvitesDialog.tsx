@@ -1,5 +1,6 @@
 "use client";
 
+import Icon from "@/components/shared/Icon";
 import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import type { OfficialInvitesData } from "@/lib/officialInvites";
@@ -70,7 +71,7 @@ export default function OfficialInvitesDialog({
             className="inline-flex h-8 w-8 items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-foreground/10 hover:text-foreground"
             aria-label="Close dialog"
           >
-            <span aria-hidden="true" className="material-symbols-rounded text-lg">close</span>
+            <Icon name="close" className="text-lg" />
           </button>
         </div>
 

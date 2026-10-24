@@ -1,4 +1,6 @@
+import Icon from "@/components/shared/Icon";
 import type { ReactNode } from "react";
+import type { IconName } from "@/components/shared/Icon";
 
 type UiStateKind = "loading" | "empty" | "error";
 type UiStateLayout = "card" | "inline";
@@ -11,7 +13,7 @@ interface UiStateProps {
   className?: string;
 }
 
-const STATE_CONFIG: Record<UiStateKind, { icon: string; title: string }> = {
+const STATE_CONFIG: Record<UiStateKind, { icon: IconName; title: string }> = {
   loading: { icon: "progress_activity", title: "Loading content" },
   empty: { icon: "search_off", title: "No results found" },
   error: { icon: "error", title: "Something went wrong" },
@@ -31,9 +33,7 @@ export default function UiState({
     const inlineColor = kind === "error" ? "text-red-700 dark:text-red-300" : "text-foreground/60";
     return (
       <div className={`inline-flex items-center gap-1.5 text-sm ${inlineColor} ${className}`.trim()}>
-        <span aria-hidden="true" className={`material-symbols-rounded text-[15px] ${kind === "loading" ? "animate-spin motion-reduce:animate-none" : ""}`}>
-          {config.icon}
-        </span>
+        <Icon name={ config.icon } className={`text-[15px] ${kind === "loading" ? "animate-spin motion-reduce:animate-none" : ""}`} />
         <span>{resolvedTitle}</span>
       </div>
     );
@@ -48,9 +48,7 @@ export default function UiState({
 
   return (
     <div className={`w-full flex flex-col items-center justify-center gap-3 rounded-xl px-6 py-16 text-center ${cardClass} ${className}`.trim()}>
-      <span aria-hidden="true" className={`material-symbols-rounded text-5xl ${iconClass} ${kind === "loading" ? "animate-spin motion-reduce:animate-none" : ""}`}>
-        {config.icon}
-      </span>
+      <Icon name={ config.icon } className={`text-5xl ${iconClass} ${kind === "loading" ? "animate-spin motion-reduce:animate-none" : ""}`} />
       <p className="text-base font-semibold text-current">{resolvedTitle}</p>
       {description ? <p className="text-sm text-current/90 max-w-xl">{description}</p> : null}
     </div>

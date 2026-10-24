@@ -13,13 +13,6 @@ const inter = localFont({
   weight: "100 900",
 });
 
-const materialSymbols = localFont({
-  src: "./fonts/MaterialSymbolsRounded.woff2",
-  variable: "--font-material-symbols",
-  display: "block",
-  weight: "100 700",
-});
-
 const themeInitScript = `
   (() => {
     const storedTheme = localStorage.getItem("theme");
@@ -51,7 +44,7 @@ export default async function RootLayout({
       <head>
         <script nonce={nonce} dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body className={`${inter.variable} ${materialSymbols.variable} font-sans antialiased bg-background text-foreground`} suppressHydrationWarning>
+      <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`} suppressHydrationWarning>
         <Providers nonce={nonce}>
           <div className="min-h-screen flex flex-col">
             <Navbar />

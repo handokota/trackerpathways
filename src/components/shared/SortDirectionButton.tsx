@@ -1,3 +1,4 @@
+import Icon from "@/components/shared/Icon";
 import type { SortDirection } from "@/lib/officialInvites";
 
 interface SortDirectionButtonProps {
@@ -26,9 +27,7 @@ export default function SortDirectionButton({
       } ${className}`}
       aria-label={`Sort ${direction === "asc" ? "ascending" : "descending"}`}
     >
-      <span aria-hidden="true" className={`material-symbols-rounded ${isSmall ? "text-sm" : "text-base"}`}>
-        {direction === "asc" ? "arrow_upward" : "arrow_downward"}
-      </span>
+      <Icon name={ direction === "asc" ? "arrow_upward" : "arrow_downward" } className={`${isSmall ? "text-sm" : "text-base"}`} />
       {showTooltip && (
         <span className="pointer-events-none absolute left-1/2 top-full z-20 -translate-x-1/2 translate-y-2 rounded-md border border-foreground/15 bg-card px-2 py-1 text-[11px] font-medium text-foreground/80 whitespace-nowrap opacity-0 transition-all duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 hidden md:block">
           Sort: {direction === "asc" ? "Ascending" : "Descending"}

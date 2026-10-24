@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   reactCompiler: true,
   poweredByHeader: false,
-  allowedDevOrigins: ["trackerpathways.home.arpa"],
+  allowedDevOrigins: ["trackerpathways.home.arpa", "localhost", "127.0.0.1"],
   async headers() {
     return [
       {

@@ -1,3 +1,4 @@
+import Icon from "@/components/shared/Icon";
 import type { MouseEvent } from "react";
 
 interface OfficialInvitesBadgeProps {
@@ -24,7 +25,7 @@ export default function OfficialInvitesBadge({
       className={`relative group inline-flex items-center gap-1 text-xs font-semibold ui-accent-badge px-2 py-0.5 rounded-md transition-colors duration-200 motion-reduce:transition-none cursor-pointer shrink-0 ${className}`}
       aria-label={ariaLabel}
     >
-      <span aria-hidden="true" className="material-symbols-rounded text-sm">outbound</span>
+      <Icon name="outbound" className="text-sm" />
       {label ? <span className={labelClassName}>{label}</span> : null}
       <span>{count}</span>
     </button>
