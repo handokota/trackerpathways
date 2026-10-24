@@ -31,11 +31,11 @@ export default function Navbar() {
             className={`w-9 h-9 flex items-center justify-center rounded-md transition-all hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/25 ${
               pathname === "/map" 
                 ? "text-foreground" 
-                : "text-foreground/60"
+                : "text-icon-muted"
             }`}
             aria-label="View Map"
           >
-            <Icon name="map" className="text-lg" />
+            <Icon name="map" className={`text-lg ${pathname === "/map" ? "text-foreground" : "text-icon-muted"}`} />
           </Link>
 
           <Link 
@@ -43,11 +43,11 @@ export default function Navbar() {
             className={`w-9 h-9 flex items-center justify-center rounded-md transition-all hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/25 ${
               pathname === "/directory" 
                 ? "text-foreground" 
-                : "text-foreground/60"
+                : "text-icon-muted"
             }`}
             aria-label="Tracker Directory"
           >
-            <Icon name="menu_book" className="text-lg" />
+            <Icon name="menu_book" className={`text-lg ${pathname === "/directory" ? "text-foreground" : "text-icon-muted"}`} />
           </Link>
           
           <ThemeSwitcher />

@@ -42,7 +42,7 @@ export default function ThemeSwitcher() {
         className="w-9 h-9 flex items-center justify-center rounded-md text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-all"
         aria-label="Change Theme"
       >
-        <Icon name={ currentIcon } className="text-lg" />
+        <Icon name={ currentIcon } className="text-lg text-icon-muted" />
       </button>
 
       {isOpen && (
@@ -57,10 +57,10 @@ export default function ThemeSwitcher() {
               className={`w-full flex items-center gap-3 px-3 py-2 text-sm transition-colors hover:bg-foreground/5 font-medium rounded-md ${
                 theme === t.id 
                   ? "text-foreground" 
-                  : "text-foreground/60" 
+                  : "text-icon-muted"
               }`}
             >
-              <Icon name={ t.icon } className="text-lg" />
+              <Icon name={ t.icon } className={`text-lg ${theme === t.id ? "text-foreground" : "text-icon-muted"}`} />
               {t.label}
             </button>
           ))}

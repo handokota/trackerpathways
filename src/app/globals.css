@@ -78,6 +78,7 @@ html {
 }
 
 .text-ui-muted { color: color-mix(in oklab, var(--foreground) 60%, transparent); }
+.text-icon-muted { color: color-mix(in oklab, var(--foreground) 45%, var(--background)); }
 .text-ui-emphasis { color: color-mix(in oklab, var(--foreground) 70%, transparent); }
 .text-ui-dim { color: color-mix(in oklab, var(--foreground) 50%, transparent); }
 .text-ui-strong { color: color-mix(in oklab, var(--foreground) 80%, transparent); }

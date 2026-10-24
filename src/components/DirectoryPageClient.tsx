@@ -226,7 +226,7 @@ export default function DirectoryPageClient() {
         <div className="w-full flex items-center gap-2 md:contents">
           <div className="relative flex-1 md:justify-self-center shrink-0">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/30 flex items-center">
-              <Icon name="search" className="" />
+              <Icon name="search" className="text-icon-muted" />
             </span>
             <input
               type="text"
@@ -250,7 +250,7 @@ export default function DirectoryPageClient() {
                 className="h-10 rounded-xl border border-foreground/10 bg-foreground/5 px-3 text-sm font-semibold text-foreground/80 transition-colors hover:border-foreground/20 hover:bg-foreground/10"
               >
                 <span className="inline-flex items-center gap-1.5">
-                  <Icon name="tune" className="text-base" />
+                  <Icon name="tune" className="text-base text-icon-muted" />
                   View
                 </span>
               </button>
@@ -259,7 +259,7 @@ export default function DirectoryPageClient() {
                 <div className="absolute right-0 mt-2 w-40 max-w-[calc(100vw-2rem)] rounded-xl border border-foreground/10 bg-card p-3 z-20 shadow-lg motion-safe:animate-in fade-in zoom-in-95 duration-200">
                   <div className="w-full min-w-0">
                     <div className="flex items-center gap-2 text-sm font-semibold text-foreground/60 mb-1">
-                      <Icon name="sort" className="text-base" />
+                      <Icon name="sort" className="text-base text-icon-muted" />
                       <span>Sort by</span>
                     </div>
                     <div className="h-px bg-foreground/10 mb-2" />
@@ -277,7 +277,7 @@ export default function DirectoryPageClient() {
                             className={`h-8 w-full rounded-md px-2 text-sm font-normal transition-colors grid grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-1 ${
                               isActive
                                 ? "bg-foreground/10 text-foreground"
-                                : "text-foreground/60 hover:text-foreground"
+                                : "text-icon-muted hover:text-foreground"
                             }`}
                           >
                             {isActive ? (
@@ -290,7 +290,7 @@ export default function DirectoryPageClient() {
                                 className="h-5 w-5 inline-flex items-center justify-center text-foreground transition-colors hover:text-foreground/80"
                                 aria-label={`${option.label} sort ${optionDirection === "asc" ? "ascending" : "descending"}`}
                               >
-                                <Icon name={ optionDirection === "asc" ? "arrow_upward" : "arrow_downward" } className="text-sm" />
+                                <Icon name={ optionDirection === "asc" ? "arrow_upward" : "arrow_downward" } className="text-sm text-foreground" />
                               </button>
                             ) : (
                               <span className="h-5 w-5" aria-hidden="true" />

@@ -66,7 +66,7 @@ export default function OfficialInvitesContent({
           aria-expanded={isUnlockAccordionOpen}
         >
           <span>Forum unlock requirements</span>
-          <Icon name="keyboard_arrow_down" className={`text-lg text-foreground/60 transition-transform duration-200 ${isUnlockAccordionOpen ? "rotate-180" : ""}`} />
+          <Icon name="keyboard_arrow_down" className={`text-lg text-icon-muted transition-transform duration-200 ${isUnlockAccordionOpen ? "rotate-180" : ""}`} />
         </button>
         <div
           className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
@@ -141,7 +141,7 @@ export default function OfficialInvitesContent({
                   : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10"
               }`}
             >
-              <Icon name="south_west" className="text-sm shrink-0" />
+              <Icon name="south_west" className="text-sm text-icon-muted shrink-0" />
               <span className="truncate">Invited From ({data.invitedFrom.length})</span>
             </button>
           </div>
@@ -161,7 +161,7 @@ export default function OfficialInvitesContent({
                 <option value="officialInvites">Official</option>
                 <option value="alphabetical">Name</option>
               </select>
-              <Icon name="expand_more" className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-sm text-foreground/50" />
+              <Icon name="expand_more" className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-sm text-icon-muted" />
             </div>
             <SortDirectionButton
               direction={officialInvitesSortDirection}
@@ -217,7 +217,7 @@ export default function OfficialInvitesContent({
                     </div>
 
                     <div className="flex items-center shrink-0 ml-1">
-                      <Icon name="keyboard_arrow_down" className={`text-lg text-foreground/60 transition-transform duration-200 ${isInviteCardOpen ? "rotate-180" : ""}`} />
+                      <Icon name="keyboard_arrow_down" className={`text-lg text-icon-muted transition-transform duration-200 ${isInviteCardOpen ? "rotate-180" : ""}`} />
                     </div>
                   </div>
 

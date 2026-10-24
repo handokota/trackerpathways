@@ -843,7 +843,7 @@ export default function TrackerSearchApp() {
                             : "text-foreground/70 bg-foreground/5 hover:bg-foreground/10 hover:text-foreground border-transparent"
                       }`}
                     >
-                      <Icon name="bookmarks" className="text-[14px]" />
+                      <Icon name="bookmarks" className="text-[14px] text-icon-muted" />
                       <span className="hidden sm:inline">Use My Trackers</span>
                     </button>
                   </div>
@@ -923,10 +923,10 @@ export default function TrackerSearchApp() {
                   className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all text-sm font-medium border border-foreground/10 bg-foreground/5 hover:border-foreground/20 hover:bg-foreground/10 ${
                     showFilters
                       ? 'text-foreground border-foreground/20'
-                      : 'text-foreground/50 hover:text-foreground'
+                      : 'text-icon-muted hover:text-foreground'
                   }`}
                 >
-                  <Icon name="tune" className="text-lg" />
+                  <Icon name="tune" className={`text-lg ${showFilters ? "text-foreground" : "text-icon-muted"}`} />
                   <span className="hidden sm:inline">Options</span>
                 </button>
 
@@ -938,10 +938,10 @@ export default function TrackerSearchApp() {
                   className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all text-sm font-medium border border-foreground/10 bg-foreground/5 hover:border-foreground/20 hover:bg-foreground/10 ${
                     showCollectionManager
                       ? 'text-foreground border-foreground/20'
-                      : 'text-foreground/50 hover:text-foreground'
+                      : 'text-icon-muted hover:text-foreground'
                   }`}
                 >
-                  <Icon name="collections_bookmark" className="text-lg" />
+                  <Icon name="collections_bookmark" className={`text-lg ${showCollectionManager ? "text-foreground" : "text-icon-muted"}`} />
                   <span className="hidden sm:inline">My Trackers</span>
                 </button>
               </div>
@@ -968,7 +968,7 @@ export default function TrackerSearchApp() {
                       className={`flex-1 px-3 py-1.5 text-sm rounded-md transition-all ring-0 focus:ring-0 font-medium ${
                         maxJumps === val
                           ? 'bg-foreground/10 text-foreground'
-                          : 'text-foreground/60 hover:text-foreground'
+                          : 'text-icon-muted hover:text-foreground'
                       }`}
                     >
                       {val}
@@ -996,7 +996,7 @@ export default function TrackerSearchApp() {
                       className={`flex-1 px-2 py-1.5 text-sm rounded-md whitespace-nowrap transition-all ring-0 focus:ring-0 font-medium ${
                         maxDays === opt.v
                           ? 'bg-foreground/10 text-foreground'
-                          : 'text-foreground/60 hover:text-foreground'
+                          : 'text-icon-muted hover:text-foreground'
                       }`}
                     >
                       {opt.l}
@@ -1097,7 +1097,7 @@ export default function TrackerSearchApp() {
                   className="h-10 rounded-xl border border-foreground/10 bg-foreground/5 px-3 text-sm font-semibold text-foreground/80 transition-colors hover:border-foreground/20 hover:bg-foreground/10"
                 >
                   <span className="inline-flex items-center gap-1.5">
-                    <Icon name="tune" className="text-base" />
+                    <Icon name="tune" className="text-base text-icon-muted" />
                     View
                   </span>
                 </button>
@@ -1107,7 +1107,7 @@ export default function TrackerSearchApp() {
                     <div className="grid grid-cols-1 gap-3 items-stretch md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
                       <div className="w-full min-w-0">
                         <div className="flex items-center gap-2 text-sm font-semibold text-foreground/60 mb-1">
-                          <Icon name="sort" className="text-base" />
+                          <Icon name="sort" className="text-base text-icon-muted" />
                           <span>Sort by</span>
                         </div>
                         <div className="h-px bg-foreground/10 mb-2" />
@@ -1121,7 +1121,7 @@ export default function TrackerSearchApp() {
                                 className={`h-8 w-full rounded-md px-2 text-sm font-normal transition-colors grid grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-1 ${
                                   isActive
                                     ? "bg-foreground/10 text-foreground"
-                                    : "text-foreground/60 hover:text-foreground"
+                                    : "text-icon-muted hover:text-foreground"
                                 }`}
                               >
                                 {isActive ? (
@@ -1135,7 +1135,7 @@ export default function TrackerSearchApp() {
                                     className="h-5 w-5 inline-flex items-center justify-center text-foreground transition-colors hover:text-foreground/80"
                                     aria-label={`${option.label} sort ${optionDirection === "asc" ? "ascending" : "descending"}`}
                                   >
-                                    <Icon name={ optionDirection === "asc" ? "arrow_upward" : "arrow_downward" } className="text-sm" />
+                                    <Icon name={ optionDirection === "asc" ? "arrow_upward" : "arrow_downward" } className="text-sm text-foreground" />
                                   </button>
                                 ) : (
                                   <span className="h-5 w-5" aria-hidden="true" />
@@ -1161,7 +1161,7 @@ export default function TrackerSearchApp() {
 
                       <div className="w-full min-w-0">
                         <div className="flex items-center gap-2 text-sm font-semibold text-foreground/60 mb-1">
-                          <Icon name="format_list_numbered" className="text-base" />
+                          <Icon name="format_list_numbered" className="text-base text-icon-muted" />
                           <span>Per page</span>
                         </div>
                         <div className="h-px bg-foreground/10 mb-2" />
@@ -1176,7 +1176,7 @@ export default function TrackerSearchApp() {
                                 className={`h-8 w-full rounded-md px-2 text-sm font-normal transition-colors grid grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-1 ${
                                   isActive
                                     ? "bg-foreground/10 text-foreground"
-                                    : "text-foreground/60 hover:text-foreground"
+                                    : "text-icon-muted hover:text-foreground"
                                 }`}
                               >
                                 <div className="flex h-5 w-5 items-center justify-center">
@@ -1249,19 +1249,19 @@ export default function TrackerSearchApp() {
 
                     <div className="flex flex-wrap items-center gap-2 md:gap-3 shrink-0">
                       <div className={infoBadgeClass}>
-                        <Icon name="route" className="text-[14px] opacity-70" />
+                        <Icon name="route" className="text-[14px] text-icon-muted" />
                         <span>{sourceFoundCount} route{sourceFoundCount !== 1 && 's'}</span>
                       </div>
                       <div className={infoBadgeClass}>
-                        <Icon name="linear_scale" className="text-[14px] opacity-70" />
+                        <Icon name="linear_scale" className="text-[14px] text-icon-muted" />
                         <span>Best: {bestHops} hop{bestHops !== 1 && 's'}</span>
                       </div>
                       <div className={infoBadgeClass}>
-                        <Icon name="schedule" className="text-[14px] opacity-70" />
+                        <Icon name="schedule" className="text-[14px] text-icon-muted" />
                         <span>{bestDays !== null ? `${bestDays}d` : 'Unk'}</span>
                       </div>
                       <div className="flex items-center justify-center w-7 h-7 rounded-full transition-colors ml-1">
-                        <Icon name="keyboard_arrow_down" className={`text-xl text-foreground/60 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+                        <Icon name="keyboard_arrow_down" className={`text-xl text-icon-muted transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
                       </div>
                     </div>
                   </div>
@@ -1333,7 +1333,7 @@ export default function TrackerSearchApp() {
                                       <div key={rIdx} className="text-sm pl-3 relative border-l-2 border-foreground/10">
                                         {!isDirect && (
                                           <div className="text-sm font-bold text-foreground/70 mb-1 flex items-center gap-1">
-                                            <span>{fromNode}</span><Icon name="arrow_right_alt" className="text-base" /><span>{toNode}</span>
+                                            <span>{fromNode}</span><Icon name="arrow_right_alt" className="text-base text-icon-muted" /><span>{toNode}</span>
                                           </div>
                                         )}
                                         <div className={`text-xs font-medium mb-1 ${stepDays === null ? "text-foreground/40" : "text-foreground/70"}`}>
@@ -1374,7 +1374,7 @@ export default function TrackerSearchApp() {
                                   aria-label="First page"
                                   className="h-8 min-w-8 rounded-md border border-foreground/10 bg-foreground/5 px-2 text-xs font-semibold text-foreground/70 transition-colors inline-flex items-center justify-center hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                                 >
-                                  <Icon name="first_page" className="text-sm" />
+                                  <Icon name="first_page" className="text-sm text-icon-muted" />
                                 </button>
                                 <button
                                   type="button"
@@ -1383,7 +1383,7 @@ export default function TrackerSearchApp() {
                                   aria-label="Previous page"
                                   className="h-8 min-w-8 rounded-md border border-foreground/10 bg-foreground/5 px-2 text-xs font-semibold text-foreground/70 transition-colors inline-flex items-center justify-center hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                                 >
-                                  <Icon name="chevron_left" className="text-sm" />
+                                  <Icon name="chevron_left" className="text-sm text-icon-muted" />
                                 </button>
                                 <span className="h-8 min-w-8 rounded-md border border-foreground/20 bg-foreground/10 px-2 text-xs font-semibold text-foreground inline-flex items-center justify-center">
                                   {sourceRoutePage}
@@ -1395,7 +1395,7 @@ export default function TrackerSearchApp() {
                                   aria-label="Next page"
                                   className="h-8 min-w-8 rounded-md border border-foreground/10 bg-foreground/5 px-2 text-xs font-semibold text-foreground/70 transition-colors inline-flex items-center justify-center hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                                 >
-                                  <Icon name="chevron_right" className="text-sm" />
+                                  <Icon name="chevron_right" className="text-sm text-icon-muted" />
                                 </button>
                                 <button
                                   type="button"
@@ -1404,7 +1404,7 @@ export default function TrackerSearchApp() {
                                   aria-label="Last page"
                                   className="h-8 min-w-8 rounded-md border border-foreground/10 bg-foreground/5 px-2 text-xs font-semibold text-foreground/70 transition-colors inline-flex items-center justify-center hover:bg-foreground/10 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                                 >
-                                  <Icon name="last_page" className="text-sm" />
+                                  <Icon name="last_page" className="text-sm text-icon-muted" />
                                 </button>
                               </div>
                             )}

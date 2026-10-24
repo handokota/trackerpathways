@@ -71,7 +71,7 @@ export default function OfficialInvitesDialog({
             className="inline-flex h-8 w-8 items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-foreground/10 hover:text-foreground"
             aria-label="Close dialog"
           >
-            <Icon name="close" className="text-lg" />
+            <Icon name="close" className="text-lg text-icon-muted" />
           </button>
         </div>
 

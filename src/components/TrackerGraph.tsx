@@ -593,7 +593,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                         : "bg-foreground/5 text-foreground/70 border-foreground/10 hover:bg-foreground/10 hover:text-foreground"
                   }`}
                 >
-                  <Icon name="bookmarks" className="text-sm" />
+                  <Icon name="bookmarks" className="text-sm text-icon-muted" />
                   Use My Trackers
                 </button>
 
@@ -604,7 +604,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                       className={`text-center px-2 py-1 text-xs rounded-sm transition-colors ${
                         pathSortBy === "jumps"
                           ? "bg-foreground/10 text-foreground"
-                          : "text-foreground/60 hover:text-foreground"
+                          : "text-icon-muted hover:text-foreground"
                       }`}
                     >
                       Jumps
@@ -614,7 +614,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                       className={`text-center px-2 py-1 text-xs rounded-sm transition-colors ${
                         pathSortBy === "days"
                           ? "bg-foreground/10 text-foreground"
-                          : "text-foreground/60 hover:text-foreground"
+                          : "text-icon-muted hover:text-foreground"
                       }`}
                     >
                       Days
@@ -1072,7 +1072,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
               className="inline-flex h-8 w-8 items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-foreground/10 hover:text-foreground"
               aria-label="Close panel"
             >
-              <Icon name="close" className="text-lg" />
+              <Icon name="close" className="text-lg text-icon-muted" />
             </button>
           </div>
 
