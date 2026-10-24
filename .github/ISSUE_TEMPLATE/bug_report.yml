@@ -31,12 +31,3 @@ body:
       description: A clear and concise description of what you expected to happen.
     validations:
       required: true
-
-  - type: input
-    id: environment
-    attributes:
-      label: Environment
-      description: Browser, OS, or device version (if applicable).
-      placeholder: Firefox 146.0, Arch Linux
-    validations:
-      required: false
