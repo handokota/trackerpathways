@@ -6,6 +6,9 @@ const data = rawData as unknown as DataStructure;
 const MAX_API_JUMPS = 8;
 const MAX_API_DAYS = 3650;
 const MAX_PATHS_LIMIT = 999;
+const MAX_QUERY_LENGTH = 256;
+const MAX_SOURCE_ITEMS = 16;
+const MAX_SOURCE_ITEM_LENGTH = 64;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 6;
 const RATE_LIMIT_MAX_BUCKETS = 5000;
@@ -53,7 +56,11 @@ const parseAndValidatePositiveInt = (
     return fallback;
   }
 
-  const parsed = Number.parseInt(rawValue, 10);
+  if (!/^\d+$/.test(rawValue)) {
+    return null;
+  }
+
+  const parsed = Number(rawValue);
   if (!Number.isFinite(parsed) || parsed < min || parsed > max) {
     return null;
   }
@@ -62,33 +69,30 @@ const parseAndValidatePositiveInt = (
 };
 
 const getClientIdentifier = (request: Request): string => {
-  const forwardedFor = request.headers.get("x-forwarded-for");
-  if (forwardedFor) {
-    const firstIp = forwardedFor.split(",")[0]?.trim();
-    if (firstIp) {
-      return firstIp;
+  if (process.env.TRUSTED_PROXY_HEADERS === "true") {
+    const forwardedFor = request.headers.get("x-forwarded-for");
+    if (forwardedFor) {
+      const firstIp = forwardedFor.split(",")[0]?.trim();
+      if (firstIp && firstIp.length <= 64) {
+        return firstIp;
+      }
+    }
+
+    const realIp = request.headers.get("x-real-ip")?.trim();
+    if (realIp && realIp.length <= 64) {
+      return realIp;
+    }
+
+    const connectingIp = request.headers.get("cf-connecting-ip")?.trim();
+    if (connectingIp && connectingIp.length <= 64) {
+      return connectingIp;
     }
   }
 
-  const realIp = request.headers.get("x-real-ip")?.trim();
-  if (realIp) {
-    return realIp;
-  }
-
-  const connectingIp = request.headers.get("cf-connecting-ip")?.trim();
-  if (connectingIp) {
-    return connectingIp;
-  }
-
-  const userAgent = request.headers.get("user-agent")?.trim() || "unknown-agent";
-  return `unknown:${userAgent}`;
+  return "direct-client";
 };
 
 const pruneExpiredRateLimitBuckets = (now: number) => {
-  if (rateLimitBuckets.size < RATE_LIMIT_MAX_BUCKETS) {
-    return;
-  }
-
   for (const [key, bucket] of rateLimitBuckets.entries()) {
     if (bucket.resetAt <= now) {
       rateLimitBuckets.delete(key);
@@ -101,6 +105,13 @@ const consumeRateLimit = (clientKey: string, now: number): RateLimitResult => {
 
   const existingBucket = rateLimitBuckets.get(clientKey);
   if (!existingBucket || existingBucket.resetAt <= now) {
+    if (rateLimitBuckets.size >= RATE_LIMIT_MAX_BUCKETS) {
+      const oldestKey = rateLimitBuckets.keys().next().value;
+      if (oldestKey) {
+        rateLimitBuckets.delete(oldestKey);
+      }
+    }
+
     const resetAt = now + RATE_LIMIT_WINDOW_MS;
     rateLimitBuckets.set(clientKey, { count: 1, resetAt });
     return {
@@ -158,6 +169,13 @@ export async function GET(request: Request) {
     ? parseAndValidatePositiveInt(maxDaysStr, 1, 1, MAX_API_DAYS)
     : null;
 
+  if (sourceRaw.length > MAX_QUERY_LENGTH || targetRaw.length > MAX_QUERY_LENGTH) {
+    return NextResponse.json(
+      { error: `source and target must be at most ${MAX_QUERY_LENGTH} characters.` },
+      { status: 400, headers: buildRateLimitHeaders(rateLimit) }
+    );
+  }
+
   if (maxJumps === null) {
     return NextResponse.json(
       { error: `Invalid jumps value. Use an integer between 1 and ${MAX_API_JUMPS}.` },
@@ -177,6 +195,17 @@ export async function GET(request: Request) {
     ? Array.from(new Set(sQueryRaw.split(",").map((source) => source.trim()).filter(Boolean)))
     : [];
   const tQuery = targetRaw.toLowerCase().trim();
+
+  if (
+    sourceInputs.length > MAX_SOURCE_ITEMS ||
+    sourceInputs.some((source) => source.length > MAX_SOURCE_ITEM_LENGTH) ||
+    tQuery.length > MAX_SOURCE_ITEM_LENGTH
+  ) {
+    return NextResponse.json(
+      { error: `Search terms must contain at most ${MAX_SOURCE_ITEMS} sources and ${MAX_SOURCE_ITEM_LENGTH} characters per term.` },
+      { status: 400, headers: buildRateLimitHeaders(rateLimit) }
+    );
+  }
 
   if (!sQueryRaw && !tQuery) {
     return NextResponse.json([], { headers: buildRateLimitHeaders(rateLimit) });
@@ -287,7 +316,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json(results, {
     headers: {
-      "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+      "Cache-Control": "private, no-store",
       ...buildRateLimitHeaders(rateLimit),
     },
   });
