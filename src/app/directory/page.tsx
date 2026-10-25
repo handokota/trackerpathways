@@ -7,6 +7,9 @@ import UiState from "@/components/shared/UiState";
 export const metadata: Metadata = {
   title: "Tracker Directory - Abbreviations List",
   description: "Complete directory of private trackers and their abbreviations.",
+  alternates: {
+    canonical: "/directory",
+  },
 };
 
 export default function DirectoryPage() {

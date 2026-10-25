@@ -7,6 +7,9 @@ import UiState from "@/components/shared/UiState";
 export const metadata: Metadata = {
   title: "Tracker Pathways - Discover the private tracker network",
   description: "Find your way to the trackers worth chasing. Explore detailed pathways, requirements, and invite tiers.",
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function Home() {

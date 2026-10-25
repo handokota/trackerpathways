@@ -10,6 +10,9 @@ import UiState from "@/components/shared/UiState";
 export const metadata: Metadata = {
   title: "Tracker Map - Visual Network",
   description: "Interactive visualization of tracker pathways.",
+  alternates: {
+    canonical: "/map",
+  },
 };
 
 const data = rawData as unknown as DataStructure;
