@@ -376,7 +376,6 @@
     },
     "Bit-HDTV": {
       "PTerClub": { "days": 180, "reqs": "Elite, 6months", "active": "Yes", "updated": "Oct 2026" },
-      "seedpool": { "days": 0, "reqs": "500 GB seedsize", "active": "No", "updated": "Oct 2026" },
       "SpeedApp": { "days": 0, "reqs": "Screenshot", "active": "Yes", "updated": "Oct 2026" },
       "YuScene": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Oct 2026" }
     },
