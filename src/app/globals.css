@@ -77,6 +77,14 @@ html {
   color: var(--foreground);
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-young-serif), Georgia, serif;
+}
+
+.font-title {
+  font-family: var(--font-young-serif), Georgia, serif;
+}
+
 .text-ui-muted { color: color-mix(in oklab, var(--foreground) 60%, transparent); }
 .text-icon-muted { color: color-mix(in oklab, var(--foreground) 45%, var(--background)); }
 .text-ui-emphasis { color: color-mix(in oklab, var(--foreground) 70%, transparent); }
@@ -299,7 +307,7 @@ html {
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 *, ::before, ::after {

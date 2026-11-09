@@ -20,7 +20,7 @@ export default function Navbar() {
             <span className="ui-logo" />
           </div>
 
-          <span className="text-xl font-bold tracking-tight text-foreground hidden sm:block">
+          <span className="font-title text-xl font-bold tracking-tight text-foreground hidden sm:block">
             Tracker Pathways
           </span>
         </Link>

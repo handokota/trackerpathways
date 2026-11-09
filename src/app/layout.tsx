@@ -6,11 +6,18 @@ import { Providers } from "./providers";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const inter = localFont({
-  src: "./fonts/InterVariable.woff2",
-  variable: "--font-inter",
+const dmSans = localFont({
+  src: "./fonts/DMSans-latin.woff2",
+  variable: "--font-dm-sans",
   display: "swap",
   weight: "100 900",
+});
+
+const youngSerif = localFont({
+  src: "./fonts/YoungSerif-latin.woff2",
+  variable: "--font-young-serif",
+  display: "swap",
+  weight: "400",
 });
 
 const themeInitScript = `
@@ -48,7 +55,7 @@ export default async function RootLayout({
       <head>
         <script nonce={nonce} dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`} suppressHydrationWarning>
+      <body className={`${dmSans.variable} ${youngSerif.variable} font-sans antialiased bg-background text-foreground`} suppressHydrationWarning>
         <Providers nonce={nonce}>
           <div className="min-h-screen flex flex-col">
             <Navbar />
