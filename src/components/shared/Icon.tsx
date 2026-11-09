@@ -26,6 +26,7 @@ import {
   Route,
   Search,
   SearchX,
+  Share2,
   SlidersHorizontal,
   Sun,
   X,
@@ -62,6 +63,7 @@ export type IconName =
   | "schedule"
   | "search"
   | "search_off"
+  | "share"
   | "south_west"
   | "sort"
   | "tune"
@@ -100,6 +102,7 @@ const icons: Record<IconName, LucideIcon> = {
   schedule: Clock3,
   search: Search,
   search_off: SearchX,
+  share: Share2,
   south_west: ArrowDownLeft,
   sort: ArrowUpDown,
   tune: SlidersHorizontal,

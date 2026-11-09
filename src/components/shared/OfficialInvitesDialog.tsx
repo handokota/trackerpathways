@@ -1,6 +1,7 @@
 "use client";
 
 import Icon from "@/components/shared/Icon";
+import ShareButton from "@/components/shared/ShareButton";
 import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import type { OfficialInvitesData } from "@/lib/officialInvites";
@@ -64,15 +65,18 @@ export default function OfficialInvitesDialog({
               Official Invites
             </p>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            ref={closeButtonRef}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-foreground/10 hover:text-foreground"
-            aria-label="Close dialog"
-          >
-            <Icon name="close" className="text-lg text-icon-muted" />
-          </button>
+          <div className="flex items-center gap-1">
+            <ShareButton title={`${data.sourceName} Official Invites`} />
+            <button
+              type="button"
+              onClick={onClose}
+              ref={closeButtonRef}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-foreground/10 hover:text-foreground"
+              aria-label="Close dialog"
+            >
+              <Icon name="close" className="text-lg text-icon-muted" />
+            </button>
+          </div>
         </div>
 
         <div className="p-4 overflow-y-auto overflow-x-hidden overscroll-contain space-y-4 custom-scrollbar flex-1 min-h-0">

@@ -1,6 +1,7 @@
 "use client";
 
 import Icon from "@/components/shared/Icon";
+import ShareButton from "@/components/shared/ShareButton";
 import { useState, useMemo, useEffect, useDeferredValue, useRef, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import rawData from "@/data/trackers.json";
@@ -814,7 +815,7 @@ export default function TrackerSearchApp() {
                     aria-label="Source tracker"
                     type="text"
                     disabled={isUsingCollection}
-                    placeholder={isUsingCollection ? "Using My Trackers" : "Source tracker(s)"}
+                    placeholder={isUsingCollection ? "Using My Trackers" : "Search source trackers..."}
                     className={`w-full h-10 bg-transparent border-none outline-none font-medium text-sm pr-10 sm:pr-37.5 ${
                       isUsingCollection ? "text-foreground/50 cursor-not-allowed" : "text-foreground placeholder:text-foreground/30"
                     }`}
@@ -860,7 +861,7 @@ export default function TrackerSearchApp() {
                 <input
                   aria-label="Target tracker"
                   type="text"
-                  placeholder="Target tracker(s)"
+                  placeholder="Search target tracker..."
                   className="w-full h-10 bg-transparent border-none outline-none font-medium text-foreground placeholder:text-foreground/30 text-sm"
                   value={targetSearch}
                   onFocus={() => setShowTargetSug(true)}
@@ -1095,6 +1096,7 @@ export default function TrackerSearchApp() {
             </div>
 
             <div className="flex items-center justify-end w-full md:w-auto pt-3 md:pt-0 border-t border-foreground/5 md:border-0 shrink-0">
+              <ShareButton title="Tracker Pathways search" className="mr-2" />
               <div className="relative" ref={viewControlsRef}>
                 <button
                   type="button"
@@ -1436,7 +1438,7 @@ export default function TrackerSearchApp() {
             )}
 
             {searchError && (
-              <UiState kind="error" title="Could not load routes" description={searchError} />
+              <UiState kind="error" title="Unable to load routes" description={searchError} />
             )}
           </div>
         </div>
