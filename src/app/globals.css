@@ -310,6 +310,10 @@ body {
   font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
+.float-tooltip-kap {
+  font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
 *, ::before, ::after {
   border-color: var(--border);
 }
