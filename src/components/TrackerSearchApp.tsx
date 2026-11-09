@@ -831,22 +831,6 @@ export default function TrackerSearchApp() {
                     }}
                     onKeyDown={handleSourceKeyDown}
                   />
-                  <div className="absolute right-0 flex items-center pr-1">
-                    <button
-                      onClick={toggleMyTrackers}
-                      disabled={myTrackers.length === 0}
-                      className={`flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1.5 rounded-md transition-colors border ${
-                        myTrackers.length === 0
-                          ? "text-foreground/30 cursor-not-allowed bg-transparent border-transparent"
-                          : isUsingCollection
-                            ? "ui-status-open border border-foreground/10"
-                            : "text-foreground/70 bg-foreground/5 hover:bg-foreground/10 hover:text-foreground border-transparent"
-                      }`}
-                    >
-                      <Icon name="bookmarks" className="text-[14px] text-icon-muted" />
-                      <span className="hidden sm:inline">Use My Trackers</span>
-                    </button>
-                  </div>
                 </div>
                 {!isUsingCollection && showSourceSug && sourceSuggestions.length > 0 && (
                   <div className="absolute top-full -left-8 w-[calc(100%+2rem)] mt-2 bg-card rounded-xl overflow-hidden z-50 motion-safe:animate-in fade-in zoom-in-95 duration-200 border border-foreground/10">
@@ -914,12 +898,15 @@ export default function TrackerSearchApp() {
 
             <div className="flex items-center justify-between mt-1 pt-1 px-2 pb-1">
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <button
+                  type="button"
                   onClick={() => {
                     setShowFilters(!showFilters);
                     if (showCollectionManager) setShowCollectionManager(false);
                   }}
+                  aria-expanded={showFilters}
+                  aria-controls="search-options-panel"
                   className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all text-sm font-medium border border-foreground/10 bg-foreground/5 hover:border-foreground/20 hover:bg-foreground/10 ${
                     showFilters
                       ? 'text-foreground border-foreground/20'
@@ -931,10 +918,13 @@ export default function TrackerSearchApp() {
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => {
                     setShowCollectionManager(!showCollectionManager);
                     if (showFilters) setShowFilters(false);
                   }}
+                  aria-expanded={showCollectionManager}
+                  aria-controls="my-trackers-panel"
                   className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all text-sm font-medium border border-foreground/10 bg-foreground/5 hover:border-foreground/20 hover:bg-foreground/10 ${
                     showCollectionManager
                       ? 'text-foreground border-foreground/20'
@@ -944,6 +934,23 @@ export default function TrackerSearchApp() {
                   <Icon name="collections_bookmark" className={`text-lg ${showCollectionManager ? "text-foreground" : "text-icon-muted"}`} />
                   <span className="hidden sm:inline">My Trackers</span>
                 </button>
+
+                <button
+                  type="button"
+                  onClick={toggleMyTrackers}
+                  disabled={myTrackers.length === 0}
+                  aria-pressed={isUsingCollection}
+                  className={`px-3 py-1.5 rounded-md flex items-center gap-2 transition-all text-sm font-medium border ${
+                    myTrackers.length === 0
+                      ? "text-foreground/30 cursor-not-allowed bg-transparent border-transparent"
+                      : isUsingCollection
+                        ? "ui-status-open border-foreground/10"
+                        : "text-icon-muted border-foreground/10 bg-foreground/5 hover:border-foreground/20 hover:bg-foreground/10 hover:text-foreground"
+                  }`}
+                >
+                  <Icon name="bookmarks" className={`text-lg ${isUsingCollection ? "text-foreground" : "text-icon-muted"}`} />
+                  <span className="hidden sm:inline">Use Collection</span>
+                </button>
               </div>
 
             </div>
@@ -952,7 +959,7 @@ export default function TrackerSearchApp() {
         </div>
 
         {showFilters && (
-          <div className="max-w-2xl mx-auto mt-2 p-6 bg-foreground/3 border border-foreground/10 rounded-xl motion-safe:animate-in fade-in slide-in-from-top-2 duration-200">
+          <div id="search-options-panel" className="max-w-2xl mx-auto mt-2 p-6 bg-foreground/3 border border-foreground/10 rounded-xl motion-safe:animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
               <div>
@@ -1010,7 +1017,7 @@ export default function TrackerSearchApp() {
         )}
 
         {showCollectionManager && (
-          <div className={`max-w-2xl mx-auto mt-2 p-6 bg-foreground/3 border border-foreground/10 rounded-xl motion-safe:animate-in fade-in slide-in-from-top-2 duration-200 relative z-20 transition-all ${showCollectionSug ? 'mb-40' : ''}`}>
+          <div id="my-trackers-panel" className={`max-w-2xl mx-auto mt-2 p-6 bg-foreground/3 border border-foreground/10 rounded-xl motion-safe:animate-in fade-in slide-in-from-top-2 duration-200 relative z-20 transition-all ${showCollectionSug ? 'mb-40' : ''}`}>
             <div className="flex flex-col gap-4">
               <div className="relative" ref={collectionWrapperRef}>
                 <label className="text-sm font-medium text-foreground/50 mb-2 block">Add to My Trackers</label>
