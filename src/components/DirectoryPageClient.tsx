@@ -346,7 +346,7 @@ export default function DirectoryPageClient() {
                   className="text-sm font-normal text-foreground/70 line-clamp-2"
                   title={t.info.description}
                 >
-                  {t.info.description ? t.info.description : "No description for this tracker is available"}
+                  {t.info.description ? t.info.description : "No description is available for this tracker."}
                 </span>
               </div>
             ))}

@@ -33,7 +33,7 @@ export default function Navbar() {
                 ? "text-foreground" 
                 : "text-icon-muted"
             }`}
-            aria-label="View Map"
+            aria-label="View map"
           >
             <Icon name="map" className={`text-lg ${pathname === "/map" ? "text-foreground" : "text-icon-muted"}`} />
           </Link>
@@ -45,7 +45,7 @@ export default function Navbar() {
                 ? "text-foreground" 
                 : "text-icon-muted"
             }`}
-            aria-label="Tracker Directory"
+            aria-label="Open tracker directory"
           >
             <Icon name="menu_book" className={`text-lg ${pathname === "/directory" ? "text-foreground" : "text-icon-muted"}`} />
           </Link>

@@ -729,7 +729,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
 
               {useCollectionAsSource && pathEnd && collectionPathOptions.length === 0 && (
                 <div className="text-sm text-red-500 font-medium text-center py-1">
-                  No path found from My Trackers
+                  No path found from your trackers.
                 </div>
               )}
               {useCollectionAsSource && pathEnd && selectedCollectionPath && (

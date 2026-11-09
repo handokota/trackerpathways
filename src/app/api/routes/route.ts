@@ -154,7 +154,7 @@ export async function GET(request: Request) {
   const rateLimit = consumeRateLimit(getClientIdentifier(request), now);
   if (!rateLimit.allowed) {
     return NextResponse.json(
-      { error: "Too many requests. Please try again in a minute." },
+      { error: "Too many requests. Please try again later." },
       { status: 429, headers: buildRateLimitExceededHeaders(rateLimit, now) }
     );
   }

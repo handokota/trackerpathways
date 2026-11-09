@@ -40,7 +40,7 @@ export default function ThemeSwitcher() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-9 h-9 flex items-center justify-center rounded-md text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-all"
-        aria-label="Change Theme"
+        aria-label="Change theme"
       >
         <Icon name={ currentIcon } className="text-lg text-icon-muted" />
       </button>
