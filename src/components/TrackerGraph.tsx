@@ -583,8 +583,10 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
             <div className="p-4 flex flex-col gap-4 min-w-62.5">
               <div className="flex items-center justify-between gap-2">
                 <button
+                  type="button"
                   onClick={toggleCollectionSourceMode}
                   disabled={collectionNodes.length === 0}
+                  aria-pressed={useCollectionAsSource}
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-colors border ${
                     collectionNodes.length === 0
                       ? "cursor-not-allowed opacity-50 bg-foreground/5 text-foreground/70 border-foreground/10"
@@ -594,7 +596,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                   }`}
                 >
                   <Icon name="bookmarks" className="text-sm text-icon-muted" />
-                  Use My Trackers
+                  Use Collection
                 </button>
 
                 {useCollectionAsSource && (
