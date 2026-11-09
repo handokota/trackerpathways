@@ -29,7 +29,7 @@ type SortByOption = "days" | "jumps" | "officialInvites";
 const SORT_OPTIONS: Array<{ value: SortByOption; label: string }> = [
   { value: "jumps", label: "Jumps" },
   { value: "days", label: "Days" },
-  { value: "officialInvites", label: "Official" },
+  { value: "officialInvites", label: "Invite count" },
 ];
 
 const parsePositiveIntParam = (value: string | null, fallback: number) => {
@@ -949,7 +949,7 @@ export default function TrackerSearchApp() {
                   }`}
                 >
                   <Icon name="bookmarks" className={`text-lg ${isUsingCollection ? "text-foreground" : "text-icon-muted"}`} />
-                  <span className="hidden sm:inline">Use Collection</span>
+                  <span className="hidden sm:inline">Use as Source</span>
                 </button>
               </div>
 
@@ -1246,7 +1246,7 @@ export default function TrackerSearchApp() {
                       </span>
                       <OfficialInvitesBadge
                         count={officialInvites.length}
-                        ariaLabel={`Official invites for ${sourceName}: ${officialInvites.length}`}
+                        ariaLabel={`Official Invites for ${sourceName}: ${officialInvites.length}`}
                         onClick={(event) => {
                           event.stopPropagation();
                           openOfficialInvitesDialog(sourceName);
@@ -1305,7 +1305,7 @@ export default function TrackerSearchApp() {
                                         {!isDirect && <span className={badgeClass}>{path.routes.length} hop</span>}
                                         <OfficialInvitesBadge
                                           count={targetOfficialInvites.length}
-                                          ariaLabel={`Official invites for ${path.target}: ${targetOfficialInvites.length}`}
+                                          ariaLabel={`Official Invites for ${path.target}: ${targetOfficialInvites.length}`}
                                           onClick={() => openOfficialInvitesDialog(path.target)}
                                         />
                                       </div>
@@ -1354,7 +1354,7 @@ export default function TrackerSearchApp() {
                                               {getStatusLabel(req.active)}
                                             </span>
                                             <div className="flex items-center gap-1 text-foreground/30">
-                                              <span className="text-xs font-medium">Checked: {req.updated}</span>
+                                              <span className="text-xs font-medium">Last updated: {req.updated}</span>
                                             </div>
                                           </div>
                                         </div>

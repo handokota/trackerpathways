@@ -61,7 +61,7 @@ export default function OfficialInvitesDialog({
               {data.sourceName}
             </h2>
             <p className="text-sm text-foreground/70 mt-0.5">
-              Official invites
+              Official Invites
             </p>
           </div>
           <button

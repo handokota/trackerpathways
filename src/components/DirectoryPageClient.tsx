@@ -25,7 +25,7 @@ type DirectorySortByOption = "alphabetical" | "officialInvites";
 
 const DIRECTORY_SORT_OPTIONS: Array<{ value: DirectorySortByOption; label: string }> = [
   { value: "alphabetical", label: "Name" },
-  { value: "officialInvites", label: "Official" },
+  { value: "officialInvites", label: "Invite count" },
 ];
 
 export default function DirectoryPageClient() {
@@ -333,7 +333,7 @@ export default function DirectoryPageClient() {
                   <div className="shrink-0 flex items-center gap-1.5">
                     <OfficialInvitesBadge
                       count={t.officialInvites}
-                      ariaLabel={`Official invites for ${t.name}: ${t.officialInvites}`}
+                      ariaLabel={`Official Invites for ${t.name}: ${t.officialInvites}`}
                       onClick={() => openOfficialInvitesDialog(t.name)}
                     />
                     <span className="px-2 py-0.5 text-xs font-semibold rounded-md bg-foreground/10 text-foreground/80">
@@ -362,7 +362,7 @@ export default function DirectoryPageClient() {
         <UiState
           kind="empty"
           title="No trackers found"
-          description={`No match for "${search}". Try another tracker name, abbreviation, type, country, year, or description.`}
+          description={`No trackers match "${search}". Try another tracker name, abbreviation, type, country, year, or description.`}
           className="py-20"
         />
       )}

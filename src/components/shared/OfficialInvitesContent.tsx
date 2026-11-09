@@ -65,7 +65,7 @@ export default function OfficialInvitesContent({
           className="w-full flex items-center justify-between gap-2 text-left text-sm font-semibold text-foreground cursor-pointer"
           aria-expanded={isUnlockAccordionOpen}
         >
-          <span>Forum unlock requirements</span>
+          <span>Forum Requirements</span>
           <Icon name="keyboard_arrow_down" className={`text-lg text-icon-muted transition-transform duration-200 ${isUnlockAccordionOpen ? "rotate-180" : ""}`} />
         </button>
         <div
@@ -111,7 +111,7 @@ export default function OfficialInvitesContent({
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-foreground/70">No requirements provided.</p>
+              <p className="text-sm text-foreground/70">No additional requirements.</p>
             )}
           </div>
         </div>
@@ -130,7 +130,7 @@ export default function OfficialInvitesContent({
               }`}
             >
               <Icon name="outbound" className="text-sm shrink-0" />
-              <span className="truncate">Can Invite To ({data.canInviteTo.length})</span>
+              <span className="truncate">Can invite to ({data.canInviteTo.length})</span>
             </button>
             <button
               type="button"
@@ -142,7 +142,7 @@ export default function OfficialInvitesContent({
               }`}
             >
               <Icon name="south_west" className="text-sm text-icon-muted shrink-0" />
-              <span className="truncate">Invited From ({data.invitedFrom.length})</span>
+              <span className="truncate">Invited from ({data.invitedFrom.length})</span>
             </button>
           </div>
           <div className={controlsRowClass}>
@@ -158,7 +158,7 @@ export default function OfficialInvitesContent({
                 className={selectClass}
                 aria-label="Sort dialog invite trackers"
               >
-                <option value="officialInvites">Official</option>
+                <option value="officialInvites">Invite count</option>
                 <option value="alphabetical">Name</option>
               </select>
               <Icon name="expand_more" className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-sm text-icon-muted" />
@@ -254,7 +254,7 @@ export default function OfficialInvitesContent({
                                 </p>
                               ) : (
                                 <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
-                                  {renderReqs(section.requirementText || "No requirements provided.")}
+                                  {renderReqs(section.requirementText || "No additional requirements.")}
                                 </p>
                               )}
                             </div>
@@ -262,7 +262,7 @@ export default function OfficialInvitesContent({
                         </div>
                       ) : (
                         <p className="text-sm text-foreground/80 leading-snug wrap-break-words">
-                          No requirements provided.
+                          No additional requirements.
                         </p>
                       )}
 
@@ -272,7 +272,7 @@ export default function OfficialInvitesContent({
                             {getStatusLabel(invite.details.active)}
                           </span>
                           <div className="flex items-center gap-1 text-foreground/30">
-                            <span className="text-xs font-medium">Checked: {invite.details.updated}</span>
+                            <span className="text-xs font-medium">Last updated: {invite.details.updated}</span>
                           </div>
                         </div>
                       </div>
@@ -287,7 +287,7 @@ export default function OfficialInvitesContent({
           <p className="text-sm text-foreground/70 text-center py-4 border border-foreground/10 rounded-lg">
             {officialInvitesTab === "canInviteTo"
               ? "No active official invites were found for this tracker."
-              : "No active invite routes into this tracker were found."}
+              : "No active invite routes to this tracker were found."}
           </p>
         )}
       </div>

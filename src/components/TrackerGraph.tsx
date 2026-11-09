@@ -21,7 +21,7 @@ import useFocusTrap from "@/hooks/useFocusTrap";
 
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
   ssr: false,
-  loading: () => <div className="flex items-center justify-center h-full text-muted-foreground">Loading Graph...</div>,
+  loading: () => <div className="flex items-center justify-center h-full text-muted-foreground">Loading graph...</div>,
 });
 
 interface TrackerGraphProps {
@@ -596,7 +596,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
                   }`}
                 >
                   <Icon name="bookmarks" className="text-sm text-icon-muted" />
-                  Use Collection
+                  Use as Source
                 </button>
 
                 {useCollectionAsSource && (
@@ -632,7 +632,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
               )}
 
               <div className="flex flex-col gap-1.5 relative">
-                <label className="text-sm font-medium text-muted-foreground ml-1">Source Tracker</label>
+                <label className="text-sm font-medium text-muted-foreground ml-1">Source tracker</label>
                 <input
                   type="text"
                   disabled={useCollectionAsSource}
@@ -689,10 +689,10 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
               </div>
 
               <div className="flex flex-col gap-1.5 relative">
-                <label className="text-sm font-medium text-muted-foreground ml-1">Target Tracker</label>
+                <label className="text-sm font-medium text-muted-foreground ml-1">Target tracker</label>
                 <input
                   type="text"
-                  placeholder="Search destination tracker..."
+                  placeholder="Search for a destination tracker..."
                   className="w-full bg-foreground/5 border border-foreground/10 rounded-md text-sm p-2.5 outline-none focus:border-green-500/50 transition-colors"
                   value={pathEndInput}
                   onFocus={() => setShowPathEndSug(true)}
@@ -1066,7 +1066,7 @@ export default function TrackerGraph({ data, rawData }: TrackerGraphProps) {
           <div className="flex items-center justify-between p-5 border-b border-foreground/10 shrink-0">
             <div className="min-w-0">
               <h2 id="tracker-official-panel-title" className="text-xl font-bold tracking-tight truncate pr-2">{selectedNodeOfficialData.sourceName}</h2>
-              <p className="text-xs text-foreground/60 mt-0.5">Official invites</p>
+              <p className="text-xs text-foreground/60 mt-0.5">Official Invites</p>
             </div>
             <button
               onClick={closeSelectedNodePanel}
