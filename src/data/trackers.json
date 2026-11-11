@@ -291,7 +291,7 @@
       "Dolphin Is Coming": { "days": 0, "reqs": "10 music torrents or 15 other torrents", "active": "Yes", "updated": "Jan 2026" },
       "FunFile": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Jan 2026" },
       "GazelleGames": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Jan 2026" },
-      "HDBits": { "days": 365, "reqs": "Legend, 1 year, 3 profile links", "active": "Yes", "updated": "Jan 2026" },
+      "HDBits": { "days": 730, "reqs": "Torrent Master+, 2 year, 250 Anime uploads, 2 TiB seed size, 3-month average seed time", "active": "Yes", "updated": "Nov 2026" },
       "LST": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Jan 2026" },
       "LzTr": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Jan 2026" },
       "OldToonsWorld": { "days": 90, "reqs": "3 months, seedsize>=1TB OR Average Seedtime>=1month", "active": "Yes", "updated": "Jan 2026" },
