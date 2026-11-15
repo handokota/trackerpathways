@@ -31,9 +31,10 @@ export default function UiState({
 
   if (layout === "inline") {
     const inlineColor = kind === "error" ? "text-red-700 dark:text-red-300" : "text-foreground/60";
+    const inlineIconColor = kind === "error" ? "text-red-500" : "text-icon-muted";
     return (
       <div className={`inline-flex items-center gap-1.5 text-sm ${inlineColor} ${className}`.trim()}>
-        <Icon name={ config.icon } className={`text-[15px] ${kind === "loading" ? "animate-spin motion-reduce:animate-none" : ""}`} />
+        <Icon name={ config.icon } className={`text-[15px] ${inlineIconColor} ${kind === "loading" ? "animate-spin motion-reduce:animate-none" : ""}`} />
         <span>{resolvedTitle}</span>
       </div>
     );
@@ -44,7 +45,7 @@ export default function UiState({
       ? "border border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300"
       : "border border-foreground/10 bg-foreground/3 text-foreground/60";
 
-  const iconClass = kind === "error" ? "text-red-500/80" : "text-foreground/25";
+  const iconClass = kind === "error" ? "text-red-500" : "text-icon-muted";
 
   return (
     <div className={`w-full flex flex-col items-center justify-center gap-3 rounded-xl px-6 py-16 text-center ${cardClass} ${className}`.trim()}>
