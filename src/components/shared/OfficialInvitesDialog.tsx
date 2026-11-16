@@ -76,7 +76,7 @@ export default function OfficialInvitesDialog({
               type="button"
               onClick={onClose}
               ref={closeButtonRef}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-foreground/70 transition-colors hover:text-foreground"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-foreground/70 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
               aria-label="Close dialog"
             >
               <Icon name="close" className="text-lg text-icon-muted" />
