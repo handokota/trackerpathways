@@ -66,12 +66,17 @@ export default function OfficialInvitesDialog({
             </p>
           </div>
           <div className="flex items-center gap-1">
-            <ShareButton title={`${data.sourceName} Official Invites`} />
+            <ShareButton
+              title={`${data.sourceName} Official Invites`}
+              accessibleLabel="Share official invites"
+              iconOnly
+              className="border-transparent bg-transparent"
+            />
             <button
               type="button"
               onClick={onClose}
               ref={closeButtonRef}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-foreground/10 hover:text-foreground"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-foreground/70 transition-colors hover:text-foreground"
               aria-label="Close dialog"
             >
               <Icon name="close" className="text-lg text-icon-muted" />
