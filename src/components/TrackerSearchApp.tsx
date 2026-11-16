@@ -97,6 +97,8 @@ export default function TrackerSearchApp() {
 
   const [sourceSearch, setSourceSearch] = useState(searchParams.get("source") || "");
   const [targetSearch, setTargetSearch] = useState(searchParams.get("target") || "");
+  const [committedSource, setCommittedSource] = useState(searchParams.get("source") || "");
+  const [committedTarget, setCommittedTarget] = useState(searchParams.get("target") || "");
 
   const [maxJumps, setMaxJumps] = useState<number>(
     searchParams.get("jumps") ? Number.parseInt(searchParams.get("jumps")!, 10) : 5
@@ -140,9 +142,9 @@ export default function TrackerSearchApp() {
   const targetListRef = useRef<HTMLDivElement>(null);
   const collectionListRef = useRef<HTMLDivElement>(null);
 
-  const deferredSource = useDeferredValue(sourceSearch);
-  const deferredTarget = useDeferredValue(targetSearch);
-  const isStale = sourceSearch !== deferredSource || targetSearch !== deferredTarget;
+  const deferredSource = useDeferredValue(committedSource);
+  const deferredTarget = useDeferredValue(committedTarget);
+  const isStale = sourceSearch !== committedSource || targetSearch !== committedTarget;
 
   const [mounted, setMounted] = useState(false);
 
@@ -282,6 +284,8 @@ export default function TrackerSearchApp() {
        setTimeout(() => {
          setSourceSearch("");
          setTargetSearch("");
+         setCommittedSource("");
+         setCommittedTarget("");
          setFoundPaths([]);
          setSearchError(null);
          setVisiblePathsBySource({});
@@ -393,7 +397,9 @@ export default function TrackerSearchApp() {
     const terms = sourceSearch.split(",");
     terms.pop();
     terms.push(selectedItem);
-    setSourceSearch(terms.join(", "));
+    const nextSource = terms.join(", ");
+    setSourceSearch(nextSource);
+    setCommittedSource(nextSource);
     setVisiblePathsBySource({});
     setShowSourceSug(false);
     setSourceActiveIndex(-1);
@@ -401,9 +407,24 @@ export default function TrackerSearchApp() {
 
   const handleTargetSelect = (selectedItem: string) => {
     setTargetSearch(selectedItem);
+    setCommittedTarget(selectedItem);
     setVisiblePathsBySource({});
     setShowTargetSug(false);
     setTargetActiveIndex(-1);
+  };
+
+  const commitSourceSearch = () => {
+    const nextSource = sourceSearch.trim();
+    setSourceSearch(nextSource);
+    setCommittedSource(nextSource);
+    setShowSourceSug(false);
+  };
+
+  const commitTargetSearch = () => {
+    const nextTarget = targetSearch.trim();
+    setTargetSearch(nextTarget);
+    setCommittedTarget(nextTarget);
+    setShowTargetSug(false);
   };
 
   const handleCollectionSelect = (selectedItem: string) => {
@@ -424,7 +445,10 @@ export default function TrackerSearchApp() {
   };
 
   const handleSourceKeyDown = (e: React.KeyboardEvent) => {
-    if (!showSourceSug) return;
+    if (!showSourceSug) {
+      if (e.key === "Enter") commitSourceSearch();
+      return;
+    }
     const suggestions = sourceSuggestions;
     if (suggestions.length === 0) return;
 
@@ -439,11 +463,17 @@ export default function TrackerSearchApp() {
       handleSourceSelect(suggestions[sourceActiveIndex]);
     } else if (e.key === "Escape") {
       setShowSourceSug(false);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      commitSourceSearch();
     }
   };
 
   const handleTargetKeyDown = (e: React.KeyboardEvent) => {
-    if (!showTargetSug) return;
+    if (!showTargetSug) {
+      if (e.key === "Enter") commitTargetSearch();
+      return;
+    }
     const suggestions = targetSuggestions;
     if (suggestions.length === 0) return;
 
@@ -458,6 +488,9 @@ export default function TrackerSearchApp() {
       handleTargetSelect(suggestions[targetActiveIndex]);
     } else if (e.key === "Escape") {
       setShowTargetSug(false);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      commitTargetSearch();
     }
   };
 
@@ -484,8 +517,11 @@ export default function TrackerSearchApp() {
     if (myTrackers.length === 0) return;
     if (isUsingCollection) {
       setSourceSearch("");
+      setCommittedSource("");
     } else {
-      setSourceSearch(myTrackers.join(", "));
+      const nextSource = myTrackers.join(", ");
+      setSourceSearch(nextSource);
+      setCommittedSource(nextSource);
     }
     setVisiblePathsBySource({});
     setShowSourceSug(false);
@@ -1080,7 +1116,7 @@ export default function TrackerSearchApp() {
 
       </div>
 
-      {(sourceSearch || targetSearch) && (
+      {(committedSource || committedTarget) && (
         <div className="mt-12 motion-safe:animate-in fade-in slide-in-from-bottom-8 duration-200">
 
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-foreground/3 border border-foreground/10 rounded-xl p-4 mb-6">
@@ -1428,7 +1464,7 @@ export default function TrackerSearchApp() {
               );
             })}
 
-            {!searchError && !isStale && !isLoading && foundPaths.length === 0 && (sourceSearch || targetSearch) && (
+            {!searchError && !isStale && !isLoading && foundPaths.length === 0 && (committedSource || committedTarget) && (
               <UiState
                 kind="empty"
                 title="No routes found"
