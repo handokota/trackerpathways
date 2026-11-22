@@ -248,6 +248,7 @@
   },
   "routeInfo": {
     "Aither": {
+      "Simurg": { "days": null, "reqs": "Unknown", "active": "Yes", "updated": "Nov 2026" },
       "Anthelion": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
       "BrokenStones": { "days": 0, "reqs": "Prometheus+", "active": "Yes", "updated": "Dec 2025" },
       "Cathode-Ray.Tube": { "days": 365, "reqs": "Prometheus+, 1 year, ratio>=1", "active": "Yes", "updated": "Dec 2025" },
@@ -363,6 +364,7 @@
       "Unwalled": { "days": 0, "reqs": "Pro+", "active": "Yes", "updated": "Dec 2025" }
     },
     "Bibliotik": {
+      "Simurg": { "days": null, "reqs": "Unknown", "active": "Yes", "updated": "Nov 2026" },
       "FileList": { "days": 0, "reqs": "Invite forum access", "active": "No", "updated": "Nov 2024" },
       "LzTr": { "days": 360, "reqs": "12 months", "active": "Yes", "updated": "Nov 2024" },
       "Orpheus": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Nov 2024" },
@@ -436,6 +438,7 @@
       "TeamHD": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Nov 2024" }
     },
     "BrokenStones": {
+      "Simurg": { "days": null, "reqs": "Unknown", "active": "Yes", "updated": "Nov 2026" },
       "inTheShadow": { "days": 0, "reqs": "Elite or higher", "active": "Limited", "updated": "Sep 2026" },
       "LST": { "days": 270, "reqs": "Elite or higher, 9 months", "active": "Yes", "updated": "Sep 2026" },
       "Luminarr": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Jun 2026" },
@@ -739,6 +742,7 @@
       "YuScene": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Aug 2026" }
     },
     "Orpheus": {
+      "Simurg": { "days": null, "reqs": "Unknown", "active": "Yes", "updated": "Nov 2026" },
       "Aither": { "days": 180, "reqs": "6 months", "active": "Yes", "updated": "Feb 2026" },
       "Anthelion": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Feb 2026" },
       "BeyondHD": { "days": 365, "reqs": "250 uploads, 1 year", "active": "Yes", "updated": "Feb 2026" },
@@ -761,6 +765,7 @@
       "Unwalled": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Feb 2026" }
     },
     "PassThePopcorn": {
+      "Simurg": { "days": null, "reqs": "Unknown", "active": "Yes", "updated": "Nov 2026" },
       "Aither": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Nov 2024" },
       "AlphaRatio": { "days": 90, "reqs": "3 months, ratio>1.0", "active": "Yes", "updated": "Nov 2024" },
       "AnimeBytes": { "days": 90, "reqs": "3 months", "active": "Yes", "updated": "Nov 2024" },
@@ -864,6 +869,9 @@
     "RetroMoviesClub": {
       "OldToonsWorld": { "days": 0, "reqs": "Supporting Actor+", "active": "Yes", "updated": "Sep 2026" }
     },
+    "RetroToon": {
+      "Simurg": { "days": null, "reqs": "Unknown", "active": "Yes", "updated": "Nov 2026" }
+    },
     "RocketHD": {
       "AnimeWorld": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Nov 2025" },
       "HomieHelpDesk": { "days": 120, "reqs": "4 months, 5TB upload, 2 additional proofs", "active": "Yes", "updated": "Nov 2025" }
@@ -892,6 +900,9 @@
       "Upload.cx": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Aug 2026" },
       "White Rabbit Network": { "days": 0, "reqs": "Removed", "active": "No", "updated": "Aug 2026" },
       "YuScene": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Aug 2026" }
+    },
+    "Simurg": {
+      "BrokenStones": { "days": null, "reqs": "Unknown", "active": "Yes", "updated": "Nov 2026" }
     },
     "SpeedApp": {
       "RetroFlix": { "days": 0, "reqs": "Login with SpeedApp account", "active": "Yes", "updated": "Jan 2026" }
@@ -924,6 +935,7 @@
       "TLFBits": { "days": 0, "reqs": "Invite forum access", "active": "Yes", "updated": "Jan 2026" }
     },
     "TV-Vault": {
+      "Simurg": { "days": null, "reqs": "Unknown", "active": "Yes", "updated": "Nov 2026" },
       "AlphaRatio": { "days": 90, "reqs": "3 months, ratio>1", "active": "Yes", "updated": "Apr 2025" },
       "Blutopia": { "days": 0, "reqs": "Elite+", "active": "Yes", "updated": "Oct 2025" },
       "Cinemageddon": { "days": 0, "reqs": "Unstated", "active": "Yes", "updated": "Apr 2025" },
