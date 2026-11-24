@@ -156,6 +156,11 @@ export const getStatusColor = (status: string) => {
   return "ui-status-limited";
 };
 
+export const isRouteClosed = (status: string) => {
+  const normalized = status.trim().toLowerCase();
+  return normalized === "no" || normalized === "closed";
+};
+
 export const getStatusLabel = (status: string) => {
   const normalized = status.toLowerCase();
   if (normalized === "yes") {
