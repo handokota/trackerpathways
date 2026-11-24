@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import rawData from "@/data/trackers.json";
 import { DataStructure, PathResult } from "@/types";
+import { isRouteClosed } from "@/lib/officialInvites";
 
 const data = rawData as unknown as DataStructure;
 const MAX_API_JUMPS = 8;
@@ -275,6 +276,10 @@ export async function GET(request: Request) {
     const neighbors = data.routeInfo[currentNode];
     if (neighbors) {
       for (const [nextTracker, details] of Object.entries(neighbors)) {
+        if (isRouteClosed(details.active)) {
+          continue;
+        }
+
         if (startNodeSet.has(nextTracker) && nextTracker.toLowerCase() !== tQuery) {
           continue;
         }

@@ -1,4 +1,5 @@
 import { DataStructure } from "@/types";
+import { isRouteClosed } from "@/lib/officialInvites";
 
 interface GraphNode {
   id: string;
@@ -57,6 +58,10 @@ export function findShortestPath(
     const targets = data.routeInfo[node];
     if (targets) {
       for (const neighbor of Object.keys(targets)) {
+        if (isRouteClosed(targets[neighbor].active)) {
+          continue;
+        }
+
         if (!visited.has(neighbor)) {
           visited.add(neighbor);
           const newPath = [...path, neighbor];
